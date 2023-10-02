@@ -1,4 +1,4 @@
-package org.petmarket.config;
+package config;
 
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletResponse;
