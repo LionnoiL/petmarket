@@ -1,4 +1,4 @@
-package config;
+package org.petmarket.config;
 
 import org.springframework.context.annotation.Configuration;
 
