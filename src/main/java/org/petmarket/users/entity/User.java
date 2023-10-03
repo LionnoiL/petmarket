@@ -2,7 +2,7 @@ package org.petmarket.users.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.petmarket.location.entity.City;
+import org.petmarket.language.entity.Language;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -71,7 +71,9 @@ public class User {
     @JoinColumn(name = "location_id")
     private Location location;
 
-    //TODO language
+    @ManyToOne
+    @JoinColumn(name = "location_id")
+    private Language language;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_roles",
