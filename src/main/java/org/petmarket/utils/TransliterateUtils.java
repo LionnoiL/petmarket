@@ -14,7 +14,6 @@ public class TransliterateUtils {
     public static final Transliterator UA_LATIN_TRANS = Transliterator.getInstance("Ukrainian-Latin/BGN");
     public static final Transliterator RU_LATIN_TRANS = Transliterator.getInstance("ru-ru_Latn/BGN");
 
-
     @PersistenceContext
     EntityManager entityManager;
 
