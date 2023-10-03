@@ -3,11 +3,12 @@ package org.petmarket.users.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.petmarket.language.entity.Language;
+import org.petmarket.location.entity.Location;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.xml.stream.Location;
+
 import java.util.Date;
 import java.util.List;
 
@@ -72,7 +73,7 @@ public class User {
     private Location location;
 
     @ManyToOne
-    @JoinColumn(name = "location_id")
+    @JoinColumn(name = "lang_code")
     private Language language;
 
     @ManyToMany(fetch = FetchType.EAGER)
