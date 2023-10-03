@@ -44,6 +44,12 @@ public class User {
     @Column(name = "last_name")
     private String lastName;
 
+    @Column(name = "google_name")
+    private String googleName;
+
+    @Column(name = "google_user_name")
+    private String googleUserName;
+
     @Column(name = "email")
     private String email;
 
@@ -52,6 +58,14 @@ public class User {
 
     @Column(name = "password")
     private String password;
+
+    @Column(name = "site")
+    private String site;
+
+    @Column(name = "rating")
+    private int rating;
+
+    //TODO location, language
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_roles",
@@ -72,5 +86,17 @@ public class User {
     @Override
     public int hashCode() {
         return id.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", created=" + created +
+                ", updated=" + updated +
+                ", status=" + status +
+                ", username='" + username + '\'' +
+                ", email='" + email + '\'' +
+                '}';
     }
 }

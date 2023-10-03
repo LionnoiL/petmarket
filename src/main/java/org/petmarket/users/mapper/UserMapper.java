@@ -8,7 +8,7 @@ import org.petmarket.users.entity.User;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
-public interface UserDtoMapper {
+public interface UserMapper {
 
     UserResponseDto mapEntityToDto(User entity);
 

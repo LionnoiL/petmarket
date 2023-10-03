@@ -3,7 +3,7 @@ package org.petmarket.users.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.errorhandling.ItemNotFoundException;
-import org.petmarket.users.mapper.UserDtoMapper;
+import org.petmarket.users.mapper.UserMapper;
 import org.petmarket.users.dto.UserRequestDto;
 import org.petmarket.users.dto.UserResponseDto;
 import org.petmarket.users.entity.Role;
@@ -24,7 +24,7 @@ import java.util.List;
 @Service
 public class UserAuthService {
 
-    private final UserDtoMapper userMapper;
+    private final UserMapper userMapper;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
 
