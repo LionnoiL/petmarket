@@ -1,4 +1,4 @@
-package org.petmarket.users.converter;
+package org.petmarket.users.mapper;
 
 import org.mapstruct.Mapper;
 import org.petmarket.users.dto.UserRequestDto;
