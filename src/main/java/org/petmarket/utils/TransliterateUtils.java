@@ -11,15 +11,15 @@ import java.util.List;
 @Service
 public class TransliterateUtils {
 
+    public static final Transliterator UA_LATIN_TRANS = Transliterator.getInstance("Ukrainian-Latin/BGN");
+    public static final Transliterator RU_LATIN_TRANS = Transliterator.getInstance("ru-ru_Latn/BGN");
+
+
     @PersistenceContext
     EntityManager entityManager;
 
     public String getTransliterate(String cyrillicString) {
-        Transliterator uaToLatinTrans = Transliterator.getInstance("Ukrainian-Latin/BGN");
-        Transliterator ruToLatinTrans = Transliterator.getInstance("ru-ru_Latn/BGN");
-
-        String transliterateString = uaToLatinTrans.transliterate(cyrillicString);
-        return ruToLatinTrans.transliterate(transliterateString);
+        return UA_LATIN_TRANS.transliterate(RU_LATIN_TRANS.transliterate(cyrillicString));
     }
 
     public String getAlias(String table, String inputString) {
