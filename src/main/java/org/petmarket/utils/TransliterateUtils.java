@@ -21,22 +21,22 @@ public class TransliterateUtils {
         return UA_LATIN_TRANS.transliterate(RU_LATIN_TRANS.transliterate(cyrillicString));
     }
 
-    public String getAlias(String table, String inputString) {
+    public String getAlias(String entityName, String inputString) {
         if (inputString == null || inputString.isEmpty()) {
             return "";
         }
         String transliterateString = getTransliterate(inputString);
         String result = transliterateString.replaceAll("[^A-Za-zА-Яа-я0-9]", "-");
-        while (checkAlias(table, result)) {
+        while (checkAlias(entityName, result)) {
             result = result + "-" + Helper.getRandomString(3);
         }
         return result;
     }
 
-    public boolean checkAlias(String table, String alias) {
+    public boolean checkAlias(String entityName, String alias) {
         List<Object> result;
         Query q = entityManager.createQuery(
-                "SELECT a FROM " + table + " a WHERE lower(a.alias) LIKE lower(?1)",
+                "SELECT a FROM " + entityName + " a WHERE lower(a.alias) LIKE lower(?1)",
                 Object.class);
         q.setParameter(1, alias);
         result = q.getResultList();
