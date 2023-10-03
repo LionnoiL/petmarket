@@ -23,7 +23,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @RequiredArgsConstructor
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity(securedEnabled = true)
+@EnableMethodSecurity(securedEnabled = true, prePostEnabled = true)
 public class SecurityConfig {
 
     private static final String ADMIN_ENDPOINT = "/v1/admin/**";
@@ -62,6 +62,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers(ALL_PERMITTED_ENDPOINTS).permitAll()
                         .requestMatchers(ADMIN_ENDPOINT).hasRole("ADMIN")
+                        .anyRequest().permitAll()
                 )
                 .exceptionHandling().authenticationEntryPoint(authenticationEntryPointJwt)
                 .and().exceptionHandling().accessDeniedHandler(accessDeniedHandlerJwt)
