@@ -11,11 +11,13 @@ import java.util.List;
 @Service
 public class TransliterateUtils {
 
-    public static final Transliterator UA_LATIN_TRANS = Transliterator.getInstance("Ukrainian-Latin/BGN");
-    public static final Transliterator RU_LATIN_TRANS = Transliterator.getInstance("ru-ru_Latn/BGN");
+    public static final Transliterator UA_LATIN_TRANS = Transliterator.getInstance(
+            "Ukrainian-Latin/BGN");
+    public static final Transliterator RU_LATIN_TRANS = Transliterator.getInstance(
+            "ru-ru_Latn/BGN");
 
     @PersistenceContext
-    EntityManager entityManager;
+    private EntityManager entityManager;
 
     public String getTransliterate(String cyrillicString) {
         return UA_LATIN_TRANS.transliterate(RU_LATIN_TRANS.transliterate(cyrillicString));

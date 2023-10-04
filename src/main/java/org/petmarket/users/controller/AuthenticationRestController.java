@@ -27,7 +27,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-
 @Tag(name = "Authentication", description = "the user authentication API")
 @RequiredArgsConstructor
 @RestController
@@ -41,11 +40,14 @@ public class AuthenticationRestController {
 
     @Operation(summary = "Login in and returns the authentication token")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully authenticated", content = {
-                    @Content(mediaType = "application/json", schema =
-                    @Schema(implementation = JwtResponseDto.class))
-            }),
-            @ApiResponse(responseCode = "400", description = "It indicates that the server can not or will not process the request due to an apparent client error",
+            @ApiResponse(responseCode = "200", description = "Successfully authenticated",
+                    content = {
+                            @Content(mediaType = "application/json", schema =
+                            @Schema(implementation = JwtResponseDto.class))
+                    }),
+            @ApiResponse(responseCode = "400",
+                    description = "It indicates that the server can not or will not process" +
+                            " the request due to an apparent client error",
                     content = {
                             @Content(mediaType = "application/json", schema =
                             @Schema(implementation = ErrorResponse.class))
@@ -55,7 +57,8 @@ public class AuthenticationRestController {
     public ResponseEntity login(@RequestBody AuthenticationRequestDto requestDto) {
         try {
             String username = requestDto.getEmail();
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, requestDto.getPassword()));
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(username, requestDto.getPassword()));
             User user = userService.findByUsername(username);
 
             if (user == null) {
@@ -72,7 +75,8 @@ public class AuthenticationRestController {
         }
     }
 
-    @Operation(summary = "User Registration", description = "The user registration API creates a user account in application")
+    @Operation(summary = "User Registration",
+            description = "The user registration API creates a user account in application")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful operation"),
             @ApiResponse(responseCode = "400", description = "The User has already been added " +
@@ -83,7 +87,8 @@ public class AuthenticationRestController {
                     })
     })
     @PostMapping("register")
-    public ResponseEntity register(@RequestBody UserRequestDto requestDto, BindingResult bindingResult) {
+    public ResponseEntity register(@RequestBody UserRequestDto requestDto,
+                                   BindingResult bindingResult) {
         userAuthService.register(requestDto, bindingResult);
         return ResponseEntity.ok().build();
     }
