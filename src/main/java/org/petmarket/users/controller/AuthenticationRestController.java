@@ -6,8 +6,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.petmarket.errorhandling.ErrorResponse;
+import org.petmarket.errorhandling.ItemNotCreatedException;
 import org.petmarket.security.jwt.AuthenticationRequestDto;
 import org.petmarket.security.jwt.JwtResponseDto;
 import org.petmarket.security.jwt.JwtTokenProvider;
@@ -15,6 +17,7 @@ import org.petmarket.users.dto.UserRequestDto;
 import org.petmarket.users.entity.User;
 import org.petmarket.users.service.UserAuthService;
 import org.petmarket.users.service.UserService;
+import org.petmarket.utils.ErrorUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -27,6 +30,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.security.auth.login.LoginException;
+
 
 @Tag(name = "Authentication", description = "the user authentication API")
 @RequiredArgsConstructor
@@ -38,6 +43,7 @@ public class AuthenticationRestController {
     private final JwtTokenProvider jwtTokenProvider;
     private final UserService userService;
     private final UserAuthService userAuthService;
+    private final ErrorUtils errorUtils;
 
     @Operation(summary = "Login in and returns the authentication token")
     @ApiResponses(value = {
@@ -52,7 +58,11 @@ public class AuthenticationRestController {
                     })
     })
     @PostMapping("login")
-    public ResponseEntity login(@RequestBody AuthenticationRequestDto requestDto) {
+    public ResponseEntity login(@Valid @RequestBody AuthenticationRequestDto requestDto, BindingResult bindingResult) throws LoginException {
+        if (bindingResult.hasErrors()) {
+            throw new LoginException(errorUtils.getErrorsString(bindingResult));
+        }
+
         try {
             String username = requestDto.getEmail();
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, requestDto.getPassword()));
@@ -83,7 +93,7 @@ public class AuthenticationRestController {
                     })
     })
     @PostMapping("register")
-    public ResponseEntity register(@RequestBody UserRequestDto requestDto, BindingResult bindingResult) {
+    public ResponseEntity register(@Valid @RequestBody UserRequestDto requestDto, BindingResult bindingResult) {
         userAuthService.register(requestDto, bindingResult);
         return ResponseEntity.ok().build();
     }

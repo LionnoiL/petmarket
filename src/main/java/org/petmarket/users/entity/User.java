@@ -1,13 +1,13 @@
 package org.petmarket.users.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import lombok.*;
 import org.petmarket.language.entity.Language;
 import org.petmarket.location.entity.Location;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
 
 import java.util.Date;
 import java.util.List;
@@ -65,6 +65,7 @@ public class User {
     @Column(name = "site")
     private String site;
 
+    @Min(0)
     @Column(name = "rating")
     private int rating;
 
