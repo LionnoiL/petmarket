@@ -4,6 +4,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.errorhandling.ItemNotCreatedException;
 import org.petmarket.errorhandling.ItemNotFoundException;
+import org.petmarket.errorhandling.LoginException;
+import org.petmarket.security.jwt.JwtResponseDto;
+import org.petmarket.security.jwt.JwtTokenProvider;
 import org.petmarket.users.dto.UserRequestDto;
 import org.petmarket.users.dto.UserResponseDto;
 import org.petmarket.users.entity.Role;
@@ -14,6 +17,12 @@ import org.petmarket.users.repository.RoleRepository;
 import org.petmarket.users.repository.UserRepository;
 import org.petmarket.utils.ErrorUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
@@ -30,6 +39,9 @@ public class UserAuthService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final ErrorUtils errorUtils;
+    private final AuthenticationManager authenticationManager;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final UserService userService;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -54,5 +66,30 @@ public class UserAuthService {
         User registeredUser = userRepository.save(user);
 
         return userMapper.mapEntityToDto(registeredUser);
+    }
+
+    public ResponseEntity<JwtResponseDto> login(UserRequestDto requestDto, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            throw new LoginException(errorUtils.getErrorsString(bindingResult));
+        }
+
+        try {
+            String username = requestDto.getEmail();
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(username, requestDto.getPassword()));
+            User user = userService.findByUsername(username);
+
+            if (user == null) {
+                throw new UsernameNotFoundException("User with email: " + username + " not found");
+            }
+
+            String token = jwtTokenProvider.createToken(username, user.getRoles());
+
+            JwtResponseDto response = new JwtResponseDto(username, token);
+
+            return ResponseEntity.ok(response);
+        } catch (AuthenticationException e) {
+            throw new BadCredentialsException("Invalid email or password");
+        }
     }
 }

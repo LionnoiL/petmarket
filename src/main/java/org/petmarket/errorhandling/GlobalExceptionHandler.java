@@ -22,7 +22,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(LoginException.class)
     private ResponseEntity<ErrorResponse> handleException(LoginException exception) {
         ErrorResponse response = new ErrorResponse(
-                "Login failed",
+                exception.getMessage(),
                 System.currentTimeMillis()
         );
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
