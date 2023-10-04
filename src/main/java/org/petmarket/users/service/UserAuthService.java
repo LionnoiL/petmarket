@@ -1,16 +1,15 @@
 package org.petmarket.users.service;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.errorhandling.ItemNotCreatedException;
 import org.petmarket.errorhandling.ItemNotFoundException;
-import org.petmarket.users.mapper.UserMapper;
 import org.petmarket.users.dto.UserRequestDto;
 import org.petmarket.users.dto.UserResponseDto;
 import org.petmarket.users.entity.Role;
 import org.petmarket.users.entity.User;
 import org.petmarket.users.entity.UserStatus;
+import org.petmarket.users.mapper.UserMapper;
 import org.petmarket.users.repository.RoleRepository;
 import org.petmarket.users.repository.UserRepository;
 import org.petmarket.utils.ErrorUtils;
