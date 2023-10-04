@@ -12,18 +12,18 @@ import org.springframework.context.annotation.Configuration;
 public class SwaggerConfig {
 
     @Bean
-    public OpenAPI openAPI() {
-        return new OpenAPI().addSecurityItem(new SecurityRequirement().
-                        addList("Bearer Authentication"))
-                .components(new Components().addSecuritySchemes
-                        ("Bearer Authentication", createAPIKeyScheme()))
+    public OpenAPI openApi() {
+        return new OpenAPI().addSecurityItem(new SecurityRequirement()
+                        .addList("Bearer Authentication"))
+                .components(new Components().addSecuritySchemes(
+                        "Bearer Authentication", createApiKeyScheme()))
                 .info(new Info().title("Team Challenge PetMarket marketplace")
                         .description("PetMarket API.")
                         .version("1.0")
                 );
     }
 
-    private SecurityScheme createAPIKeyScheme() {
+    private SecurityScheme createApiKeyScheme() {
         return new SecurityScheme().type(SecurityScheme.Type.HTTP)
                 .bearerFormat("JWT")
                 .scheme("bearer");

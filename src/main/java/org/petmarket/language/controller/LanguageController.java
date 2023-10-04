@@ -31,7 +31,8 @@ public class LanguageController {
             @ApiResponse(responseCode = "200", description = "Successful operation", content = {
                     @Content(
                             mediaType = "application/json",
-                            array = @ArraySchema(schema = @Schema(implementation = LanguageResponseDto.class))
+                            array = @ArraySchema(schema = @Schema(
+                                    implementation = LanguageResponseDto.class))
                     )
             })
     })

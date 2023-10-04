@@ -43,6 +43,7 @@ public class SecurityConfig {
             // -- Swagger UI v3 (OpenAPI)
             "/v3/api-docs/**",
             "/swagger-ui/**",
+            "/v1/blog/categories/**"
     };
     private final JwtTokenProvider jwtTokenProvider;
     @Autowired

@@ -14,13 +14,16 @@ import java.io.IOException;
 @Component
 public class AuthenticationEntryPointJwt implements AuthenticationEntryPoint {
     @Override
-    public void commence(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, AuthenticationException authenticationException) throws IOException {
+    public void commence(HttpServletRequest httpServletRequest,
+                         HttpServletResponse httpServletResponse,
+                         AuthenticationException authenticationException) throws IOException {
 
         httpServletResponse.setContentType(MediaType.APPLICATION_JSON_VALUE);
         httpServletResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
         ErrorResponse response = new ErrorResponse(
-                "You need to login first in order to perform this action.", System.currentTimeMillis()
+                "You need to login first in order to perform this action.",
+                System.currentTimeMillis()
         );
 
         final ObjectMapper mapper = new ObjectMapper();

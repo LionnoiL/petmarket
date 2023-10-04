@@ -9,7 +9,6 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
-
     UserResponseDto mapEntityToDto(User entity);
 
     User mapDtoRequestToDto(UserRequestDto dto);
