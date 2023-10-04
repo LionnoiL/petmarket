@@ -9,7 +9,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.petmarket.errorhandling.ErrorResponse;
-import org.petmarket.errorhandling.ItemNotCreatedException;
 import org.petmarket.security.jwt.AuthenticationRequestDto;
 import org.petmarket.security.jwt.JwtResponseDto;
 import org.petmarket.security.jwt.JwtTokenProvider;
