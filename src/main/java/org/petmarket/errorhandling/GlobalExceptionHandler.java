@@ -73,7 +73,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler
-    private ResponseEntity<ErrorResponse> handleException(SQLIntegrityConstraintViolationException exception) {
+    private ResponseEntity<ErrorResponse> handleException(
+            SQLIntegrityConstraintViolationException exception) {
         ErrorResponse response = new ErrorResponse(
                 exception.getMessage(), System.currentTimeMillis()
         );
@@ -89,9 +90,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @Override
-    protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException exception,
-                                                                  HttpHeaders headers, HttpStatusCode status,
-                                                                  WebRequest request) {
+    protected ResponseEntity<Object> handleHttpMessageNotReadable(
+            HttpMessageNotReadableException exception,
+            HttpHeaders headers, HttpStatusCode status,
+            WebRequest request) {
         ErrorResponse response = new ErrorResponse(
                 exception.getMessage(), System.currentTimeMillis()
         );

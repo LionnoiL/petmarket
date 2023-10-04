@@ -20,7 +20,8 @@ public class JwtResponseDto {
         return email;
     }
 
-    @Schema(example = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBlbWFpbC5jb20iLCJyb2xlcyI6WyJST0xFX0FETUlOIl0sImlhdCI" +
+    @Schema(example = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBlbWFp" +
+            "bC5jb20iLCJyb2xlcyI6WyJST0xFX0FETUlOIl0sImlhdCI" +
             "6MTY5MjAyMTE4NywiZXhwIjoxNjkyMDI0Nzg3fQ.cDhtb3UzxzYR3gPeIgCOTSaum-Z-yYHyF4VvhF0ND6M",
             description = "Authenticated user token")
     public String getToken() {
