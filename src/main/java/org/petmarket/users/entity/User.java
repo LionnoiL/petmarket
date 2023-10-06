@@ -47,12 +47,6 @@ public class User {
     @Column(name = "last_name")
     private String lastName;
 
-    @Column(name = "google_name")
-    private String googleName;
-
-    @Column(name = "google_user_name")
-    private String googleUserName;
-
     @Column(name = "email")
     private String email;
 
@@ -76,6 +70,10 @@ public class User {
     @ManyToOne
     @JoinColumn(name = "lang_code")
     private Language language;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "login_provider")
+    private LoginProvider loginProvider;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_roles",

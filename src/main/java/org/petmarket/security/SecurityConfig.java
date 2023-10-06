@@ -5,6 +5,7 @@ import org.petmarket.security.jwt.AccessDeniedHandlerJwt;
 import org.petmarket.security.jwt.AuthenticationEntryPointJwt;
 import org.petmarket.security.jwt.JwtConfigure;
 import org.petmarket.security.jwt.JwtTokenProvider;
+import org.petmarket.security.oauth.OAuth2LoginSuccessHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,11 +28,8 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     private static final String ADMIN_ENDPOINT = "/v1/admin/**";
-    private static final String LOGIN_ENDPOINT = "/v1/auth/login";
-    private static final String REGISTER_ENDPOINT = "/v1/auth/register";
     private static final String[] ALL_PERMITTED_ENDPOINTS = {
-            LOGIN_ENDPOINT,
-            REGISTER_ENDPOINT,
+            "/oauth2/**",
             // -- Swagger UI v2
             "/v2/api-docs",
             "/swagger-resources",
@@ -52,9 +50,14 @@ public class SecurityConfig {
     private AuthenticationEntryPointJwt authenticationEntryPointJwt;
     @Autowired
     private AccessDeniedHandlerJwt accessDeniedHandlerJwt;
+    @Autowired
+    private OAuth2LoginSuccessHandler loginSuccessHandler;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+
+        http
+                .oauth2Login(oath2 -> oath2.successHandler(loginSuccessHandler));
 
         http.cors().disable().csrf()
                 .disable()

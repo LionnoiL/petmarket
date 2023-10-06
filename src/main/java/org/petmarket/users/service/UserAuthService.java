@@ -9,6 +9,7 @@ import org.petmarket.security.jwt.JwtResponseDto;
 import org.petmarket.security.jwt.JwtTokenProvider;
 import org.petmarket.users.dto.UserRequestDto;
 import org.petmarket.users.dto.UserResponseDto;
+import org.petmarket.users.entity.LoginProvider;
 import org.petmarket.users.entity.Role;
 import org.petmarket.users.entity.User;
 import org.petmarket.users.entity.UserStatus;
@@ -62,6 +63,7 @@ public class UserAuthService {
         user.setRoles(userRoles);
         user.setStatus(UserStatus.ACTIVE);
         user.setId(null);
+        user.setLoginProvider(LoginProvider.LOCAL);
 
         User registeredUser = userRepository.save(user);
 
