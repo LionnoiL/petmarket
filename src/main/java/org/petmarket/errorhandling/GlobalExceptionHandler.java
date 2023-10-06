@@ -19,6 +19,15 @@ import java.sql.SQLIntegrityConstraintViolationException;
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
+    @ExceptionHandler(LoginException.class)
+    private ResponseEntity<ErrorResponse> handleException(LoginException exception) {
+        ErrorResponse response = new ErrorResponse(
+                exception.getMessage(),
+                System.currentTimeMillis()
+        );
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(BadCredentialsException.class)
     private ResponseEntity<ErrorResponse> handleException(BadCredentialsException exception) {
         ErrorResponse response = new ErrorResponse(

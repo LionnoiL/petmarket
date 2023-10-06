@@ -2,16 +2,28 @@ package org.petmarket.users.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.petmarket.errorhandling.ItemNotCreatedException;
 import org.petmarket.errorhandling.ItemNotFoundException;
-import org.petmarket.users.mapper.UserMapper;
+import org.petmarket.errorhandling.LoginException;
+import org.petmarket.security.jwt.JwtResponseDto;
+import org.petmarket.security.jwt.JwtTokenProvider;
 import org.petmarket.users.dto.UserRequestDto;
 import org.petmarket.users.dto.UserResponseDto;
+import org.petmarket.users.entity.LoginProvider;
 import org.petmarket.users.entity.Role;
 import org.petmarket.users.entity.User;
 import org.petmarket.users.entity.UserStatus;
+import org.petmarket.users.mapper.UserMapper;
 import org.petmarket.users.repository.RoleRepository;
 import org.petmarket.users.repository.UserRepository;
+import org.petmarket.utils.ErrorUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
@@ -27,11 +39,18 @@ public class UserAuthService {
     private final UserMapper userMapper;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final ErrorUtils errorUtils;
+    private final AuthenticationManager authenticationManager;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final UserService userService;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
 
     public UserResponseDto register(UserRequestDto userRequestDto, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            throw new ItemNotCreatedException(errorUtils.getErrorsString(bindingResult));
+        }
 
         User user = userMapper.mapDtoRequestToDto(userRequestDto);
         Role roleUser = roleRepository.findByName("ROLE_USER").orElseThrow(() -> {
@@ -44,9 +63,35 @@ public class UserAuthService {
         user.setRoles(userRoles);
         user.setStatus(UserStatus.ACTIVE);
         user.setId(null);
+        user.setLoginProvider(LoginProvider.LOCAL);
 
         User registeredUser = userRepository.save(user);
 
         return userMapper.mapEntityToDto(registeredUser);
+    }
+
+    public ResponseEntity<JwtResponseDto> login(UserRequestDto requestDto, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            throw new LoginException(errorUtils.getErrorsString(bindingResult));
+        }
+
+        try {
+            String username = requestDto.getEmail();
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(username, requestDto.getPassword()));
+            User user = userService.findByUsername(username);
+
+            if (user == null) {
+                throw new UsernameNotFoundException("User with email: " + username + " not found");
+            }
+
+            String token = jwtTokenProvider.createToken(username, user.getRoles());
+
+            JwtResponseDto response = new JwtResponseDto(username, token);
+
+            return ResponseEntity.ok(response);
+        } catch (AuthenticationException e) {
+            throw new BadCredentialsException("Invalid email or password");
+        }
     }
 }

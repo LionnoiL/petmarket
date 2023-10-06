@@ -1,12 +1,14 @@
 package org.petmarket.users.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import lombok.*;
 import org.petmarket.language.entity.Language;
 import org.petmarket.location.entity.Location;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import java.util.Date;
 import java.util.List;
 
@@ -45,12 +47,6 @@ public class User {
     @Column(name = "last_name")
     private String lastName;
 
-    @Column(name = "google_name")
-    private String googleName;
-
-    @Column(name = "google_user_name")
-    private String googleUserName;
-
     @Column(name = "email")
     private String email;
 
@@ -63,6 +59,7 @@ public class User {
     @Column(name = "site")
     private String site;
 
+    @Min(0)
     @Column(name = "rating")
     private int rating;
 
@@ -73,6 +70,10 @@ public class User {
     @ManyToOne
     @JoinColumn(name = "lang_code")
     private Language language;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "login_provider")
+    private LoginProvider loginProvider;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_roles",
@@ -88,7 +89,6 @@ public class User {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-
         User user = (User) o;
 
         return id.equals(user.id);
