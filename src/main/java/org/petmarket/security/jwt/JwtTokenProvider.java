@@ -1,8 +1,16 @@
 package org.petmarket.security.jwt;
 
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.Date;
+import java.util.List;
 import org.petmarket.users.entity.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,11 +22,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.Date;
-import java.util.List;
-
 @Component
 public class JwtTokenProvider {
 
@@ -27,7 +30,9 @@ public class JwtTokenProvider {
     @Value("${jwt.token.secret}")
     private String secret;
     @Value("${jwt.token.expired}")
-    private long validityInMilliseconds;
+    private long validityAccessTokenInMilliseconds;
+    @Value("${jwt.refresh-token.expired}")
+    private long validityRefreshTokenInMilliseconds;
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -42,23 +47,41 @@ public class JwtTokenProvider {
     public Authentication getAuthentication(String token) {
         UserDetails userDetails = this.userDetailsService.loadUserByUsername(getUsername(token));
         return new UsernamePasswordAuthenticationToken(userDetails,
-                "", userDetails.getAuthorities());
+            "", userDetails.getAuthorities());
     }
 
     public String createToken(String username, List<Role> roles) {
 
         Claims claims = Jwts.claims().setSubject(username);
         claims.put("roles", getRoleNames(roles));
+        claims.put("access", true);
 
         Date now = new Date();
-        Date validity = new Date(now.getTime() + validityInMilliseconds);
+        Date validity = new Date(now.getTime() + validityAccessTokenInMilliseconds);
 
         return Jwts.builder()
-                .setClaims(claims)
-                .setIssuedAt(now)
-                .setExpiration(validity)
-                .signWith(SignatureAlgorithm.HS256, secret)
-                .compact();
+            .setClaims(claims)
+            .setIssuedAt(now)
+            .setExpiration(validity)
+            .signWith(SignatureAlgorithm.HS256, secret)
+            .compact();
+    }
+
+    public String createRefreshToken(String username, List<Role> roles) {
+
+        Claims claims = Jwts.claims().setSubject(username);
+        claims.put("roles", getRoleNames(roles));
+        claims.put("access", false);
+
+        Date now = new Date();
+        Date validity = new Date(now.getTime() + validityRefreshTokenInMilliseconds);
+
+        return Jwts.builder()
+            .setClaims(claims)
+            .setIssuedAt(now)
+            .setExpiration(validity)
+            .signWith(SignatureAlgorithm.HS256, secret)
+            .compact();
     }
 
     public String resolveToken(HttpServletRequest req) {
@@ -69,12 +92,19 @@ public class JwtTokenProvider {
         return null;
     }
 
-    public boolean validateToken(String token) {
+    public boolean validateToken(String token, boolean isAccessToken) {
         try {
             Jws<Claims> claims = Jwts.parser().setSigningKey(secret).parseClaimsJws(token);
             if (claims.getBody().getExpiration().before(new Date())) {
                 return false;
             }
+
+            if (isAccessToken) {
+                if (!claims.getBody().get("access", Boolean.class)) {
+                    return false;
+                }
+            }
+
             return true;
         } catch (JwtException | IllegalArgumentException e) {
             return false;

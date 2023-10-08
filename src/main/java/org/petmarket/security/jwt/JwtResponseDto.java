@@ -13,7 +13,8 @@ import lombok.Setter;
 public class JwtResponseDto {
 
     private String email;
-    private String token;
+    private String accessToken;
+    private String refreshToken;
 
     @Schema(example = "andriy@mail.com", description = "Authenticated user email")
     public String getEmail() {
@@ -24,7 +25,11 @@ public class JwtResponseDto {
             "bC5jb20iLCJyb2xlcyI6WyJST0xFX0FETUlOIl0sImlhdCI" +
             "6MTY5MjAyMTE4NywiZXhwIjoxNjkyMDI0Nzg3fQ.cDhtb3UzxzYR3gPeIgCOTSaum-Z-yYHyF4VvhF0ND6M",
             description = "Authenticated user token")
-    public String getToken() {
-        return token;
+    public String getAccessToken() {
+        return accessToken;
+    }
+
+    public String getRefreshToken() {
+        return refreshToken;
     }
 }
