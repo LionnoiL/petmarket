@@ -29,19 +29,19 @@ public class SecurityConfig {
 
     private static final String ADMIN_ENDPOINT = "/v1/admin/**";
     private static final String[] ALL_PERMITTED_ENDPOINTS = {
-            "/oauth2/**",
-            // -- Swagger UI v2
-            "/v2/api-docs",
-            "/swagger-resources",
-            "/swagger-resources/**",
-            "/configuration/ui",
-            "/configuration/security",
-            "/swagger-ui.html",
-            "/webjars/**",
-            // -- Swagger UI v3 (OpenAPI)
-            "/v3/api-docs/**",
-            "/swagger-ui/**",
-            "/v1/blog/categories/**"
+        "/oauth2/**",
+        // -- Swagger UI v2
+        "/v2/api-docs",
+        "/swagger-resources",
+        "/swagger-resources/**",
+        "/configuration/ui",
+        "/configuration/security",
+        "/swagger-ui.html",
+        "/webjars/**",
+        // -- Swagger UI v3 (OpenAPI)
+        "/v3/api-docs/**",
+        "/swagger-ui/**",
+        "/v1/blog/categories/**"
     };
     private final JwtTokenProvider jwtTokenProvider;
     @Autowired
@@ -57,21 +57,21 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
-                .oauth2Login(oath2 -> oath2.successHandler(loginSuccessHandler));
+            .oauth2Login(oath2 -> oath2.successHandler(loginSuccessHandler));
 
         http.cors().disable().csrf()
-                .disable()
-                .httpBasic().disable()
-                .formLogin().disable()
-                .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers(ALL_PERMITTED_ENDPOINTS).permitAll()
-                        .requestMatchers(ADMIN_ENDPOINT).hasRole("ADMIN")
-                        .anyRequest().permitAll()
-                )
-                .exceptionHandling().authenticationEntryPoint(authenticationEntryPointJwt)
-                .and().exceptionHandling().accessDeniedHandler(accessDeniedHandlerJwt)
-                .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and().apply(new JwtConfigure(jwtTokenProvider))
+            .disable()
+            .httpBasic().disable()
+            .formLogin().disable()
+            .authorizeHttpRequests((authorize) -> authorize
+                .requestMatchers(ALL_PERMITTED_ENDPOINTS).permitAll()
+                .requestMatchers(ADMIN_ENDPOINT).hasRole("ADMIN")
+                .anyRequest().permitAll()
+            )
+            .exceptionHandling().authenticationEntryPoint(authenticationEntryPointJwt)
+            .and().exceptionHandling().accessDeniedHandler(accessDeniedHandlerJwt)
+            .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .and().apply(new JwtConfigure(jwtTokenProvider))
         ;
 
         return http.build();
@@ -93,7 +93,7 @@ public class SecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
         return http.getSharedObject(AuthenticationManagerBuilder.class)
-                .authenticationProvider(authProvider())
-                .build();
+            .authenticationProvider(authProvider())
+            .build();
     }
 }

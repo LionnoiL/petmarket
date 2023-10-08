@@ -85,7 +85,9 @@ public class OAuth2LoginSuccessHandler extends SavedRequestAwareAuthenticationSu
         }
 
         String token = jwtTokenProvider.createToken(email, user.getRoles());
-        JwtResponseDto jwtResponseDto = new JwtResponseDto(email, token);
+        String refreshToken = jwtTokenProvider.createRefreshToken(email, user.getRoles());
+        JwtResponseDto jwtResponseDto = new JwtResponseDto(email, token, refreshToken);
+
         ObjectMapper mapper = new ObjectMapper();
 
         response.setStatus(HttpServletResponse.SC_OK);

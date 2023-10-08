@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.petmarket.errorhandling.ErrorResponse;
@@ -29,37 +30,45 @@ public class AuthenticationRestController {
 
     @Operation(summary = "Login in and returns the authentication token")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully authenticated", content = {
-                    @Content(mediaType = "application/json", schema =
-                    @Schema(implementation = JwtResponseDto.class))
-            }),
-            @ApiResponse(responseCode = "400", description = "It indicates that the server can not or will " +
-                    "not process the request due to an apparent client error",
-                    content = {
-                            @Content(mediaType = "application/json", schema =
-                            @Schema(implementation = ErrorResponse.class))
-                    })
+        @ApiResponse(responseCode = "200", description = "Successfully authenticated", content = {
+            @Content(mediaType = "application/json", schema =
+            @Schema(implementation = JwtResponseDto.class))
+        }),
+        @ApiResponse(responseCode = "400", description =
+            "It indicates that the server can not or will " +
+                "not process the request due to an apparent client error",
+            content = {
+                @Content(mediaType = "application/json", schema =
+                @Schema(implementation = ErrorResponse.class))
+            })
     })
     @PostMapping("login")
-    public ResponseEntity login(@Valid @RequestBody UserRequestDto requestDto, BindingResult bindingResult) {
+    public ResponseEntity login(@Valid @RequestBody UserRequestDto requestDto,
+        BindingResult bindingResult) {
         return userAuthService.login(requestDto, bindingResult);
     }
 
     @Operation(summary = "User Registration",
-            description = "The user registration API creates a user account in application")
+        description = "The user registration API creates a user account in application")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successful operation"),
-            @ApiResponse(responseCode = "400", description = "The User has already been added " +
-                    "or some data is missing",
-                    content = {
-                            @Content(mediaType = "application/json", schema =
-                            @Schema(implementation = ErrorResponse.class))
-                    })
+        @ApiResponse(responseCode = "200", description = "Successful operation"),
+        @ApiResponse(responseCode = "400", description = "The User has already been added " +
+            "or some data is missing",
+            content = {
+                @Content(mediaType = "application/json", schema =
+                @Schema(implementation = ErrorResponse.class))
+            })
     })
     @PostMapping("register")
     public ResponseEntity register(@Valid @RequestBody UserRequestDto requestDto,
-                                   BindingResult bindingResult) {
+        BindingResult bindingResult) {
         userAuthService.register(requestDto, bindingResult);
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/refresh")
+    @Operation(summary = "Refresh token")
+    public ResponseEntity<JwtResponseDto> refreshToken(HttpServletRequest request) {
+        return userAuthService.refreshToken(request);
     }
 }
