@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.language.repository.LanguageRepository;
 import org.petmarket.users.entity.User;
+import org.petmarket.utils.Helper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -22,22 +23,29 @@ import java.util.Map;
 public class EmailService implements NotificationService {
 
     private final JavaMailSender emailSender;
-
+    private LanguageRepository languageRepository;
     @Autowired
     private SpringTemplateEngine templateEngine;
-
     @Value("${spring.mail.username}")
     private String emailFrom;
-    private LanguageRepository languageRepository;
+    @Value("${site.name}")
+    private String siteName;
 
     @Override
     public void send(NotificationType type, Map<String, Object> fields, User user) {
         log.info("send message to {} with text: {}", user.getEmail(), fields.get("link"));
+
+        fields.put("mailtoLink", "mailto:" + emailFrom);
+        fields.put("email", emailFrom);
+        fields.put("footer", "© " + Helper.getCurrentYear() + " " + siteName);
+
         String templateName = getTemplateName(type, user);
 
         switch (type) {
             case RESET_PASSWORD -> sendEmailMessage("Запит на зміну паролю", templateName, fields, user);
-            case CHANGE_PASSWORD -> sendEmailMessage("Ви успішно змінили пароль", templateName, fields, user);
+            case CHANGE_PASSWORD -> {
+                sendEmailMessage("Ви успішно змінили пароль", templateName, fields, user);
+            }
             default -> log.info("error sending mail to {}", user.getEmail());
         }
     }
