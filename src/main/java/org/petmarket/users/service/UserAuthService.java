@@ -1,6 +1,7 @@
 package org.petmarket.users.service;
 
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.errorhandling.ItemNotCreatedException;
@@ -138,9 +139,9 @@ public class UserAuthService {
         user.setEmailConfirmCode(UUID.randomUUID().toString());
         userRepository.save(user);
 
-        Map<String, Object> fields = Map.of(
-                "link", constructUrlForResetPasswordEmailMessage(user)
-        );
+        Map<String, Object> fields = new HashMap<>();
+        fields.put("link", constructUrlForResetPasswordEmailMessage(user));
+
         emailService.send(NotificationType.RESET_PASSWORD, fields, user);
     }
 
@@ -162,10 +163,11 @@ public class UserAuthService {
         user.setPassword(passwordEncoder.encode(resetPasswordRequestDto.getNewPassword()));
         user.setEmailConfirmCode("");
         userRepository.save(user);
-        Map<String, Object> fields = Map.of(
-                "message", "Ви успішно змінили пароль.",
-                "link", baseSiteUrl
-        );
+
+        Map<String, Object> fields = new HashMap<>();
+        fields.put("message", "Ви успішно змінили пароль.");
+        fields.put("link", constructUrlForResetPasswordEmailMessage(user));
+
         emailService.send(NotificationType.CHANGE_PASSWORD, fields, user);
     }
 }
