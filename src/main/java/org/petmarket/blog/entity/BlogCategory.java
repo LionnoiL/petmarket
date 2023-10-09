@@ -10,11 +10,11 @@ import java.util.List;
 @Getter
 @Setter
 @Table(name = "blog_categories")
-public class Category {
+public class BlogCategory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "blogCategory", cascade = CascadeType.ALL)
     private List<CategoryTranslation> translations = new ArrayList<>();
 
     /*@Enumerated(EnumType.STRING)
@@ -26,8 +26,9 @@ public class Category {
 
     @Override
     public String toString() {
-        return "Category{"
-                + "id=" + id
-                + '}';
+        return "BlogCategory{" +
+                "id=" + id +
+                ", translations=" + translations +
+                '}';
     }
 }

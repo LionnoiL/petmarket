@@ -1,13 +1,15 @@
 package org.petmarket.blog.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.petmarket.users.entity.User;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -23,15 +25,29 @@ public class Post {
     private User user;
     @CreatedDate
     @Column(name = "created")
-    private Date created;
+    private LocalDateTime created;
     @LastModifiedDate
     @Column(name = "updated")
-    private Date updated;
+    private LocalDateTime updated;
+
+    @Column(name = "reading_minutes")
+    private int readingMinutes;
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private Status status;
     @ManyToMany
     @JoinTable(name = "post_categories",
             joinColumns = @JoinColumn(name = "post_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id"))
-    private List<Category> categories;
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    private List<BlogCategory> categories = new ArrayList<>();
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "post", cascade = CascadeType.ALL)
     private List<PostTranslations> translations = new ArrayList<>();
+
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "post", cascade = CascadeType.REMOVE)
+    private List<BlogComment> comments = new ArrayList<>();
+
+    public enum Status {
+        PUBLISHED, DRAFT
+    }
 }

@@ -2,7 +2,7 @@ package org.petmarket.blog.service.impl;
 
 import org.petmarket.blog.dto.category.BlogPostCategoryRequestDto;
 import org.petmarket.blog.dto.category.BlogPostCategoryResponseDto;
-import org.petmarket.blog.entity.Category;
+import org.petmarket.blog.entity.BlogCategory;
 import org.petmarket.blog.entity.CategoryTranslation;
 import org.petmarket.blog.mapper.CategoryMapper;
 import org.petmarket.blog.repository.CategoryRepository;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
@@ -26,60 +26,58 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public BlogPostCategoryResponseDto save(BlogPostCategoryRequestDto blogPostCategoryRequestDto) {
-        return null;
+    public BlogPostCategoryResponseDto save(BlogPostCategoryRequestDto requestDto,
+                                            String langCode) {
+        BlogCategory blogCategory = new BlogCategory();
+        List<CategoryTranslation> translations = new ArrayList<>();
+        translations.add(createTranslation(requestDto, langCode, blogCategory));
+        blogCategory.setTranslations(translations);
+        categoryRepository.save(blogCategory);
+        return mapper.categoryToDto(blogCategory, langCode);
     }
 
     @Override
-    public BlogPostCategoryResponseDto get(Long id) {
-        return null;
+    public BlogPostCategoryResponseDto get(Long id, String langCode) {
+        return mapper.categoryToDto(getBlogCategory(id), langCode);
     }
 
     @Override
-    public List<BlogPostCategoryResponseDto> getAll(Pageable pageable) {
-        return null;
+    public List<BlogPostCategoryResponseDto> getAll(Pageable pageable, String langCode) {
+        return categoryRepository.findAll().stream()
+                .map(category -> mapper.categoryToDto(category, langCode))
+                .collect(Collectors.toList());
     }
 
     @Override
     public void delete(Long id) {
-
+        categoryRepository.deleteById(id);
     }
 
     @Override
     public BlogPostCategoryResponseDto updateById(
-            Long id, BlogPostCategoryRequestDto blogPostCategoryRequestDto) {
-        return null;
-    }
-
-    @Override
-    public BlogPostCategoryResponseDto saveWithLang(BlogPostCategoryRequestDto requestDto,
-                                                    String langCode) {
-
-        Category category = new Category();
-        CategoryTranslation categoryTranslation = new CategoryTranslation();
-        categoryTranslation.setCategoryName(requestDto.getTitle());
-        categoryTranslation.setCategoryDescription(requestDto.getDescription());
-        categoryTranslation.setLangCode(langCode);
-        categoryTranslation.setCategory(category);
-        List<CategoryTranslation> translations = new ArrayList<>(List.of(categoryTranslation));
+            Long id, String langCode, BlogPostCategoryRequestDto requestDto) {
+        BlogCategory category = getBlogCategory(id);
+        List<CategoryTranslation> translations = category.getTranslations();
+        translations.add(createTranslation(requestDto, langCode, category));
         category.setTranslations(translations);
-
         categoryRepository.save(category);
-
         return mapper.categoryToDto(category, langCode);
     }
 
+    private CategoryTranslation createTranslation(BlogPostCategoryRequestDto requestDto,
+                                                  String langCode, BlogCategory category) {
+        CategoryTranslation newTranslation = new CategoryTranslation();
+        newTranslation.setCategoryName(requestDto.getTitle());
+        newTranslation.setCategoryDescription(requestDto.getDescription());
+        newTranslation.setBlogCategory(category);
+        newTranslation.setLangCode(langCode);
+        return newTranslation;
+    }
+
     @Override
-    public BlogPostCategoryResponseDto getByIdAndLang(Long id, String langCode) {
-        Category category = categoryRepository.findById(id).orElseThrow(
+    public BlogCategory getBlogCategory(Long id) {
+        return categoryRepository.findById(id).orElseThrow(
                 () -> new ItemNotFoundException("Can't find category with id: " + id)
         );
-        CategoryTranslation categoryTranslation = category.getTranslations().stream()
-                .filter(t -> t.getLangCode().equals(langCode))
-                .findFirst()
-                .orElseThrow(
-                        () -> new NoSuchElementException("Cant' find elem")
-                );
-        return mapper.categoryToDto(category, langCode);
     }
 }
