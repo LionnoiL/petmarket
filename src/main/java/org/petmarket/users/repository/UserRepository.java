@@ -9,4 +9,6 @@ import java.util.Optional;
 public interface UserRepository extends UserRepositoryBasic {
 
     Optional<User> findByEmail(String email);
+
+    Optional<User> findByEmailConfirmCode(String code);
 }

@@ -1,16 +1,17 @@
 package org.petmarket.users.service;
 
 import jakarta.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.errorhandling.ItemNotCreatedException;
 import org.petmarket.errorhandling.ItemNotFoundException;
 import org.petmarket.errorhandling.LoginException;
+import org.petmarket.notifications.NotificationService;
+import org.petmarket.notifications.NotificationType;
 import org.petmarket.security.jwt.JwtResponseDto;
 import org.petmarket.security.jwt.JwtTokenProvider;
 import org.petmarket.security.jwt.JwtUser;
+import org.petmarket.users.dto.ResetPasswordRequestDto;
 import org.petmarket.users.dto.UserRequestDto;
 import org.petmarket.users.dto.UserResponseDto;
 import org.petmarket.users.entity.LoginProvider;
@@ -22,6 +23,7 @@ import org.petmarket.users.repository.RoleRepository;
 import org.petmarket.users.repository.UserRepository;
 import org.petmarket.utils.ErrorUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -32,6 +34,11 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -45,6 +52,10 @@ public class UserAuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
     private final UserService userService;
+    private final NotificationService emailService;
+
+    @Value("${site.base.url}")
+    private String baseSiteUrl;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -106,14 +117,55 @@ public class UserAuthService {
             User user = userRepository.findByEmail(jwtUser.getEmail()).get();
             String accessToken = jwtTokenProvider.createToken(user.getEmail(), user.getRoles());
             String refreshToken = jwtTokenProvider.createRefreshToken(user.getEmail(),
-                user.getRoles());
+                    user.getRoles());
             JwtResponseDto jwtResponseDto = new JwtResponseDto(
-                user.getEmail(),accessToken, refreshToken
+                    user.getEmail(), accessToken, refreshToken
             );
 
             return ResponseEntity.ok(jwtResponseDto);
         }
 
         throw new BadCredentialsException("Invalid email or password");
+    }
+
+    public void sendResetPassword(String email) {
+        if (email == null || email.isEmpty()) {
+            throw new ItemNotFoundException("User email not found");
+        }
+        User user = userRepository.findByEmail(email).orElseThrow(
+                () -> new ItemNotFoundException("User email not found")
+        );
+        user.setEmailConfirmCode(UUID.randomUUID().toString());
+        userRepository.save(user);
+
+        Map<String, Object> fields = Map.of(
+                "link", constructUrlForResetPasswordEmailMessage(user)
+        );
+        emailService.send(NotificationType.RESET_PASSWORD, fields, user);
+    }
+
+    private String constructUrlForResetPasswordEmailMessage(User user) {
+        return baseSiteUrl + "/user/reset-password/" + user.getEmailConfirmCode();
+    }
+
+    public void resetPassword(ResetPasswordRequestDto resetPasswordRequestDto,
+                              BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            throw new ItemNotCreatedException(errorUtils.getErrorsString(bindingResult));
+        }
+
+        User user = userRepository.findByEmailConfirmCode(
+                resetPasswordRequestDto.getVerificationCode()).orElseThrow(
+                () -> new ItemNotFoundException("Verification code not found")
+        );
+
+        user.setPassword(passwordEncoder.encode(resetPasswordRequestDto.getNewPassword()));
+        user.setEmailConfirmCode("");
+        userRepository.save(user);
+        Map<String, Object> fields = Map.of(
+                "message", "Ви успішно змінили пароль.",
+                "link", baseSiteUrl
+        );
+        emailService.send(NotificationType.CHANGE_PASSWORD, fields, user);
     }
 }
