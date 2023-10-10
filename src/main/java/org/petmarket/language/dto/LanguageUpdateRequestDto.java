@@ -1,5 +1,6 @@
 package org.petmarket.language.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -22,10 +23,12 @@ public class LanguageUpdateRequestDto {
 
     private Boolean enable;
 
+    @Schema(example = "Poland")
     public String getName() {
         return name;
     }
 
+    @Schema(example = "true")
     public Boolean getEnable() {
         return enable;
     }
