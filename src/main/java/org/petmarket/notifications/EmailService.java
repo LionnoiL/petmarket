@@ -3,7 +3,8 @@ package org.petmarket.notifications;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.petmarket.language.repository.LanguageRepository;
+import org.petmarket.translate.TranslationMessages;
+import org.petmarket.translate.TranslationService;
 import org.petmarket.users.entity.User;
 import org.petmarket.utils.Helper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,7 @@ import java.util.Map;
 public class EmailService implements NotificationService {
 
     private final JavaMailSender emailSender;
-    private LanguageRepository languageRepository;
+    private final TranslationService translationService;
     @Autowired
     private SpringTemplateEngine templateEngine;
     @Value("${spring.mail.username}")
@@ -39,24 +40,37 @@ public class EmailService implements NotificationService {
         fields.put("email", emailFrom);
         fields.put("footer", "© " + Helper.getCurrentYear() + " " + siteName);
 
-        String templateName = getTemplateName(type, user);
+        String userLangCode = getUserLanguageCode(user);
+        String templateName = getTemplateName(type, userLangCode);
 
         switch (type) {
-            case RESET_PASSWORD -> sendEmailMessage("Запит на зміну паролю", templateName, fields, user);
-            case CHANGE_PASSWORD -> {
-                sendEmailMessage("Ви успішно змінили пароль", templateName, fields, user);
-            }
+            case RESET_PASSWORD -> sendEmailMessage(
+                    translationService.getTranslate(TranslationMessages.PASSWORD_CHANGE_REQUEST, userLangCode),
+                    templateName,
+                    fields,
+                    user
+            );
+            case CHANGE_PASSWORD -> sendEmailMessage(
+                    translationService.getTranslate(TranslationMessages.PASSWORD_CHANGED_SUCCESSFULLY, userLangCode),
+                    templateName,
+                    fields,
+                    user
+            );
             default -> log.info("error sending mail to {}", user.getEmail());
         }
     }
 
-    private String getTemplateName(NotificationType type, User user) {
-        StringBuilder result = new StringBuilder("email/");
+    private String getUserLanguageCode(User user) {
         if (user.getLanguage() == null) {
-            result.append("ua");
+            return "ua";
         } else {
-            result.append(user.getLanguage().getLangCode());
+            return user.getLanguage().getLangCode();
         }
+    }
+
+    private String getTemplateName(NotificationType type, String langCode) {
+        StringBuilder result = new StringBuilder("email/");
+        result.append(langCode);
         result.append("/");
 
         switch (type) {
