@@ -51,7 +51,8 @@ public class LanguageAdminController {
     @PostMapping
     @ResponseBody
     public LanguageResponseDto addLanguage(
-            @RequestBody @Valid @NotNull(message = "Request body is mandatory") final LanguageCreateRequestDto request, BindingResult bindingResult) {
+            @RequestBody @Valid @NotNull(message = "Request body is mandatory") final LanguageCreateRequestDto request,
+            BindingResult bindingResult) {
         log.info("Received request to create Language - {}.", request);
         return languageService.addLanguage(request, bindingResult);
     }

@@ -20,7 +20,6 @@ import org.springframework.validation.BindingResult;
 import java.util.Collection;
 import java.util.List;
 
-
 @Slf4j
 @RequiredArgsConstructor
 @Service
@@ -77,7 +76,8 @@ public class LanguageService {
     }
 
     @Transactional
-    public LanguageResponseDto updateLanguage(String langCode, LanguageUpdateRequestDto dto, BindingResult bindingResult) {
+    public LanguageResponseDto updateLanguage(String langCode, LanguageUpdateRequestDto dto,
+                                              BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             throw new ItemNotUpdatedException(errorUtils.getErrorsString(bindingResult));
         }
