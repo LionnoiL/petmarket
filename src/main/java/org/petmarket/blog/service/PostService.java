@@ -9,6 +9,5 @@ public interface PostService extends AbstractService<BlogPostResponseDto, BlogPo
     Post findById(Long id);
 
     BlogPostResponseDto savePost(BlogPostRequestDto requestDto,
-                                 Authentication authentication,
-                                 String langCode);
+                                 Authentication authentication);
 }

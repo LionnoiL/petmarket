@@ -41,7 +41,7 @@ public class SecurityConfig {
             // -- Swagger UI v3 (OpenAPI)
             "/v3/api-docs/**",
             "/swagger-ui/**",
-            "/v1/blog/categories/**",
+            "/v1/blog/**",
             "/v1/admin/blog/**"
     };
     private final JwtTokenProvider jwtTokenProvider;

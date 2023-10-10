@@ -20,19 +20,16 @@ import org.springframework.web.bind.annotation.*;
 public class CategoryAdminController {
     private final CategoryService categoryService;
 
-    @PostMapping("/{langCode}")
+    @PostMapping
     @Operation(summary = "Save a new blog category",
-            description = "Create a new blog category with the specified language code")
+            description = "Create a new blog category with the default language code")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Blog category created successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid input data"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public BlogPostCategoryResponseDto save(@RequestBody @Valid BlogPostCategoryRequestDto requestDto,
-                                            @PathVariable(name = "langCode")
-                                            @Parameter(description = "Language code",
-                                                    required = true) String langCode) {
-        return categoryService.save(requestDto, langCode);
+    public BlogPostCategoryResponseDto save(@RequestBody @Valid BlogPostCategoryRequestDto requestDto) {
+        return categoryService.save(requestDto);
     }
 
     @PutMapping("/{id}/{langCode}")

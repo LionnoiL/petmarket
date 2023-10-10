@@ -3,6 +3,7 @@ package org.petmarket.blog.service.impl;
 import org.petmarket.blog.dto.comment.BlogPostCommentRequest;
 import org.petmarket.blog.dto.comment.BlogPostCommentResponse;
 import org.petmarket.blog.entity.BlogComment;
+import org.petmarket.blog.entity.CommentStatus;
 import org.petmarket.blog.mapper.BlogCommentMapper;
 import org.petmarket.blog.repository.CommentRepository;
 import org.petmarket.blog.service.CommentService;
@@ -42,7 +43,7 @@ public class CommentServiceImpl implements CommentService {
         comment.setUser(userService.findByUsername("admin@email.com"));
         //comment.setUser(userService.findByUsername(authentication.getName()));
         comment.setPost(postService.findById(postId));
-        comment.setStatus(BlogComment.Status.PENDING);
+        comment.setStatus(CommentStatus.PENDING);
         comment.setComment(request.getComment());
         comment.setCreated(LocalDateTime.now());
 
@@ -69,13 +70,13 @@ public class CommentServiceImpl implements CommentService {
         BlogComment comment = commentRepository.findById(commentId).orElseThrow(
                 () -> new NoSuchElementException("Can;t find blog comment with id: " + commentId)
         );
-        comment.setStatus(BlogComment.Status.valueOf(status));
+        comment.setStatus(CommentStatus.valueOf(status));
         commentRepository.save(comment);
         return mapper.toDto(comment);
     }
 
     @Override
-    public BlogPostCommentResponse save(BlogPostCommentRequest request, String langCode) {
+    public BlogPostCommentResponse save(BlogPostCommentRequest request) {
         return null;
     }
 

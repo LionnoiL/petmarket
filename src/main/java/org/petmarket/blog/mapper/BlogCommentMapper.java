@@ -11,4 +11,5 @@ public interface BlogCommentMapper {
 
     @Mapping(target = "userName", source = "user.username")
     BlogPostCommentResponse toDto(BlogComment blogComment);
+
 }

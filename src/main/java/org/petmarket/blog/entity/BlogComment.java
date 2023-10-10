@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.petmarket.users.entity.User;
 import org.springframework.data.annotation.CreatedDate;
-
 import java.time.LocalDateTime;
 
 @Entity
@@ -32,9 +31,6 @@ public class BlogComment {
     private String comment;
     @NotNull
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private CommentStatus status;
 
-    public enum Status {
-        PENDING, APPROVED, SPAM
-    }
 }

@@ -2,10 +2,10 @@ package org.petmarket.blog.service.impl;
 
 import org.petmarket.blog.dto.posts.BlogPostRequestDto;
 import org.petmarket.blog.dto.posts.BlogPostResponseDto;
+import org.petmarket.blog.entity.BlogCategory;
 import org.petmarket.blog.entity.Post;
 import org.petmarket.blog.entity.PostTranslations;
 import org.petmarket.blog.mapper.BlogPostMapper;
-import org.petmarket.blog.mapper.CategoryMapper;
 import org.petmarket.blog.repository.PostRepository;
 import org.petmarket.blog.service.CategoryService;
 import org.petmarket.blog.service.PostService;
@@ -23,6 +23,8 @@ import java.util.stream.Collectors;
 @Service
 public class PostServiceImpl implements PostService {
     private static final int AVERAGE_READING_WORDS_AMOUNT = 150;
+    private static final String TEMPORARY_DEF_LANG_CODE = "ua";
+    private static final String TEMPORARY_USER_NAME = "admin@email.com";
     private final PostRepository postRepository;
     private final BlogPostMapper postMapper;
     private final UserService userService;
@@ -39,20 +41,35 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public BlogPostResponseDto save(BlogPostRequestDto requestDto, String langCode) {
-        return null;
-    }
-
-    @Override
     public BlogPostResponseDto get(Long id, String langCode) {
-        return postMapper.toDto(findById(id), langCode);
+        Post post = findById(id);
+
+        List<PostTranslations> translations = post.getTranslations().stream()
+                .filter(t -> t.getLangCode().equals(langCode))
+                .collect(Collectors.toList());
+
+        List<BlogCategory> filteredCategories = post.getCategories().stream()
+                .map(category -> {
+                    category.setTranslations(
+                            category.getTranslations().stream()
+                                    .filter(c -> c.getLangCode().equals(langCode))
+                                    .collect(Collectors.toList())
+                    );
+                    return category;
+                })
+                .filter(category -> !category.getTranslations().isEmpty())
+                .collect(Collectors.toList());
+
+        post.setCategories(filteredCategories);
+        post.setTranslations(translations);
+        return postMapper.toDto(post);
     }
 
     @Override
     public List<BlogPostResponseDto> getAll(Pageable pageable, String langCode) {
         return postRepository.findAll(pageable).stream()
-                .map(p -> postMapper.toDto(p, langCode))
-                .collect(Collectors.toList());
+                .map(postMapper::toDto)
+                .toList();
     }
 
     @Override
@@ -74,24 +91,15 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public BlogPostResponseDto savePost(BlogPostRequestDto requestDto,
-                                        Authentication authentication,
-                                        String langCode) {
-        Post post = new Post();
-        List<PostTranslations> postTranslations = new ArrayList<>();
-        PostTranslations translation = createPostTranslation(post, requestDto, langCode);
-        postTranslations.add(translation);
-        post.setUser(userService.findByUsername("admin@email.com"));
-        //post.setUser(userService.findByUsername(authentication.getName()));
-        post.setCategories(requestDto.getCategoriesIds().stream()
-                .map(categoryService::getBlogCategory)
-                .collect(Collectors.toList()));
-        post.setTranslations(postTranslations);
-        post.setStatus(Post.Status.DRAFT);
-        post.setCreated(LocalDateTime.now());
-        post.setUpdated(LocalDateTime.now());
-        post.setReadingMinutes(getReadingMinutes(requestDto.getText()));
+                                        Authentication authentication) {
+        Post post = createPost(requestDto);
         postRepository.save(post);
-        return postMapper.toDto(post, langCode);
+        return postMapper.toDto(post);
+    }
+
+    @Override
+    public BlogPostResponseDto save(BlogPostRequestDto requestDto) {
+        return null;
     }
 
     private String truncateStringTo500Characters(String input) {
@@ -112,11 +120,33 @@ public class PostServiceImpl implements PostService {
         return translation;
     }
 
-    public int getReadingMinutes(String text) {
+    private int getReadingMinutes(String text) {
         if (text == null || text.isEmpty()) {
             return 0;
         }
         String[] words = text.split("\\s+");
         return words.length / AVERAGE_READING_WORDS_AMOUNT;
+    }
+
+    private Post createPost(BlogPostRequestDto requestDto) {
+        Post post = new Post();
+
+        List<PostTranslations> postTranslations = new ArrayList<>();
+
+        PostTranslations translation = createPostTranslation(post, requestDto, TEMPORARY_DEF_LANG_CODE);
+        postTranslations.add(translation);
+
+        post.setUser(userService.findByUsername(TEMPORARY_USER_NAME));
+        //post.setUser(userService.findByUsername(authentication.getName()));
+        post.setCategories(requestDto.getCategoriesIds().stream()
+                .map(categoryService::getBlogCategory)
+                .collect(Collectors.toList()));
+        post.setTranslations(postTranslations);
+        post.setStatus(Post.Status.DRAFT);
+        post.setCreated(LocalDateTime.now());
+        post.setUpdated(LocalDateTime.now());
+        post.setReadingMinutes(getReadingMinutes(requestDto.getText()));
+
+        return post;
     }
 }

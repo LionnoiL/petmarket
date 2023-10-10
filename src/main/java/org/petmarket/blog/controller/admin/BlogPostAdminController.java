@@ -18,24 +18,21 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/v1/admin/blog")
 @RequiredArgsConstructor
 @Tag(name = "Admin Blog Post Management", description = "Admin Blog Post")
-public class BlogPostController {
+public class BlogPostAdminController {
     private final PostService postService;
 
     @Operation(summary = "Create a new blog post",
-            description = "Create a new blog post with the specified language code")
+            description = "Create a new blog post with the default language code")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Blog post created successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid input data"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    @PostMapping("/{langCode}")
+    @PostMapping
     public BlogPostResponseDto createPost(@RequestBody @Valid BlogPostRequestDto requestDto,
-                                          @PathVariable(name = "langCode")
-                                          @Parameter(description = "Language code",
-                                                  required = true) String langCode,
                                           Authentication authentication) {
-        return postService.savePost(requestDto, authentication, langCode);
+        return postService.savePost(requestDto, authentication);
     }
 
     @Operation(summary = "Delete a blog post", description = "Delete a blog post by ID")
