@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.language.dto.LanguageResponseDto;
+import org.petmarket.language.service.LanguageService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,6 +27,8 @@ import java.util.Collections;
 @RequestMapping(value = "/v1/languages")
 public class LanguageController {
 
+    private final LanguageService languageService;
+
     @Operation(summary = "Get all Languages.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful operation", content = {
@@ -40,7 +43,12 @@ public class LanguageController {
     @ResponseBody
     public ResponseEntity<Collection<LanguageResponseDto>> getAll() {
         log.info("Received request to get all Languages.");
-        //TODO add service
-        return ResponseEntity.ok().body(Collections.emptyList());
+        Collection<LanguageResponseDto> languageResponseDtos = languageService.getAll();
+        if (languageResponseDtos.isEmpty()) {
+            log.info("Languages are absent.");
+            return ResponseEntity.ok().body(Collections.emptyList());
+        }
+        log.info("All Languages were retrieved - {}.", languageResponseDtos);
+        return ResponseEntity.ok().body(languageResponseDtos);
     }
 }
