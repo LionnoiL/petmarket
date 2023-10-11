@@ -35,6 +35,7 @@ public class LanguageService {
         return languageMapper.mapEntityToDto(languages);
     }
 
+    @Transactional
     public LanguageResponseDto enableLanguage(String langCode) {
         Language language = languageRepository.findById(langCode).orElseThrow(() -> {
             throw new ItemNotFoundException("Language not found");
@@ -44,6 +45,7 @@ public class LanguageService {
         return languageMapper.mapEntityToDto(language);
     }
 
+    @Transactional
     public LanguageResponseDto disableLanguage(String langCode) {
         Language language = languageRepository.findById(langCode).orElseThrow(() -> {
             throw new ItemNotFoundException("Language not found");

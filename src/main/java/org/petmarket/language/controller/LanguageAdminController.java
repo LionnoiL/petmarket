@@ -119,7 +119,11 @@ public class LanguageAdminController {
         return languageService.enableLanguage(langCode);
     }
 
-    @Operation(summary = "Disable Language by CODE")
+    @Operation(summary = "Disable Language by CODE", description = """
+            Language deactivation. 
+            If the language to be deactivated is specified as the default language 
+            in the site settings, we will get status 400.
+            """)
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful operation"),
             @ApiResponse(responseCode = "401", description = "Unauthorized", content = {

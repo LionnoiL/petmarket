@@ -29,7 +29,7 @@ public class LanguageController {
 
     private final LanguageService languageService;
 
-    @Operation(summary = "Get all Languages.")
+    @Operation(summary = "Get all Languages.", description = "Obtaining all site languages, including inactive ones.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful operation", content = {
                     @Content(
