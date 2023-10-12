@@ -71,7 +71,7 @@ public class LanguageService {
                     throw new ItemNotCreatedException("The language is already in the database");
                 });
 
-        Language language = languageMapper.mapDtoRequestToDto(dto);
+        Language language = languageMapper.mapDtoRequestToEntity(dto);
         languageRepository.save(language);
         log.info("The Language was created");
         return languageMapper.mapEntityToDto(language);

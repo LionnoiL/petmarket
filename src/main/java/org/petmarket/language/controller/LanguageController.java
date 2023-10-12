@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collection;
-import java.util.Collections;
 
 @Tag(name = "Languages", description = "the language API")
 @Slf4j
@@ -44,10 +43,6 @@ public class LanguageController {
     public ResponseEntity<Collection<LanguageResponseDto>> getAll() {
         log.info("Received request to get all Languages.");
         Collection<LanguageResponseDto> languageResponseDtos = languageService.getAll();
-        if (languageResponseDtos.isEmpty()) {
-            log.info("Languages are absent.");
-            return ResponseEntity.ok().body(Collections.emptyList());
-        }
         log.info("All Languages were retrieved - {}.", languageResponseDtos);
         return ResponseEntity.ok().body(languageResponseDtos);
     }

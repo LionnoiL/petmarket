@@ -12,7 +12,7 @@ public interface LanguageMapper {
 
     LanguageResponseDto mapEntityToDto(Language entity);
 
-    Language mapDtoRequestToDto(LanguageCreateRequestDto dto);
+    Language mapDtoRequestToEntity(LanguageCreateRequestDto dto);
 
     List<LanguageResponseDto> mapEntityToDto(List<Language> entities);
 }

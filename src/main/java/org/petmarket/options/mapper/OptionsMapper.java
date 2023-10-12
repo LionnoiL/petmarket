@@ -12,7 +12,7 @@ public interface OptionsMapper {
 
     OptionsResponseDto mapEntityToDto(Options entity);
 
-    Options mapDtoRequestToDto(OptionsRequestDto dto);
+    Options mapDtoRequestToEntity(OptionsRequestDto dto);
 
     List<OptionsResponseDto> mapEntityToDto(List<Options> entities);
 }
