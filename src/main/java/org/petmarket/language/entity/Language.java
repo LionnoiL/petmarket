@@ -24,4 +24,22 @@ public class Language {
 
     @Column(name = "enable")
     private Boolean enable;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Language language = (Language) o;
+
+        return langCode.equals(language.langCode);
+    }
+
+    @Override
+    public int hashCode() {
+        return langCode.hashCode();
+    }
 }

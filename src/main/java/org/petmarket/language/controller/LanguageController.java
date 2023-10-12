@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.language.dto.LanguageResponseDto;
+import org.petmarket.language.service.LanguageService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,7 +18,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collection;
-import java.util.Collections;
 
 @Tag(name = "Languages", description = "the language API")
 @Slf4j
@@ -26,7 +26,9 @@ import java.util.Collections;
 @RequestMapping(value = "/v1/languages")
 public class LanguageController {
 
-    @Operation(summary = "Get all Languages.")
+    private final LanguageService languageService;
+
+    @Operation(summary = "Get all Languages.", description = "Obtaining all site languages, including inactive ones.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful operation", content = {
                     @Content(
@@ -40,7 +42,8 @@ public class LanguageController {
     @ResponseBody
     public ResponseEntity<Collection<LanguageResponseDto>> getAll() {
         log.info("Received request to get all Languages.");
-        //TODO add service
-        return ResponseEntity.ok().body(Collections.emptyList());
+        Collection<LanguageResponseDto> languageResponseDtos = languageService.getAll();
+        log.info("All Languages were retrieved - {}.", languageResponseDtos);
+        return ResponseEntity.ok().body(languageResponseDtos);
     }
 }
