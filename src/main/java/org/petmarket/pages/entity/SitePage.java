@@ -39,16 +39,6 @@ public class SitePage {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "sitePage", fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<SitePageTranslation> translations;
 
-    public void addTranslation(SitePageTranslation translation) {
-        translation.setSitePage(this);
-        translations.add(translation);
-    }
-
-    public void removeTranslation(SitePageTranslation translation) {
-        translation.setSitePage(null);
-        translations.remove(translation);
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {

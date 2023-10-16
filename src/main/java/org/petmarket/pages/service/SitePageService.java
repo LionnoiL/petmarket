@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.errorhandling.ItemNotCreatedException;
+import org.petmarket.language.entity.Language;
 import org.petmarket.options.service.OptionsService;
 import org.petmarket.pages.dto.SitePageCreateRequestDto;
 import org.petmarket.pages.dto.SitePageResponseDto;
@@ -11,6 +12,7 @@ import org.petmarket.pages.entity.SitePage;
 import org.petmarket.pages.entity.SitePageTranslation;
 import org.petmarket.pages.mapper.SitePageMapper;
 import org.petmarket.pages.repository.SitePageRepository;
+import org.petmarket.translate.TranslateException;
 import org.petmarket.utils.ErrorUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
@@ -29,6 +31,28 @@ public class SitePageService {
     private final ErrorUtils errorUtils;
     private final OptionsService optionsService;
 
+    private boolean checkLanguage(SitePage page, Language language){
+        return page.getTranslations()
+            .stream()
+            .anyMatch(t -> t.getLanguage().equals(language));
+    }
+    private void addTranslation(SitePage page, SitePageTranslation translation) {
+        if (checkLanguage(page, translation.getLanguage())){
+            throw new TranslateException("Language is present in list");
+        }
+        translation.setSitePage(page);
+        page.getTranslations().add(translation);
+    }
+
+    private void removeTranslation(SitePage page, SitePageTranslation translation) {
+        Language defaultSiteLanguage = optionsService.getDefaultSiteLanguage();
+        if (checkLanguage(page, defaultSiteLanguage)){
+            throw new TranslateException("Language is default.");
+        }
+        translation.setSitePage(null);
+        page.getTranslations().remove(translation);
+    }
+
     @Transactional
     public SitePageResponseDto addPage(SitePageCreateRequestDto request, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
@@ -44,7 +68,7 @@ public class SitePageService {
                 .title(request.getTitle())
                 .language(optionsService.getDefaultSiteLanguage())
                 .build();
-        page.addTranslation(translation);
+        addTranslation(page, translation);
 
         pageRepository.save(page);
         log.info("The Page was created");
