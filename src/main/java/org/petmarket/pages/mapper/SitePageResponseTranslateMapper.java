@@ -7,8 +7,11 @@ import org.petmarket.options.service.OptionsService;
 import org.petmarket.pages.dto.SitePageResponseDto;
 import org.petmarket.pages.entity.SitePage;
 import org.petmarket.pages.entity.SitePageTranslate;
+import org.petmarket.translate.LanguageHolder;
 import org.petmarket.translate.TranslationService;
 import org.springframework.stereotype.Component;
+
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -20,8 +23,8 @@ public class SitePageResponseTranslateMapper {
     private final SitePageMapper pageMapper;
 
     public SitePageResponseDto mapEntityToDto(SitePage entity, Language language) {
-        SitePageTranslate translation = translationService.getTranslate(
-                entity.getTranslations(),
+        SitePageTranslate translation = (SitePageTranslate) translationService.getTranslate(
+                entity.getTranslations().stream().map(LanguageHolder.class::cast).collect(Collectors.toSet()),
                 language,
                 optionsService.getDefaultSiteLanguage()
         );

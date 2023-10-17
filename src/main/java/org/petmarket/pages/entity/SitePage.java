@@ -2,6 +2,7 @@ package org.petmarket.pages.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.petmarket.translate.TranslateHolder;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -17,7 +18,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
-public class SitePage {
+public class SitePage implements TranslateHolder {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
