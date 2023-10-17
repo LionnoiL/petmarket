@@ -39,6 +39,8 @@ public class SitePageService {
     private final SitePageResponseTranslateMapper sitePageResponseTranslateMapper;
     private final ErrorUtils errorUtils;
     private final OptionsService optionsService;
+    public static final String LANGUAGE_NOT_FOUND_MESSAGE = "Language not found";
+    public static final String PAGE_NOT_FOUND_MESSAGE = "Page not found";
 
     private SitePageTranslate getTranslation(SitePage page, Language language) {
         return page.getTranslations().stream()
@@ -100,10 +102,10 @@ public class SitePageService {
             throw new ItemNotUpdatedException(errorUtils.getErrorsString(bindingResult));
         }
         Language language = languageRepository.findById(langCode).orElseThrow(() -> {
-            throw new ItemNotFoundException("Language not found");
+            throw new ItemNotFoundException(LANGUAGE_NOT_FOUND_MESSAGE);
         });
         SitePage page = pageRepository.findById(id).orElseThrow(() -> {
-            throw new ItemNotFoundException("Page not found");
+            throw new ItemNotFoundException(PAGE_NOT_FOUND_MESSAGE);
         });
 
         page.setType(request.getType());
@@ -130,7 +132,7 @@ public class SitePageService {
     public Collection<SitePageResponseDto> getAll(String langCode) {
         List<SitePage> sitePages = pageRepository.findAll();
         Language language = languageRepository.findById(langCode).orElseThrow(() -> {
-            throw new ItemNotFoundException("Language not found");
+            throw new ItemNotFoundException(LANGUAGE_NOT_FOUND_MESSAGE);
         });
 
         return sitePages.stream()
@@ -140,23 +142,23 @@ public class SitePageService {
 
     public SitePageResponseDto findById(Long id, String langCode) {
         Language language = languageRepository.findById(langCode).orElseThrow(() -> {
-            throw new ItemNotFoundException("Language not found");
+            throw new ItemNotFoundException(LANGUAGE_NOT_FOUND_MESSAGE);
         });
         return pageRepository.findById(id)
                 .map(p -> sitePageResponseTranslateMapper.mapEntityToDto(p, language))
-                .orElseThrow(() -> new ItemNotFoundException("Page not found"));
+                .orElseThrow(() -> new ItemNotFoundException(PAGE_NOT_FOUND_MESSAGE));
     }
 
     public void deletePage(Long id) {
         SitePage page = pageRepository.findById(id).orElseThrow(() -> {
-            throw new ItemNotFoundException("Page not found");
+            throw new ItemNotFoundException(PAGE_NOT_FOUND_MESSAGE);
         });
         pageRepository.deleteById(page.getId());
     }
 
     public SitePageResponseDto findByType(SitePageType pageType, String langCode) {
         Language language = languageRepository.findById(langCode).orElseThrow(() -> {
-            throw new ItemNotFoundException("Language not found");
+            throw new ItemNotFoundException(LANGUAGE_NOT_FOUND_MESSAGE);
         });
         SitePage sitePage = pageRepository.findByType(pageType);
 
