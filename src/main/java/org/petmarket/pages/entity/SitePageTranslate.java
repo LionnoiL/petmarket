@@ -3,6 +3,7 @@ package org.petmarket.pages.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.petmarket.language.entity.Language;
+import org.petmarket.translate.LanguageHolder;
 
 @Entity
 @Getter
@@ -11,7 +12,7 @@ import org.petmarket.language.entity.Language;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "pages_translation")
-public class Translate implements org.petmarket.translate.Translate {
+public class SitePageTranslate implements LanguageHolder {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

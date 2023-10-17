@@ -6,7 +6,7 @@ import org.petmarket.language.entity.Language;
 import org.petmarket.options.service.OptionsService;
 import org.petmarket.pages.dto.SitePageResponseDto;
 import org.petmarket.pages.entity.SitePage;
-import org.petmarket.pages.entity.Translate;
+import org.petmarket.pages.entity.SitePageTranslate;
 import org.petmarket.translate.TranslationService;
 import org.springframework.stereotype.Component;
 
@@ -20,7 +20,7 @@ public class SitePageResponseTranslateMapper {
     private final SitePageMapper pageMapper;
 
     public SitePageResponseDto mapEntityToDto(SitePage entity, Language language) {
-        Translate translation = translationService.getTranslate(
+        SitePageTranslate translation = translationService.getTranslate(
                 entity.getTranslations(),
                 language,
                 optionsService.getDefaultSiteLanguage()

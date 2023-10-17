@@ -11,7 +11,7 @@ import org.petmarket.options.service.OptionsService;
 import org.petmarket.pages.dto.SitePageCreateRequestDto;
 import org.petmarket.pages.dto.SitePageResponseDto;
 import org.petmarket.pages.entity.SitePage;
-import org.petmarket.pages.entity.Translate;
+import org.petmarket.pages.entity.SitePageTranslate;
 import org.petmarket.pages.mapper.SitePageMapper;
 import org.petmarket.pages.mapper.SitePageResponseTranslateMapper;
 import org.petmarket.pages.repository.SitePageRepository;
@@ -42,7 +42,7 @@ public class SitePageService {
                 .anyMatch(t -> t.getLanguage().equals(language));
     }
 
-    private void addTranslation(SitePage page, Translate translation) {
+    private void addTranslation(SitePage page, SitePageTranslate translation) {
         if (checkLanguage(page, translation.getLanguage())) {
             throw new TranslateException("Language is present in list");
         }
@@ -50,7 +50,7 @@ public class SitePageService {
         page.getTranslations().add(translation);
     }
 
-    private void removeTranslation(SitePage page, Translate translation) {
+    private void removeTranslation(SitePage page, SitePageTranslate translation) {
         Language defaultSiteLanguage = optionsService.getDefaultSiteLanguage();
         if (checkLanguage(page, defaultSiteLanguage)) {
             throw new TranslateException("Language is default.");
@@ -68,7 +68,7 @@ public class SitePageService {
         Language defaultSiteLanguage = optionsService.getDefaultSiteLanguage();
         SitePage page = pageMapper.mapDtoRequestToEntity(request);
         page.setTranslations(new HashSet<>());
-        Translate translation = Translate.builder()
+        SitePageTranslate translation = SitePageTranslate.builder()
                 .id(null)
                 .sitePage(page)
                 .description(request.getDescription())

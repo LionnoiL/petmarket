@@ -3,7 +3,7 @@ package org.petmarket.translate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.language.entity.Language;
-import org.petmarket.pages.entity.Translate;
+import org.petmarket.pages.entity.SitePageTranslate;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -43,8 +43,8 @@ public class TranslationService {
         return result;
     }
 
-    public Translate getTranslate(Set<Translate> translations, Language language, Language defaultLanguage) {
-        Translate translate;
+    public SitePageTranslate getTranslate(Set<SitePageTranslate> translations, Language language, Language defaultLanguage) {
+        SitePageTranslate translate;
         translate = translations.stream()
                 .filter(t -> t.getLanguage().equals(language))
                 .findFirst().orElse(null);
