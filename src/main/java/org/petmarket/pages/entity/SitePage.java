@@ -37,7 +37,7 @@ public class SitePage {
     private SitePageType type;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "sitePage", fetch = FetchType.LAZY, orphanRemoval = true)
-    private Set<SitePageTranslation> translations;
+    private Set<Translate> translations;
 
     @Override
     public boolean equals(Object o) {

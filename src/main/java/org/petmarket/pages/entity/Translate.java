@@ -11,7 +11,7 @@ import org.petmarket.language.entity.Language;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "pages_translation")
-public class SitePageTranslation {
+public class Translate implements org.petmarket.translate.Translate {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
