@@ -101,7 +101,7 @@ public class SitePageService {
         if (bindingResult.hasErrors()) {
             throw new ItemNotUpdatedException(errorUtils.getErrorsString(bindingResult));
         }
-        Language language = languageRepository.findById(langCode).orElseThrow(() -> {
+        Language language = languageRepository.findByLangCodeAndEnableIsTrue(langCode).orElseThrow(() -> {
             throw new ItemNotFoundException(LANGUAGE_NOT_FOUND_MESSAGE);
         });
         SitePage page = pageRepository.findById(id).orElseThrow(() -> {
@@ -131,7 +131,7 @@ public class SitePageService {
 
     public Collection<SitePageResponseDto> getAll(String langCode) {
         List<SitePage> sitePages = pageRepository.findAll();
-        Language language = languageRepository.findById(langCode).orElseThrow(() -> {
+        Language language = languageRepository.findByLangCodeAndEnableIsTrue(langCode).orElseThrow(() -> {
             throw new ItemNotFoundException(LANGUAGE_NOT_FOUND_MESSAGE);
         });
 
@@ -141,7 +141,7 @@ public class SitePageService {
     }
 
     public SitePageResponseDto findById(Long id, String langCode) {
-        Language language = languageRepository.findById(langCode).orElseThrow(() -> {
+        Language language = languageRepository.findByLangCodeAndEnableIsTrue(langCode).orElseThrow(() -> {
             throw new ItemNotFoundException(LANGUAGE_NOT_FOUND_MESSAGE);
         });
         return pageRepository.findById(id)
@@ -157,7 +157,7 @@ public class SitePageService {
     }
 
     public SitePageResponseDto findByType(SitePageType pageType, String langCode) {
-        Language language = languageRepository.findById(langCode).orElseThrow(() -> {
+        Language language = languageRepository.findByLangCodeAndEnableIsTrue(langCode).orElseThrow(() -> {
             throw new ItemNotFoundException(LANGUAGE_NOT_FOUND_MESSAGE);
         });
         SitePage sitePage = pageRepository.findByType(pageType);
