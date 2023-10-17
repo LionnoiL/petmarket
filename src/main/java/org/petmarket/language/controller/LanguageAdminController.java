@@ -30,7 +30,7 @@ public class LanguageAdminController {
 
     @Operation(summary = "Create a new Language")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successful operation", content = {
+            @ApiResponse(responseCode = "201", description = "Successful operation", content = {
                     @Content(mediaType = "application/json", schema =
                     @Schema(implementation = LanguageResponseDto.class))
             }),

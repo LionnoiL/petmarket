@@ -61,7 +61,7 @@ public class PageAdminController {
 
     @Operation(summary = "Update Page by ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successful operation", content = {
+            @ApiResponse(responseCode = "201", description = "Successful operation", content = {
                     @Content(mediaType = "application/json", schema =
                     @Schema(implementation = SitePageResponseDto.class))
             }),
@@ -101,7 +101,7 @@ public class PageAdminController {
 
     @Operation(summary = "Delete Page by ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successful operation"),
+            @ApiResponse(responseCode = "204", description = "Successful operation"),
             @ApiResponse(responseCode = "401", description = "Unauthorized", content = {
                     @Content(mediaType = "application/json", schema =
                     @Schema(implementation = ErrorResponse.class))
