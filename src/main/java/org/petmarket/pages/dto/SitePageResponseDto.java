@@ -28,26 +28,32 @@ public class SitePageResponseDto {
         return id;
     }
 
+    @Schema(example = "2023-10-17", description = "The date the page was created")
     public LocalDate getCreated() {
         return created;
     }
 
+    @Schema(example = "2023-10-17", description = "Page update date")
     public LocalDate getUpdated() {
         return updated;
     }
 
+    @Schema(example = "HOW_TO_SELL", description = "Page type")
     public SitePageType getType() {
         return type;
     }
 
+    @Schema(example = "ua", description = "Page language")
     public String getLangCode() {
         return langCode;
     }
 
+    @Schema(example = "Як безпечно купувати", description = "Page title")
     public String getTitle() {
         return title;
     }
 
+    @Schema(example = "Стаття як безпечно купувати..", description = "Page description")
     public String getDescription() {
         return description;
     }

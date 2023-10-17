@@ -39,22 +39,4 @@ public class SitePage implements TranslateHolder {
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "sitePage", fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<SitePageTranslate> translations;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        SitePage sitePage = (SitePage) o;
-
-        return id.equals(sitePage.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return id.hashCode();
-    }
 }

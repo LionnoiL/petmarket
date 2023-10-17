@@ -16,6 +16,8 @@ import org.petmarket.pages.dto.SitePageCreateRequestDto;
 import org.petmarket.pages.dto.SitePageResponseDto;
 import org.petmarket.pages.dto.SitePageUpdateRequestDto;
 import org.petmarket.pages.service.SitePageService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -91,9 +93,38 @@ public class PageAdminController {
                     schema = @Schema(type = "string")
             )
             @PathVariable String langCode,
-            @RequestBody @Valid @NotNull(message = "Request body is mandatory") final SitePageUpdateRequestDto request
-            , BindingResult bindingResult) {
+            @RequestBody @Valid @NotNull(message = "Request body is mandatory") final SitePageUpdateRequestDto request,
+            BindingResult bindingResult) {
         log.info("Received request to update Page - {} with id {}.", request, id);
         return pageService.updatePage(id, langCode, request, bindingResult);
+    }
+
+    @Operation(summary = "Delete Page by ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful operation"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = {
+                    @Content(mediaType = "application/json", schema =
+                    @Schema(implementation = ErrorResponse.class))
+            }),
+            @ApiResponse(responseCode = "403", description = "Forbidden", content = {
+                    @Content(mediaType = "application/json", schema =
+                    @Schema(implementation = ErrorResponse.class))
+            }),
+            @ApiResponse(responseCode = "404", description = "Page not found", content = {
+                    @Content(mediaType = "application/json", schema =
+                    @Schema(implementation = ErrorResponse.class))
+            })
+    })
+    @DeleteMapping("/{id}")
+    @ResponseBody
+    public ResponseEntity<Void> deletePage(
+            @Parameter(description = "The ID of the page to delete", required = true,
+                    schema = @Schema(type = "integer", format = "int64")
+            )
+            @PathVariable Long id) {
+        log.info("Received request to delete the Page with id - {}.", id);
+        pageService.deletePage(id);
+        log.info("the Page with id - {} was deleted.", id);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

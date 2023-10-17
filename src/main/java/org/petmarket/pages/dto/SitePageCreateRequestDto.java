@@ -1,5 +1,6 @@
 package org.petmarket.pages.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -24,14 +25,17 @@ public class SitePageCreateRequestDto {
     private String title;
     private String description;
 
+    @Schema(example = "HOW_TO_SELL", description = "Page type")
     public SitePageType getType() {
         return type;
     }
 
+    @Schema(example = "Як безпечно купувати", description = "Page title")
     public String getTitle() {
         return title;
     }
 
+    @Schema(example = "Стаття як безпечно купувати..", description = "Page description")
     public String getDescription() {
         return description;
     }

@@ -14,6 +14,7 @@ import org.petmarket.pages.dto.SitePageResponseDto;
 import org.petmarket.pages.dto.SitePageUpdateRequestDto;
 import org.petmarket.pages.entity.SitePage;
 import org.petmarket.pages.entity.SitePageTranslate;
+import org.petmarket.pages.entity.SitePageType;
 import org.petmarket.pages.mapper.SitePageMapper;
 import org.petmarket.pages.mapper.SitePageResponseTranslateMapper;
 import org.petmarket.pages.repository.SitePageRepository;
@@ -144,5 +145,21 @@ public class SitePageService {
         return pageRepository.findById(id)
                 .map(p -> sitePageResponseTranslateMapper.mapEntityToDto(p, language))
                 .orElseThrow(() -> new ItemNotFoundException("Page not found"));
+    }
+
+    public void deletePage(Long id) {
+        SitePage page = pageRepository.findById(id).orElseThrow(() -> {
+            throw new ItemNotFoundException("Page not found");
+        });
+        pageRepository.deleteById(page.getId());
+    }
+
+    public SitePageResponseDto findByType(SitePageType pageType, String langCode) {
+        Language language = languageRepository.findById(langCode).orElseThrow(() -> {
+            throw new ItemNotFoundException("Language not found");
+        });
+        SitePage sitePage = pageRepository.findByType(pageType);
+
+        return sitePageResponseTranslateMapper.mapEntityToDto(sitePage, language);
     }
 }
