@@ -5,11 +5,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.errorhandling.ItemNotCreatedException;
 import org.petmarket.errorhandling.ItemNotFoundException;
+import org.petmarket.errorhandling.ItemNotUpdatedException;
 import org.petmarket.language.entity.Language;
 import org.petmarket.language.repository.LanguageRepository;
 import org.petmarket.options.service.OptionsService;
 import org.petmarket.pages.dto.SitePageCreateRequestDto;
 import org.petmarket.pages.dto.SitePageResponseDto;
+import org.petmarket.pages.dto.SitePageUpdateRequestDto;
 import org.petmarket.pages.entity.SitePage;
 import org.petmarket.pages.entity.SitePageTranslate;
 import org.petmarket.pages.mapper.SitePageMapper;
@@ -20,6 +22,7 @@ import org.petmarket.utils.ErrorUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -35,6 +38,12 @@ public class SitePageService {
     private final SitePageResponseTranslateMapper sitePageResponseTranslateMapper;
     private final ErrorUtils errorUtils;
     private final OptionsService optionsService;
+
+    private SitePageTranslate getTranslation(SitePage page, Language language) {
+        return page.getTranslations().stream()
+                .filter(t -> t.getLanguage().equals(language))
+                .findFirst().orElseThrow(() -> new TranslateException("No translation"));
+    }
 
     private boolean checkLanguage(SitePage page, Language language) {
         return page.getTranslations()
@@ -78,8 +87,43 @@ public class SitePageService {
         addTranslation(page, translation);
 
         pageRepository.save(page);
+
         log.info("The Page was created");
         return sitePageResponseTranslateMapper.mapEntityToDto(page, defaultSiteLanguage);
+    }
+
+    @Transactional
+    public SitePageResponseDto updatePage(Long id, String langCode, SitePageUpdateRequestDto request,
+                                          BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            throw new ItemNotUpdatedException(errorUtils.getErrorsString(bindingResult));
+        }
+        Language language = languageRepository.findById(langCode).orElseThrow(() -> {
+            throw new ItemNotFoundException("Language not found");
+        });
+        SitePage page = pageRepository.findById(id).orElseThrow(() -> {
+            throw new ItemNotFoundException("Page not found");
+        });
+
+        page.setType(request.getType());
+        page.setUpdated(LocalDate.now());
+
+        SitePageTranslate translation;
+        if (checkLanguage(page, language)) {
+            translation = getTranslation(page, language);
+        } else {
+            translation = new SitePageTranslate();
+            addTranslation(page, translation);
+            translation.setSitePage(page);
+            translation.setLanguage(language);
+        }
+        translation.setTitle(request.getTitle());
+        translation.setDescription(request.getDescription());
+
+        pageRepository.save(page);
+
+        log.info("The Page was updated");
+        return sitePageResponseTranslateMapper.mapEntityToDto(page, language);
     }
 
     public Collection<SitePageResponseDto> getAll(String langCode) {

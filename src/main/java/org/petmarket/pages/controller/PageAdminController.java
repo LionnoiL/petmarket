@@ -1,6 +1,7 @@
 package org.petmarket.pages.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -13,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.petmarket.errorhandling.ErrorResponse;
 import org.petmarket.pages.dto.SitePageCreateRequestDto;
 import org.petmarket.pages.dto.SitePageResponseDto;
+import org.petmarket.pages.dto.SitePageUpdateRequestDto;
 import org.petmarket.pages.service.SitePageService;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -53,5 +55,45 @@ public class PageAdminController {
             BindingResult bindingResult) {
         log.info("Received request to create Page - {}.", request);
         return pageService.addPage(request, bindingResult);
+    }
+
+    @Operation(summary = "Update Page by ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful operation", content = {
+                    @Content(mediaType = "application/json", schema =
+                    @Schema(implementation = SitePageResponseDto.class))
+            }),
+            @ApiResponse(responseCode = "400", description = "Some data is missing", content = {
+                    @Content(mediaType = "application/json", schema =
+                    @Schema(implementation = ErrorResponse.class))
+            }),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = {
+                    @Content(mediaType = "application/json", schema =
+                    @Schema(implementation = ErrorResponse.class))
+            }),
+            @ApiResponse(responseCode = "403", description = "Forbidden", content = {
+                    @Content(mediaType = "application/json", schema =
+                    @Schema(implementation = ErrorResponse.class))
+            }),
+            @ApiResponse(responseCode = "404", description = "Language not found", content = {
+                    @Content(mediaType = "application/json", schema =
+                    @Schema(implementation = ErrorResponse.class))
+            })
+    })
+    @PutMapping("/{id}/{langCode}")
+    @ResponseBody
+    public SitePageResponseDto updatePage(
+            @Parameter(description = "The ID of the page to update", required = true,
+                    schema = @Schema(type = "integer", format = "int64")
+            )
+            @PathVariable Long id,
+            @Parameter(description = "The Code Language of the page to retrieve", required = true,
+                    schema = @Schema(type = "string")
+            )
+            @PathVariable String langCode,
+            @RequestBody @Valid @NotNull(message = "Request body is mandatory") final SitePageUpdateRequestDto request
+            , BindingResult bindingResult) {
+        log.info("Received request to update Page - {} with id {}.", request, id);
+        return pageService.updatePage(id, langCode, request, bindingResult);
     }
 }
