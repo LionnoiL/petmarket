@@ -1,5 +1,6 @@
 package org.petmarket.blog.service.impl;
 
+import lombok.RequiredArgsConstructor;
 import org.petmarket.blog.dto.comment.BlogPostCommentRequest;
 import org.petmarket.blog.dto.comment.BlogPostCommentResponse;
 import org.petmarket.blog.entity.BlogComment;
@@ -8,35 +9,24 @@ import org.petmarket.blog.mapper.BlogCommentMapper;
 import org.petmarket.blog.repository.CommentRepository;
 import org.petmarket.blog.service.CommentService;
 import org.petmarket.blog.service.PostService;
+import org.petmarket.errorhandling.ItemNotFoundException;
 import org.petmarket.users.service.UserService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
     private final PostService postService;
     private final BlogCommentMapper mapper;
     private final UserService userService;
 
-    public CommentServiceImpl(CommentRepository repository,
-                              PostService postService,
-                              BlogCommentMapper mapper,
-                              UserService userService) {
-        this.commentRepository = repository;
-        this.postService = postService;
-        this.mapper = mapper;
-        this.userService = userService;
-    }
-
     @Override
-    public BlogPostCommentResponse saveNoTranslation(Long postId,
+    public BlogPostCommentResponse addComment(Long postId,
                                                      BlogPostCommentRequest request,
                                                      Authentication authentication) {
         BlogComment comment = new BlogComment();
@@ -46,16 +36,7 @@ public class CommentServiceImpl implements CommentService {
         comment.setStatus(CommentStatus.PENDING);
         comment.setComment(request.getComment());
         comment.setCreated(LocalDateTime.now());
-
         return mapper.toDto(commentRepository.save(comment));
-    }
-
-    @Override
-    public List<BlogPostCommentResponse> findAllPostComment(Long postId) {
-        return commentRepository.findAll().stream()
-                .filter(c -> c.getPost().getId().equals(postId))
-                .map(mapper::toDto)
-                .collect(Collectors.toList());
     }
 
     @Override
@@ -67,9 +48,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public BlogPostCommentResponse updateStatus(Long commentId, String status) {
-        BlogComment comment = commentRepository.findById(commentId).orElseThrow(
-                () -> new NoSuchElementException("Can;t find blog comment with id: " + commentId)
-        );
+        BlogComment comment = getBlogComment(commentId);
         comment.setStatus(CommentStatus.valueOf(status));
         commentRepository.save(comment);
         return mapper.toDto(comment);
@@ -82,28 +61,28 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public BlogPostCommentResponse get(Long id, String langCode) {
-        return mapper.toDto(commentRepository.findById(id).orElseThrow(
-                () -> new NoSuchElementException("Can't find comment by id: " + id)));
+        return mapper.toDto(getBlogComment(id));
     }
 
     @Override
     public List<BlogPostCommentResponse> getAll(Pageable pageable, String langCode) {
-        return commentRepository.findAll(pageable).stream()
-                .map(mapper::toDto)
-                .collect(Collectors.toList());
+        return findAllCommentAdmin(pageable);
     }
 
     @Override
     public void delete(Long id) {
-        BlogComment comment = commentRepository.findById(id).orElseThrow(
-                () -> new NoSuchElementException("Can't find comment: " + id)
-        );
-        commentRepository.delete(comment);
+        commentRepository.delete(getBlogComment(id));
     }
 
     @Override
     public BlogPostCommentResponse updateById(Long id, String langCode,
                                               BlogPostCommentRequest blogPostCommentRequest) {
         return null;
+    }
+
+    private BlogComment getBlogComment(Long commentId) {
+        return commentRepository.findById(commentId).orElseThrow(
+                () -> new ItemNotFoundException("Can't find comment: " + commentId)
+        );
     }
 }

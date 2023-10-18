@@ -13,8 +13,6 @@ import org.petmarket.blog.service.CommentService;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/v1/blog/comments")
 @RequiredArgsConstructor
@@ -35,23 +33,6 @@ public class CommentController {
             @PathVariable(name = "postId") @Parameter(description = "Post ID", required = true) Long postId,
             @RequestBody @Valid BlogPostCommentRequest request,
             Authentication authentication) {
-        return commentService.saveNoTranslation(postId, request, authentication);
-    }
-
-    @GetMapping("/{postId}")
-    @Operation(summary = "Get all comments for a blog post",
-            description = "Get all comments for a specific blog post")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200",
-                    description = "List of comments retrieved successfully"),
-            @ApiResponse(responseCode = "404",
-                    description = "Post not found"),
-            @ApiResponse(responseCode = "500",
-                    description = "Internal server error")
-    })
-    public List<BlogPostCommentResponse> getAllPostComments(@PathVariable(name = "postId")
-                                                            @Parameter(description = "Post ID",
-                                                                    required = true) Long postId) {
-        return commentService.findAllPostComment(postId);
+        return commentService.addComment(postId, request, authentication);
     }
 }

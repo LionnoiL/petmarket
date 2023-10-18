@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 public class BlogPostCommentResponse {
     private Long id;
     private LocalDateTime created;
+    private Long postId;
     private String userName;
     private String comment;
     private CommentStatus status;
