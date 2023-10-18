@@ -17,11 +17,14 @@ import org.petmarket.users.repository.UserRepository;
 import org.petmarket.users.service.UserService;
 import org.petmarket.utils.Helper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
-import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
+import org.springframework.security.web.DefaultRedirectStrategy;
+import org.springframework.security.web.RedirectStrategy;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -32,14 +35,17 @@ import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
-public class OAuth2LoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
+public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final UserService userService;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Value("${site.login.oauth.url}")
+    private String frontendLoginOAuthUrl;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -90,10 +96,9 @@ public class OAuth2LoginSuccessHandler extends SavedRequestAwareAuthenticationSu
 
         ObjectMapper mapper = new ObjectMapper();
 
-        response.setStatus(HttpServletResponse.SC_OK);
+        response.setContentType("application/json");
         response.getWriter().write(mapper.writeValueAsString(jwtResponseDto));
-        response.getWriter().flush();
 
-        super.onAuthenticationSuccess(request, response, authentication);
+        response.sendRedirect(frontendLoginOAuthUrl);
     }
 }

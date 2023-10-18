@@ -17,8 +17,8 @@ public class SwaggerConfig {
                         .addList("Bearer Authentication"))
                 .components(new Components().addSecuritySchemes(
                         "Bearer Authentication", createApiKeyScheme()))
-                .info(new Info().title("Team Challenge PetMarket marketplace")
-                        .description("PetMarket API.")
+                .info(new Info().title("Team Challenge Animal marketplace")
+                        .description("AnimalMarket API.")
                         .version("1.0")
                 );
     }
