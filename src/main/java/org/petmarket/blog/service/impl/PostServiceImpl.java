@@ -1,8 +1,10 @@
 package org.petmarket.blog.service.impl;
 
+import lombok.RequiredArgsConstructor;
 import org.petmarket.blog.dto.posts.BlogPostRequestDto;
 import org.petmarket.blog.dto.posts.BlogPostResponseDto;
 import org.petmarket.blog.entity.BlogCategory;
+import org.petmarket.blog.entity.CommentStatus;
 import org.petmarket.blog.entity.Post;
 import org.petmarket.blog.entity.PostTranslations;
 import org.petmarket.blog.mapper.BlogPostMapper;
@@ -10,6 +12,9 @@ import org.petmarket.blog.repository.PostRepository;
 import org.petmarket.blog.service.CategoryService;
 import org.petmarket.blog.service.PostService;
 import org.petmarket.errorhandling.ItemNotFoundException;
+import org.petmarket.errorhandling.ItemNotUpdatedException;
+import org.petmarket.language.service.LanguageService;
+import org.petmarket.options.service.OptionsService;
 import org.petmarket.users.service.UserService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
@@ -18,56 +23,39 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class PostServiceImpl implements PostService {
     private static final int AVERAGE_READING_WORDS_AMOUNT = 150;
-    private static final String TEMPORARY_DEF_LANG_CODE = "ua";
     private static final String TEMPORARY_USER_NAME = "admin@email.com";
     private final PostRepository postRepository;
     private final BlogPostMapper postMapper;
     private final UserService userService;
     private final CategoryService categoryService;
-
-    public PostServiceImpl(PostRepository postRepository,
-                           BlogPostMapper postMapper,
-                           UserService userService,
-                           CategoryService categoryService) {
-        this.postRepository = postRepository;
-        this.postMapper = postMapper;
-        this.userService = userService;
-        this.categoryService = categoryService;
-    }
+    private final OptionsService optionsService;
+    private final LanguageService languageService;
 
     @Override
     public BlogPostResponseDto get(Long id, String langCode) {
         Post post = findById(id);
 
         List<PostTranslations> translations = post.getTranslations().stream()
-                .filter(t -> t.getLangCode().equals(langCode))
+                .filter(t -> t.getLangCode().equals(checkedLang(langCode)))
                 .collect(Collectors.toList());
 
-        List<BlogCategory> filteredCategories = post.getCategories().stream()
-                .map(category -> {
-                    category.setTranslations(
-                            category.getTranslations().stream()
-                                    .filter(c -> c.getLangCode().equals(langCode))
-                                    .collect(Collectors.toList())
-                    );
-                    return category;
-                })
-                .filter(category -> !category.getTranslations().isEmpty())
-                .collect(Collectors.toList());
-
-        post.setCategories(filteredCategories);
+        post.setCategories(getFilteredCategories(post, langCode));
         post.setTranslations(translations);
+        post.setComments(post.getComments().stream()
+                .filter(comment -> comment.getStatus().equals(CommentStatus.APPROVED))
+                .collect(Collectors.toList()));
         return postMapper.toDto(post);
     }
 
     @Override
     public List<BlogPostResponseDto> getAll(Pageable pageable, String langCode) {
+
         return postRepository.findAll(pageable).stream()
                 .map(postMapper::toDto)
                 .toList();
@@ -79,8 +67,17 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public BlogPostResponseDto updateById(Long id, String langCode, BlogPostRequestDto blogPostRequestDto) {
-        return null;
+    public BlogPostResponseDto updateById(Long id, String langCode, BlogPostRequestDto requestDto) {
+        Post post = findById(id);
+        post.getTranslations().stream()
+                .filter(translation -> translation.getLangCode().equals(checkedLang(langCode)))
+                .peek(translation -> {
+                    translation.setTitle(requestDto.getTitle());
+                    translation.setText(requestDto.getText());
+                    translation.setShortText(truncateStringTo500Characters(requestDto.getText()));
+                })
+                .toList();
+        return postMapper.toDto(post);
     }
 
     @Override
@@ -94,6 +91,54 @@ public class PostServiceImpl implements PostService {
     public BlogPostResponseDto savePost(BlogPostRequestDto requestDto,
                                         Authentication authentication) {
         Post post = createPost(requestDto);
+        postRepository.save(post);
+        return postMapper.toDto(post);
+    }
+
+    @Override
+    public BlogPostResponseDto addTranslation(Long postId, String langCode, BlogPostRequestDto requestDto) {
+        Post post = findById(postId);
+        List<PostTranslations> translations = post.getTranslations();
+        if (translations.stream()
+                .anyMatch(t -> t.getLangCode()
+                        .equals(checkedLang(langCode)))) {
+            throw new ItemNotUpdatedException(langCode + " translation is already exist");
+        } else {
+            translations.add(createPostTranslation(post, requestDto, langCode));
+            post.setTranslations(translations);
+            postRepository.save(post);
+        }
+        return postMapper.toDto(post);
+    }
+
+    @Override
+    public List<BlogPostResponseDto> getAllByCategory(String langCode, Long categoryId) {
+        List<Post> allPosts;
+        if (categoryId != null) {
+            allPosts = findAllByBlogCategoryId(categoryId);
+        } else {
+            allPosts = postRepository.findAll();
+        }
+
+        return allPosts.stream()
+                .filter(post -> post.getStatus().equals(Post.Status.PUBLISHED))
+                .peek(post -> {
+                    post.setCategories(getFilteredCategories(post, langCode));
+                    post.setComments(post.getComments().stream()
+                            .filter(blogComment -> blogComment.getStatus().equals(CommentStatus.APPROVED))
+                            .collect(Collectors.toList()));
+                    post.setTranslations(post.getTranslations().stream()
+                            .filter(postTranslations -> postTranslations.getLangCode().equals(checkedLang(langCode)))
+                            .collect(Collectors.toList()));
+                })
+                .map(postMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public BlogPostResponseDto updateStatus(Long postId, String status) {
+        Post post = findById(postId);
+        post.setStatus(Post.Status.valueOf(status));
         postRepository.save(post);
         return postMapper.toDto(post);
     }
@@ -134,7 +179,10 @@ public class PostServiceImpl implements PostService {
 
         List<PostTranslations> postTranslations = new ArrayList<>();
 
-        PostTranslations translation = createPostTranslation(post, requestDto, TEMPORARY_DEF_LANG_CODE);
+        PostTranslations translation = createPostTranslation(
+                post,
+                requestDto,
+                optionsService.getDefaultSiteLanguage().getLangCode());
         postTranslations.add(translation);
 
         post.setUser(userService.findByUsername(TEMPORARY_USER_NAME));
@@ -149,5 +197,33 @@ public class PostServiceImpl implements PostService {
         post.setReadingMinutes(getReadingMinutes(requestDto.getText()));
 
         return post;
+    }
+
+    private String checkedLang(String langCode) {
+        return languageService.getByLangCode(langCode).getLangCode();
+    }
+
+    private List<Post> findAllByBlogCategoryId(Long categoryId) {
+        List<Post> posts = postRepository.findAll().stream()
+                .filter(post -> post.getCategories().stream()
+                        .anyMatch(category -> category.getId().equals(categoryId)))
+                .collect(Collectors.toList());
+
+        if (posts.isEmpty()) {
+            throw new ItemNotFoundException("Can't find posts for category: " + categoryId);
+        }
+
+        return posts;
+    }
+
+    private List<BlogCategory> getFilteredCategories(Post post, String langCode) {
+        return post.getCategories().stream()
+                .peek(category -> category.setTranslations(
+                        category.getTranslations().stream()
+                                .filter(c -> c.getLangCode().equals(checkedLang(langCode)))
+                                .collect(Collectors.toList())
+                ))
+                .filter(category -> !category.getTranslations().isEmpty())
+                .collect(Collectors.toList());
     }
 }
