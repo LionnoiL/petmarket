@@ -32,15 +32,14 @@ import java.util.List;
 @RequiredArgsConstructor
 @Service
 public class SitePageService {
-
+    public static final String LANGUAGE_NOT_FOUND_MESSAGE = "Language not found";
+    public static final String PAGE_NOT_FOUND_MESSAGE = "Page not found";
     private final SitePageRepository pageRepository;
     private final LanguageRepository languageRepository;
     private final SitePageMapper pageMapper;
     private final SitePageResponseTranslateMapper sitePageResponseTranslateMapper;
     private final ErrorUtils errorUtils;
     private final OptionsService optionsService;
-    public static final String LANGUAGE_NOT_FOUND_MESSAGE = "Language not found";
-    public static final String PAGE_NOT_FOUND_MESSAGE = "Page not found";
 
     private SitePageTranslate getTranslation(SitePage page, Language language) {
         return page.getTranslations().stream()

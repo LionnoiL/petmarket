@@ -1,5 +1,6 @@
 package org.petmarket.blog.service.impl;
 
+import lombok.RequiredArgsConstructor;
 import org.petmarket.blog.dto.category.BlogPostCategoryRequestDto;
 import org.petmarket.blog.dto.category.BlogPostCategoryResponseDto;
 import org.petmarket.blog.entity.BlogCategory;
@@ -8,6 +9,9 @@ import org.petmarket.blog.mapper.CategoryMapper;
 import org.petmarket.blog.repository.CategoryRepository;
 import org.petmarket.blog.service.CategoryService;
 import org.petmarket.errorhandling.ItemNotFoundException;
+import org.petmarket.errorhandling.ItemNotUpdatedException;
+import org.petmarket.language.service.LanguageService;
+import org.petmarket.options.service.OptionsService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
@@ -15,21 +19,20 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
-    private static final String TEMPORARY_DEF_LANG_CODE = "ua";
+    private final OptionsService optionsService;
     private final CategoryRepository categoryRepository;
     private final CategoryMapper mapper;
-
-    public CategoryServiceImpl(CategoryRepository categoryRepository, CategoryMapper mapper) {
-        this.categoryRepository = categoryRepository;
-        this.mapper = mapper;
-    }
+    private final LanguageService languageService;
 
     @Override
     public BlogPostCategoryResponseDto save(BlogPostCategoryRequestDto requestDto) {
         BlogCategory blogCategory = new BlogCategory();
         List<CategoryTranslation> translations = new ArrayList<>();
-        translations.add(createTranslation(requestDto, TEMPORARY_DEF_LANG_CODE, blogCategory));
+        translations.add(createTranslation(requestDto,
+                optionsService.getDefaultSiteLanguage().getLangCode(),
+                blogCategory));
         blogCategory.setTranslations(translations);
         categoryRepository.save(blogCategory);
         return mapper.categoryToDto(blogCategory);
@@ -38,7 +41,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public BlogPostCategoryResponseDto get(Long id, String langCode) {
         List<CategoryTranslation> translations = getBlogCategory(id).getTranslations().stream()
-                .filter(t -> t.getLangCode().equals(langCode))
+                .filter(t -> t.getLangCode().equals(checkedLang(langCode)))
                 .collect(Collectors.toList());
         BlogCategory category = getBlogCategory(id);
         category.setTranslations(translations);
@@ -48,6 +51,12 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public List<BlogPostCategoryResponseDto> getAll(Pageable pageable, String langCode) {
         return categoryRepository.findAll().stream()
+                .peek(category -> {
+                    category.setTranslations(category.getTranslations().stream()
+                            .filter(translation -> translation.getLangCode()
+                                    .equals(checkedLang(langCode)))
+                            .collect(Collectors.toList()));
+                })
                 .map(mapper::categoryToDto)
                 .collect(Collectors.toList());
     }
@@ -58,13 +67,43 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public BlogPostCategoryResponseDto updateById(
-            Long id, String langCode, BlogPostCategoryRequestDto requestDto) {
+    public BlogPostCategoryResponseDto updateById(Long id,
+                                                  String langCode,
+                                                  BlogPostCategoryRequestDto requestDto) {
         BlogCategory category = getBlogCategory(id);
-        List<CategoryTranslation> translations = category.getTranslations();
-        translations.add(createTranslation(requestDto, langCode, category));
-        category.setTranslations(translations);
+        category.getTranslations().stream()
+                .filter(translation -> translation.getLangCode().equals(checkedLang(langCode)))
+                .peek(translation -> {
+                    translation.setCategoryName(requestDto.getTitle());
+                    translation.setCategoryDescription(requestDto.getDescription());
+                })
+                .toList();
         categoryRepository.save(category);
+        return mapper.categoryToDto(category);
+    }
+
+    @Override
+    public BlogCategory getBlogCategory(Long id) {
+        return categoryRepository.findById(id).orElseThrow(
+                () -> new ItemNotFoundException("Can't find category with id: " + id)
+        );
+    }
+
+    @Override
+    public BlogPostCategoryResponseDto addTranslation(Long categoryId,
+                                                      String langCode,
+                                                      BlogPostCategoryRequestDto requestDto) {
+        BlogCategory category = getBlogCategory(categoryId);
+        List<CategoryTranslation> translations = category.getTranslations();
+        if (translations.stream()
+                .anyMatch(t -> t.getLangCode()
+                        .equals(checkedLang(langCode)))) {
+            throw new ItemNotUpdatedException(langCode + " translation is already exist");
+        } else {
+            translations.add(createTranslation(requestDto, langCode, category));
+            category.setTranslations(translations);
+            categoryRepository.save(category);
+        }
         return mapper.categoryToDto(category);
     }
 
@@ -74,14 +113,11 @@ public class CategoryServiceImpl implements CategoryService {
         newTranslation.setCategoryName(requestDto.getTitle());
         newTranslation.setCategoryDescription(requestDto.getDescription());
         newTranslation.setBlogCategory(category);
-        newTranslation.setLangCode(langCode);
+        newTranslation.setLangCode(checkedLang(langCode));
         return newTranslation;
     }
 
-    @Override
-    public BlogCategory getBlogCategory(Long id) {
-        return categoryRepository.findById(id).orElseThrow(
-                () -> new ItemNotFoundException("Can't find category with id: " + id)
-        );
+    private String checkedLang(String langCode) {
+        return languageService.getByLangCode(langCode).getLangCode();
     }
 }

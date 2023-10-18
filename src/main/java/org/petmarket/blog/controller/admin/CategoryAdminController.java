@@ -32,7 +32,7 @@ public class CategoryAdminController {
         return categoryService.save(requestDto);
     }
 
-    @PutMapping("/{id}/{langCode}")
+    @PostMapping("/{id}/{langCode}")
     @Operation(summary = "Add translation to a blog category",
             description = "Add translation to an existing blog category" +
                     " with the specified language code")
@@ -43,6 +43,26 @@ public class CategoryAdminController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     public BlogPostCategoryResponseDto addTranslation(@PathVariable(name = "id")
+                                                      @Parameter(description = "Category ID",
+                                                              required = true) Long id,
+                                                      @PathVariable(name = "langCode")
+                                                      @Parameter(description = "Language code",
+                                                              required = true) String langCode,
+                                                      @RequestBody @Valid BlogPostCategoryRequestDto requestDto) {
+        return categoryService.addTranslation(id, langCode, requestDto);
+    }
+
+    @PutMapping("/{id}/{langCode}")
+    @Operation(summary = "Add translation to a blog category",
+            description = "Add translation to an existing blog category" +
+                    " with the specified language code")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Blog category translation " +
+                    "added successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    public BlogPostCategoryResponseDto updateCategory(@PathVariable(name = "id")
                                                       @Parameter(description = "Category ID",
                                                               required = true) Long id,
                                                       @PathVariable(name = "langCode")
