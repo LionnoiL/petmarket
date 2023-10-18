@@ -9,6 +9,5 @@ public interface CategoryService extends AbstractService<BlogPostCategoryRespons
     BlogCategory getBlogCategory(Long id);
 
     BlogPostCategoryResponseDto addTranslation(Long categoryId,
-                                               String langCode,
-                                               BlogPostCategoryRequestDto requestDto);
+                                               String langCode, BlogPostCategoryRequestDto requestDto);
 }

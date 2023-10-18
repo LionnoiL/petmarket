@@ -32,7 +32,7 @@ public class TransliterateUtils {
         while (checkAlias(entityName, result)) {
             result = result + "-" + Helper.getRandomString(3);
         }
-        return result;
+        return result.toLowerCase();
     }
 
     public boolean checkAlias(String entityName, String alias) {

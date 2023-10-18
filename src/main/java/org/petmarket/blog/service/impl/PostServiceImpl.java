@@ -16,6 +16,7 @@ import org.petmarket.errorhandling.ItemNotUpdatedException;
 import org.petmarket.language.service.LanguageService;
 import org.petmarket.options.service.OptionsService;
 import org.petmarket.users.service.UserService;
+import org.petmarket.utils.TransliterateUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -36,6 +37,7 @@ public class PostServiceImpl implements PostService {
     private final CategoryService categoryService;
     private final OptionsService optionsService;
     private final LanguageService languageService;
+    private final TransliterateUtils transliterateUtils;
 
     @Override
     public BlogPostResponseDto get(Long id, String langCode) {
@@ -119,7 +121,6 @@ public class PostServiceImpl implements PostService {
         } else {
             allPosts = postRepository.findAll();
         }
-
         return allPosts.stream()
                 .filter(post -> post.getStatus().equals(Post.Status.PUBLISHED))
                 .peek(post -> {
@@ -132,7 +133,7 @@ public class PostServiceImpl implements PostService {
                             .collect(Collectors.toList()));
                 })
                 .map(postMapper::toDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
@@ -195,7 +196,7 @@ public class PostServiceImpl implements PostService {
         post.setCreated(LocalDateTime.now());
         post.setUpdated(LocalDateTime.now());
         post.setReadingMinutes(getReadingMinutes(requestDto.getText()));
-
+        post.setAlias(transliterateUtils.getAlias(Post.class.getSimpleName(), translation.getTitle()));
         return post;
     }
 

@@ -16,6 +16,7 @@ public class BlogPostResponseDto {
     private LocalDateTime updated;
     private int readingMinutes;
     private Post.Status status;
+    private String alias;
     private List<BlogPostCategoryResponseDto> categories;
     private List<BlogPostCommentResponse> comments;
     private List<BlogPostTranslationResponseDto> translations;

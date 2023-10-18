@@ -34,6 +34,10 @@ public class Post {
     private int readingMinutes;
 
     @NotNull
+    @Column(name="alias")
+    private String alias;
+
+    @NotNull
     @Enumerated(EnumType.STRING)
     private Status status;
     @ManyToMany
