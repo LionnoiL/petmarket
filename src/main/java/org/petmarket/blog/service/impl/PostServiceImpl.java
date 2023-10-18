@@ -42,13 +42,8 @@ public class PostServiceImpl implements PostService {
     @Override
     public BlogPostResponseDto get(Long id, String langCode) {
         Post post = findById(id);
-
-        List<PostTranslations> translations = post.getTranslations().stream()
-                .filter(t -> t.getLangCode().equals(checkedLang(langCode)))
-                .collect(Collectors.toList());
-
         post.setCategories(getFilteredCategories(post, langCode));
-        post.setTranslations(translations);
+        post.setTranslations(getTranslation(id, langCode));
         post.setComments(post.getComments().stream()
                 .filter(comment -> comment.getStatus().equals(CommentStatus.APPROVED))
                 .collect(Collectors.toList()));
@@ -128,9 +123,7 @@ public class PostServiceImpl implements PostService {
                     post.setComments(post.getComments().stream()
                             .filter(blogComment -> blogComment.getStatus().equals(CommentStatus.APPROVED))
                             .collect(Collectors.toList()));
-                    post.setTranslations(post.getTranslations().stream()
-                            .filter(postTranslations -> postTranslations.getLangCode().equals(checkedLang(langCode)))
-                            .collect(Collectors.toList()));
+                    post.setTranslations(getTranslation(post.getId(), langCode));
                 })
                 .map(postMapper::toDto)
                 .toList();
@@ -226,5 +219,19 @@ public class PostServiceImpl implements PostService {
                 ))
                 .filter(category -> !category.getTranslations().isEmpty())
                 .collect(Collectors.toList());
+    }
+
+    private List<PostTranslations> getTranslation(Long postId, String langCode) {
+        List<PostTranslations> translations = findById(postId).getTranslations().stream()
+                .filter(t -> t.getLangCode().equals(checkedLang(langCode)))
+                .collect(Collectors.toList());
+
+        if (translations.isEmpty()) {
+            translations = findById(postId).getTranslations().stream()
+                    .filter(postTranslations -> postTranslations.getLangCode().equals(
+                            optionsService.getDefaultSiteLanguage().getLangCode()))
+                    .collect(Collectors.toList());
+        }
+        return translations;
     }
 }

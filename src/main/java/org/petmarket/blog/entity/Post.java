@@ -34,7 +34,7 @@ public class Post {
     private int readingMinutes;
 
     @NotNull
-    @Column(name="alias")
+    @Column(name = "alias")
     private String alias;
 
     @NotNull

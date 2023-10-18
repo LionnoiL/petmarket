@@ -40,23 +40,17 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public BlogPostCategoryResponseDto get(Long id, String langCode) {
-        List<CategoryTranslation> translations = getBlogCategory(id).getTranslations().stream()
-                .filter(t -> t.getLangCode().equals(checkedLang(langCode)))
-                .collect(Collectors.toList());
         BlogCategory category = getBlogCategory(id);
-        category.setTranslations(translations);
+        category.setTranslations(getTranslation(id, langCode));
         return mapper.categoryToDto(category);
     }
 
     @Override
     public List<BlogPostCategoryResponseDto> getAll(Pageable pageable, String langCode) {
         return categoryRepository.findAll().stream()
-                .peek(category -> {
-                    category.setTranslations(category.getTranslations().stream()
-                            .filter(translation -> translation.getLangCode()
-                                    .equals(checkedLang(langCode)))
-                            .collect(Collectors.toList()));
-                })
+                .peek(category ->
+                        category.setTranslations(getTranslation(category.getId(), langCode))
+                )
                 .map(mapper::categoryToDto)
                 .collect(Collectors.toList());
     }
@@ -119,5 +113,19 @@ public class CategoryServiceImpl implements CategoryService {
 
     private String checkedLang(String langCode) {
         return languageService.getByLangCode(langCode).getLangCode();
+    }
+
+    private List<CategoryTranslation> getTranslation(Long categoryId, String langCode) {
+        List<CategoryTranslation> translations = getBlogCategory(categoryId).getTranslations().stream()
+                .filter(t -> t.getLangCode().equals(checkedLang(langCode)))
+                .collect(Collectors.toList());
+
+        if (translations.isEmpty()) {
+            translations = getBlogCategory(categoryId).getTranslations().stream()
+                    .filter(postTranslations -> postTranslations.getLangCode().equals(
+                            optionsService.getDefaultSiteLanguage().getLangCode()))
+                    .collect(Collectors.toList());
+        }
+        return translations;
     }
 }
