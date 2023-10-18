@@ -14,6 +14,7 @@ public class AdvertisementCategoryResponseDto {
 
     private Long id;
     private String langCode;
+    private String alias;
     private String title;
     private String tagTitle;
     private String description;
@@ -24,6 +25,10 @@ public class AdvertisementCategoryResponseDto {
         return id;
     }
 
+    @Schema(example = "Sobaki", description = "Category alias")
+    public String getAlias() {
+        return alias;
+    }
 
     @Schema(example = "ua", description = "Category language")
     public String getLangCode() {

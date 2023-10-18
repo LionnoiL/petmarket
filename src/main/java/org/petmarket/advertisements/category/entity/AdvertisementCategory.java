@@ -29,17 +29,4 @@ public class AdvertisementCategory implements TranslateHolder {
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "category", fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<AdvertisementCategoryTranslate> translations;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        AdvertisementCategory category = (AdvertisementCategory) o;
-        return id.equals(category.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return id.hashCode();
-    }
 }
