@@ -9,6 +9,7 @@ import org.petmarket.blog.mapper.BlogPostMapper;
 import org.petmarket.blog.repository.PostRepository;
 import org.petmarket.blog.service.CategoryService;
 import org.petmarket.blog.service.PostService;
+import org.petmarket.errorhandling.ItemNotFoundException;
 import org.petmarket.users.service.UserService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
@@ -85,7 +86,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public Post findById(Long id) {
         return postRepository.findById(id).orElseThrow(
-                () -> new NoSuchElementException("Can't find Blog Post id: " + id)
+                () -> new ItemNotFoundException("Can't find Blog Post id: " + id)
         );
     }
 
