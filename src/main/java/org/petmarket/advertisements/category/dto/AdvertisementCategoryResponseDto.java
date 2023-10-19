@@ -19,6 +19,8 @@ public class AdvertisementCategoryResponseDto {
     private String tagTitle;
     private String description;
     private Long parentId;
+    private boolean availableInTags;
+    private boolean availableInFavorite;
 
     @Schema(example = "1", description = "ID Category")
     public Long getId() {
@@ -53,5 +55,15 @@ public class AdvertisementCategoryResponseDto {
     @Schema(example = "10", description = "Parent ID")
     public Long getParentId() {
         return parentId;
+    }
+
+    @Schema(example = "true", description = "Availability category for tags")
+    public boolean isAvailableInTags() {
+        return availableInTags;
+    }
+
+    @Schema(example = "true", description = "Availability category for favorites")
+    public boolean isAvailableInFavorite() {
+        return availableInFavorite;
     }
 }
