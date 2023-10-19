@@ -28,8 +28,8 @@ public class AdvertisementCategoryCreateRequestDto {
     private String tagTitle;
     private String description;
     private Long parentId;
-    private Boolean availableInTags;
-    private Boolean availableInFavorite;
+    private boolean availableInTags;
+    private boolean availableInFavorite;
 
     @Schema(example = "Собаки", description = "Category title")
     public String getTitle() {
