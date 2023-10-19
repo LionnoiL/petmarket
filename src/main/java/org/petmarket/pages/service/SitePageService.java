@@ -32,8 +32,10 @@ import java.util.List;
 @RequiredArgsConstructor
 @Service
 public class SitePageService {
+
     public static final String LANGUAGE_NOT_FOUND_MESSAGE = "Language not found";
     public static final String PAGE_NOT_FOUND_MESSAGE = "Page not found";
+
     private final SitePageRepository pageRepository;
     private final LanguageRepository languageRepository;
     private final SitePageMapper pageMapper;
@@ -129,10 +131,10 @@ public class SitePageService {
     }
 
     public Collection<SitePageResponseDto> getAll(String langCode) {
-        List<SitePage> sitePages = pageRepository.findAll();
         Language language = languageRepository.findByLangCodeAndEnableIsTrue(langCode).orElseThrow(() -> {
             throw new ItemNotFoundException(LANGUAGE_NOT_FOUND_MESSAGE);
         });
+        List<SitePage> sitePages = pageRepository.findAll();
 
         return sitePages.stream()
                 .map(p -> sitePageResponseTranslateMapper.mapEntityToDto(p, language))
