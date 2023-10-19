@@ -25,10 +25,8 @@ import org.petmarket.utils.TransliterateUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -37,6 +35,7 @@ public class AdvertisementCategoryService {
 
     public static final String LANGUAGE_NOT_FOUND_MESSAGE = "Language not found";
     public static final String CATEGORY_NOT_FOUND_MESSAGE = "Category not found";
+    public static final int FAVORITE_CATEGORIES_COUNT = 1;
 
     private final AdvertisementCategoryRepository categoryRepository;
     private final LanguageRepository languageRepository;
@@ -208,10 +207,18 @@ public class AdvertisementCategoryService {
         List<Advertisement> advertisements = advertisementRepository.findTop1000ByStatusEqualsOrderByCreatedDesc(
                 AdvertisementStatus.ACTIVE
         );
-        List<Long> categoriesIds = advertisements.stream()
+        Map<Long, Long> categoryCountMap = advertisements.stream()
                 .map(advertisement -> advertisement.getCategory().getId())
                 .filter(Objects::nonNull)
-                .distinct()
+                .collect(Collectors.groupingBy(
+                        categoryId -> categoryId,
+                        Collectors.counting()
+                ));
+
+        List<Long> categoriesIds = categoryCountMap.entrySet().stream()
+                .sorted(Map.Entry.<Long, Long>comparingByValue().reversed())
+                .limit(FAVORITE_CATEGORIES_COUNT)
+                .map(Map.Entry::getKey)
                 .toList();
 
         List<AdvertisementCategory> categories = categoryRepository.findAllById(categoriesIds);
