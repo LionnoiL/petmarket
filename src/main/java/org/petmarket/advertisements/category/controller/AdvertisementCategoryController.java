@@ -77,4 +77,27 @@ public class AdvertisementCategoryController {
         log.info("All Categories were retrieved - {}.", dtos);
         return ResponseEntity.ok().body(dtos);
     }
+
+    @Operation(summary = "Get favorite Categories.", description = "Obtaining favorite site categories")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful operation", content = {
+                    @Content(
+                            mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(
+                                    implementation = AdvertisementCategoryResponseDto.class))
+                    )
+            })
+    })
+    @GetMapping("/favorite/{langCode}")
+    @ResponseBody
+    public ResponseEntity<Collection<AdvertisementCategoryResponseDto>> getFavorite(
+            @Parameter(description = "The Code Language of the categories to retrieve", required = true,
+                    schema = @Schema(type = "string")
+            )
+            @PathVariable String langCode) {
+        log.info("Received request to get favorite Categories.");
+        Collection<AdvertisementCategoryResponseDto> dtos = categoryService.getFavorite(langCode);
+        log.info("All Categories were retrieved - {}.", dtos);
+        return ResponseEntity.ok().body(dtos);
+    }
 }
