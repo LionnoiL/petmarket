@@ -21,8 +21,8 @@ public class Location {
     private City city;
 
     @Column(name = "latitude")
-    private float latitude;
+    private Float latitude;
 
     @Column(name = "longitude")
-    private float longitude;
+    private Float longitude;
 }
