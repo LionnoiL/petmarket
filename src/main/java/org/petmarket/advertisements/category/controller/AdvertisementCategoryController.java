@@ -10,13 +10,19 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.petmarket.advertisements.advertisement.dto.AdvertisementResponseDto;
 import org.petmarket.advertisements.category.dto.AdvertisementCategoryResponseDto;
 import org.petmarket.advertisements.category.service.AdvertisementCategoryService;
 import org.petmarket.errorhandling.ErrorResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
+import java.util.List;
 
 @Tag(name = "Advertisement Categories", description = "the site advertisement categories API")
 @Slf4j
@@ -99,5 +105,36 @@ public class AdvertisementCategoryController {
         Collection<AdvertisementCategoryResponseDto> dtos = categoryService.getFavorite(langCode);
         log.info("All Categories were retrieved - {}.", dtos);
         return ResponseEntity.ok().body(dtos);
+    }
+
+    @Operation(summary = "Get Advertisements by category")
+    @ApiResponse(responseCode = "200", description = "Successful operation")
+    @GetMapping(path = "/{id}/{langCode}/advertisements")
+    public Page<AdvertisementResponseDto> getAllAdvertisementsByCategory(
+            @Parameter(description = "Number of page (1..N)", required = true,
+                    schema = @Schema(type = "integer", defaultValue = "1")
+            ) @RequestParam(defaultValue = "1") int page,
+            @Parameter(description = "The size of the page to be returned", required = true,
+                    schema = @Schema(type = "integer", defaultValue = "30")
+            ) @RequestParam(defaultValue = "30") int size,
+            @Parameter(description = "Sort direction (ASC, DESC)",
+                    schema = @Schema(type = "string")
+            ) @RequestParam(required = false, defaultValue = "ASC") String sortDirection,
+            @Parameter(description = "Sort field",
+                    schema = @Schema(type = "string")
+            ) @RequestParam(required = false, defaultValue = "ASC") String sortField,
+            @Parameter(description = "List of attributes identifiers",
+                    schema = @Schema(type = "array[integer]")
+            ) @RequestParam(required = false) List<Long> attributes,
+            @Parameter(description = "List of locations identifiers",
+                    schema = @Schema(type = "array[integer]")
+            ) @RequestParam(required = false) List<Long> locations,
+            @Parameter(description = "Advertisement type (SIMPLE, PRODUCT, VIP)",
+                    schema = @Schema(type = "string")
+            ) @RequestParam(required = false, defaultValue = "SIMPLE") String type
+    ) {
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.Direction.valueOf(sortDirection), sortField);
+        //TODO finish after add AdvertisementService
+        return null;
     }
 }
