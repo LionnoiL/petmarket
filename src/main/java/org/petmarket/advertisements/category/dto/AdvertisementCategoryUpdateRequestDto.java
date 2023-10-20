@@ -18,13 +18,18 @@ public class AdvertisementCategoryUpdateRequestDto {
     @NotNull(message = "The 'title' cannot be null")
     @NotBlank(message = "The 'title' cannot be empty")
     @Size(min = 1, max = 250, message
-        = "Title must be between 1 and 250 characters")
+            = "Title must be between 1 and 250 characters")
     private String title;
 
-    @Size(max = 20, message = "The tag name must be less than or equal to 20 characters")
+    @NotNull(message = "The 'tagTitle' cannot be null")
+    @NotBlank(message = "The 'tagTitle' cannot be empty")
+    @Size(min = 1, max = 20, message
+            = "Tag title must be between 1 and 250 characters")
     private String tagTitle;
     private String description;
     private Long parentId;
+    private boolean availableInTags;
+    private boolean availableInFavorite;
 
     @Schema(example = "Собаки", description = "Category title")
     public String getTitle() {
@@ -44,5 +49,15 @@ public class AdvertisementCategoryUpdateRequestDto {
     @Schema(example = "10", description = "Parent ID")
     public Long getParentId() {
         return parentId;
+    }
+
+    @Schema(example = "true", description = "Availability category for tags")
+    public boolean isAvailableInTags() {
+        return availableInTags;
+    }
+
+    @Schema(example = "true", description = "Availability category for favorites")
+    public boolean isAvailableInFavorite() {
+        return availableInFavorite;
     }
 }

@@ -2,11 +2,10 @@ package org.petmarket.advertisements.category.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.petmarket.advertisements.advertisement.entity.Advertisement;
-import org.petmarket.advertisements.advertisement.entity.AdvertisementStatus;
 import org.petmarket.advertisements.advertisement.repository.AdvertisementRepository;
 import org.petmarket.advertisements.category.dto.AdvertisementCategoryCreateRequestDto;
 import org.petmarket.advertisements.category.dto.AdvertisementCategoryResponseDto;
+import org.petmarket.advertisements.category.dto.AdvertisementCategoryTagResponseDto;
 import org.petmarket.advertisements.category.dto.AdvertisementCategoryUpdateRequestDto;
 import org.petmarket.advertisements.category.entity.AdvertisementCategory;
 import org.petmarket.advertisements.category.entity.AdvertisementCategoryTranslate;
@@ -25,8 +24,9 @@ import org.petmarket.utils.TransliterateUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -35,7 +35,6 @@ public class AdvertisementCategoryService {
 
     public static final String LANGUAGE_NOT_FOUND_MESSAGE = "Language not found";
     public static final String CATEGORY_NOT_FOUND_MESSAGE = "Category not found";
-    public static final int FAVORITE_CATEGORIES_COUNT = 1;
 
     private final AdvertisementCategoryRepository categoryRepository;
     private final LanguageRepository languageRepository;
@@ -69,10 +68,7 @@ public class AdvertisementCategoryService {
     }
 
     public AdvertisementCategoryResponseDto findById(Long id, String langCode) {
-        Language language = languageRepository.findByLangCodeAndEnableIsTrue(langCode)
-                .orElseThrow(() -> {
-                    throw new ItemNotFoundException(LANGUAGE_NOT_FOUND_MESSAGE);
-                });
+        Language language = getLanguage(langCode);
 
         return categoryRepository.findById(id)
                 .map(category -> categoryResponseTranslateMapper.mapEntityToDto(category, language))
@@ -80,15 +76,10 @@ public class AdvertisementCategoryService {
     }
 
     public Collection<AdvertisementCategoryResponseDto> getAll(String langCode) {
-        Language language = languageRepository.findByLangCodeAndEnableIsTrue(langCode)
-                .orElseThrow(() -> {
-                    throw new ItemNotFoundException(LANGUAGE_NOT_FOUND_MESSAGE);
-                });
+        Language language = getLanguage(langCode);
         List<AdvertisementCategory> categories = categoryRepository.findAll();
 
-        return categories.stream()
-                .map(p -> categoryResponseTranslateMapper.mapEntityToDto(p, language))
-                .toList();
+        return categoryResponseTranslateMapper.mapEntityToDto(categories, language);
     }
 
     public AdvertisementCategoryResponseDto addCategory(
@@ -98,7 +89,7 @@ public class AdvertisementCategoryService {
         }
 
         AdvertisementCategory parentCategory = null;
-        if (request.getParentId() != null) {
+        if (request.getParentId() != null && request.getParentId() != 0) {
             parentCategory = categoryRepository.findById(
                             request.getParentId())
                     .orElseThrow(() -> new ItemNotFoundException(CATEGORY_NOT_FOUND_MESSAGE));
@@ -136,10 +127,7 @@ public class AdvertisementCategoryService {
             throw new ItemNotUpdatedException(errorUtils.getErrorsString(bindingResult));
         }
 
-        Language language = languageRepository.findByLangCodeAndEnableIsTrue(langCode)
-                .orElseThrow(() -> {
-                    throw new ItemNotFoundException(LANGUAGE_NOT_FOUND_MESSAGE);
-                });
+        Language language = getLanguage(langCode);
         AdvertisementCategory parentCategory = null;
         if (request.getParentId() != null) {
             parentCategory = categoryRepository.findById(
@@ -192,39 +180,31 @@ public class AdvertisementCategoryService {
             category.setParent(parentCategory);
         }
         categoryRepository.saveAll(categories);
-        return categories.stream()
-                .map(p -> categoryResponseTranslateMapper.mapEntityToDto(p,
-                        optionsService.getDefaultSiteLanguage()))
-                .toList();
+        return categoryResponseTranslateMapper.mapEntityToDto(categories, optionsService.getDefaultSiteLanguage());
     }
 
-    public Collection<AdvertisementCategoryResponseDto> getFavorite(String langCode) {
-        Language language = languageRepository.findByLangCodeAndEnableIsTrue(langCode)
+    public Collection<AdvertisementCategoryResponseDto> getFavorite(String langCode, Integer size) {
+        Language language = getLanguage(langCode);
+
+        List<Long> categoriesIds = advertisementRepository.findFavoriteCategories(size);
+        List<AdvertisementCategory> categories = categoryRepository.findAllById(categoriesIds);
+
+        return categoryResponseTranslateMapper.mapEntityToDto(categories, language);
+    }
+
+    public Collection<AdvertisementCategoryTagResponseDto> getFavoriteTags(String langCode, Integer size) {
+        Language language = getLanguage(langCode);
+
+        List<Long> categoriesIds = advertisementRepository.findFavoriteTags(size);
+        List<AdvertisementCategory> categories = categoryRepository.findAllById(categoriesIds);
+
+        return categoryResponseTranslateMapper.mapEntityToTagDto(categories, language);
+    }
+
+    private Language getLanguage(String langCode) {
+        return languageRepository.findByLangCodeAndEnableIsTrue(langCode)
                 .orElseThrow(() -> {
                     throw new ItemNotFoundException(LANGUAGE_NOT_FOUND_MESSAGE);
                 });
-
-        List<Advertisement> advertisements = advertisementRepository.findTop1000ByStatusEqualsOrderByCreatedDesc(
-                AdvertisementStatus.ACTIVE
-        );
-        Map<Long, Long> categoryCountMap = advertisements.stream()
-                .map(advertisement -> advertisement.getCategory().getId())
-                .filter(Objects::nonNull)
-                .collect(Collectors.groupingBy(
-                        categoryId -> categoryId,
-                        Collectors.counting()
-                ));
-
-        List<Long> categoriesIds = categoryCountMap.entrySet().stream()
-                .sorted(Map.Entry.<Long, Long>comparingByValue().reversed())
-                .limit(FAVORITE_CATEGORIES_COUNT)
-                .map(Map.Entry::getKey)
-                .toList();
-
-        List<AdvertisementCategory> categories = categoryRepository.findAllById(categoriesIds);
-
-        return categories.stream()
-                .map(p -> categoryResponseTranslateMapper.mapEntityToDto(p, language))
-                .toList();
     }
 }
