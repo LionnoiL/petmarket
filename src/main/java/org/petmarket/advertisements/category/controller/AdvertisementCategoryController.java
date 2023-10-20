@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.advertisements.advertisement.dto.AdvertisementResponseDto;
 import org.petmarket.advertisements.category.dto.AdvertisementCategoryResponseDto;
+import org.petmarket.advertisements.category.dto.AdvertisementCategoryTagResponseDto;
 import org.petmarket.advertisements.category.service.AdvertisementCategoryService;
 import org.petmarket.errorhandling.ErrorResponse;
 import org.springframework.data.domain.Page;
@@ -94,15 +95,46 @@ public class AdvertisementCategoryController {
                     )
             })
     })
-    @GetMapping("/favorite/{langCode}")
+    @GetMapping("/favorite/{langCode}/{size}")
     @ResponseBody
     public ResponseEntity<Collection<AdvertisementCategoryResponseDto>> getFavorite(
             @Parameter(description = "The Code Language of the categories to retrieve", required = true,
                     schema = @Schema(type = "string")
             )
-            @PathVariable String langCode) {
+            @PathVariable String langCode,
+            @Parameter(description = "The size of the categories to be returned", required = true,
+                    schema = @Schema(type = "integer", defaultValue = "10")
+            )
+            @PathVariable Integer size) {
         log.info("Received request to get favorite Categories.");
-        Collection<AdvertisementCategoryResponseDto> dtos = categoryService.getFavorite(langCode);
+        Collection<AdvertisementCategoryResponseDto> dtos = categoryService.getFavorite(langCode, size);
+        log.info("All Categories were retrieved - {}.", dtos);
+        return ResponseEntity.ok().body(dtos);
+    }
+
+    @Operation(summary = "Get favorite tags for Categories.", description = "Obtaining favorite tags for categories")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful operation", content = {
+                    @Content(
+                            mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(
+                                    implementation = AdvertisementCategoryTagResponseDto.class))
+                    )
+            })
+    })
+    @GetMapping("/favorite-tags/{langCode}/{size}")
+    @ResponseBody
+    public ResponseEntity<Collection<AdvertisementCategoryTagResponseDto>> getFavoriteTags(
+            @Parameter(description = "The Code Language of the categories to retrieve", required = true,
+                    schema = @Schema(type = "string")
+            )
+            @PathVariable String langCode,
+            @Parameter(description = "The size of the categories to be returned", required = true,
+                    schema = @Schema(type = "integer", defaultValue = "10")
+            )
+            @PathVariable Integer size) {
+        log.info("Received request to get favorite Tags Categories.");
+        Collection<AdvertisementCategoryTagResponseDto> dtos = categoryService.getFavoriteTags(langCode, size);
         log.info("All Categories were retrieved - {}.", dtos);
         return ResponseEntity.ok().body(dtos);
     }

@@ -27,6 +27,12 @@ public class AdvertisementCategory implements TranslateHolder {
     @JoinColumn(name = "parent_id")
     private AdvertisementCategory parent;
 
+    @Column(name = "available_in_tags")
+    private boolean availableInTags;
+
+    @Column(name = "available_in_favorite")
+    private boolean availableInFavorite;
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "category", fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<AdvertisementCategoryTranslate> translations;
 }
