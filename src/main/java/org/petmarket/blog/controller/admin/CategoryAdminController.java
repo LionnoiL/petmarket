@@ -11,6 +11,7 @@ import org.petmarket.blog.dto.category.BlogPostCategoryRequestDto;
 import org.petmarket.blog.dto.category.BlogPostCategoryResponseDto;
 import org.petmarket.blog.service.CategoryService;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -21,6 +22,7 @@ public class CategoryAdminController {
     private final CategoryService categoryService;
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Save a new blog category",
             description = "Create a new blog category with the default language code")
     @ApiResponses({
@@ -33,6 +35,7 @@ public class CategoryAdminController {
     }
 
     @PostMapping("/{id}/{langCode}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Add translation to a blog category",
             description = "Add translation to an existing blog category" +
                     " with the specified language code")
@@ -53,6 +56,7 @@ public class CategoryAdminController {
     }
 
     @PutMapping("/{id}/{langCode}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Add translation to a blog category",
             description = "Add translation to an existing blog category" +
                     " with the specified language code")
@@ -73,6 +77,7 @@ public class CategoryAdminController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Delete a blog category", description = "Delete a blog category by ID")
     @ApiResponses({

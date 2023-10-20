@@ -30,8 +30,7 @@ public class CommentServiceImpl implements CommentService {
                                                      BlogPostCommentRequest request,
                                                      Authentication authentication) {
         BlogComment comment = new BlogComment();
-        comment.setUser(userService.findByUsername("admin@email.com"));
-        //comment.setUser(userService.findByUsername(authentication.getName()));
+        comment.setUser(userService.findByUsername(authentication.getName()));
         comment.setPost(postService.findById(postId));
         comment.setStatus(CommentStatus.PENDING);
         comment.setComment(request.getComment());

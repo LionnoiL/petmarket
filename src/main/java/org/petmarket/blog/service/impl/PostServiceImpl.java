@@ -87,7 +87,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public BlogPostResponseDto savePost(BlogPostRequestDto requestDto,
                                         Authentication authentication) {
-        Post post = createPost(requestDto);
+        Post post = createPost(requestDto, authentication);
         postRepository.save(post);
         return postMapper.toDto(post);
     }
@@ -168,7 +168,7 @@ public class PostServiceImpl implements PostService {
         return words.length / AVERAGE_READING_WORDS_AMOUNT;
     }
 
-    private Post createPost(BlogPostRequestDto requestDto) {
+    private Post createPost(BlogPostRequestDto requestDto, Authentication authentication) {
         Post post = new Post();
 
         List<PostTranslations> postTranslations = new ArrayList<>();
@@ -179,8 +179,7 @@ public class PostServiceImpl implements PostService {
                 optionsService.getDefaultSiteLanguage().getLangCode());
         postTranslations.add(translation);
 
-        post.setUser(userService.findByUsername(TEMPORARY_USER_NAME));
-        //post.setUser(userService.findByUsername(authentication.getName()));
+        post.setUser(userService.findByUsername(authentication.getName()));
         post.setCategories(requestDto.getCategoriesIds().stream()
                 .map(categoryService::getBlogCategory)
                 .collect(Collectors.toList()));

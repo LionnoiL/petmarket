@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import org.petmarket.blog.dto.comment.BlogPostCommentResponse;
 import org.petmarket.blog.service.CommentService;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +22,7 @@ public class CommentAdminController {
     private final CommentService commentService;
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Get all comments", description = "Get all comments with pagination for admin")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "List of comments retrieved successfully"),
@@ -32,6 +34,7 @@ public class CommentAdminController {
     }
 
     @PutMapping("/{commentId}/{commentStatus}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Change comment status", description = "Change the status of a comment by ID")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Comment status changed successfully"),
@@ -55,6 +58,7 @@ public class CommentAdminController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @DeleteMapping("/{commentId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteComment(@PathVariable(name = "commentId")
                               @Parameter(description = "Comment ID",
                                       required = true) Long commentId) {

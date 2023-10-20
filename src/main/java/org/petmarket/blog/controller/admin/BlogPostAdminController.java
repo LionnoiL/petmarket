@@ -13,6 +13,7 @@ import org.petmarket.blog.dto.posts.BlogPostRequestDto;
 import org.petmarket.blog.dto.posts.BlogPostResponseDto;
 import org.petmarket.blog.service.PostService;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,6 +31,7 @@ public class BlogPostAdminController {
             @ApiResponse(responseCode = "400", description = "Invalid input data"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "500", description = "Internal server error")})
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping
     public BlogPostResponseDto createPost(@RequestBody @Valid BlogPostRequestDto requestDto,
                                           Authentication authentication) {
@@ -37,6 +39,7 @@ public class BlogPostAdminController {
     }
 
     @PostMapping("/{postId}/{langCode}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Add a translation",
             description = "Add a new translation for a blog post.")
     @ApiResponses(value = {
@@ -54,6 +57,7 @@ public class BlogPostAdminController {
     }
 
     @PutMapping("/{postId}/status/{status}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Update post status",
             description = "Update the status of a blog post.")
     @ApiResponses(value = {
@@ -70,6 +74,7 @@ public class BlogPostAdminController {
     }
 
     @PutMapping("/{postId}/{langCode}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Update a post",
             description = "Update the content of a blog post.")
     @ApiResponses(value = {
@@ -91,8 +96,8 @@ public class BlogPostAdminController {
             @ApiResponse(responseCode = "404", description = "Blog post not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")})
     @DeleteMapping("/{postId}")
+    @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-
     public void delete(@PathVariable(name = "postId")
                        @Parameter(description = "Post ID", required = true) Long postId) {
         postService.delete(postId);

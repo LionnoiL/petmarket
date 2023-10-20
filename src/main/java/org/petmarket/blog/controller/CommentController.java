@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.petmarket.blog.dto.comment.BlogPostCommentRequest;
 import org.petmarket.blog.dto.comment.BlogPostCommentResponse;
 import org.petmarket.blog.service.CommentService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,6 +22,7 @@ public class CommentController {
     private final CommentService commentService;
 
     @PostMapping("/{postId}")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @Operation(summary = "Create a new comment for a blog post",
             description = "Create a new comment for a specific blog post")
     @ApiResponses({
