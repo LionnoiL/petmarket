@@ -31,7 +31,7 @@ public class BlogPostAdminController {
             @ApiResponse(responseCode = "400", description = "Invalid input data"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "500", description = "Internal server error")})
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public BlogPostResponseDto createPost(@RequestBody @Valid BlogPostRequestDto requestDto,
                                           Authentication authentication) {
