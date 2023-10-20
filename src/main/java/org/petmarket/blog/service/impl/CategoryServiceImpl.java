@@ -39,9 +39,9 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public BlogPostCategoryResponseDto get(Long id, String langCode) {
-        BlogCategory category = getBlogCategory(id);
-        category.setTranslations(getTranslation(id, langCode));
+    public BlogPostCategoryResponseDto get(Long categoryId, String langCode) {
+        BlogCategory category = getBlogCategory(categoryId);
+        category.setTranslations(getTranslation(categoryId, langCode));
         return mapper.categoryToDto(category);
     }
 
@@ -61,10 +61,10 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public BlogPostCategoryResponseDto updateById(Long id,
+    public BlogPostCategoryResponseDto updateById(Long categoryId,
                                                   String langCode,
                                                   BlogPostCategoryRequestDto requestDto) {
-        BlogCategory category = getBlogCategory(id);
+        BlogCategory category = getBlogCategory(categoryId);
         category.getTranslations().stream()
                 .filter(translation -> translation.getLangCode().equals(checkedLang(langCode)))
                 .peek(translation -> {
@@ -77,9 +77,9 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public BlogCategory getBlogCategory(Long id) {
-        return categoryRepository.findById(id).orElseThrow(
-                () -> new ItemNotFoundException("Can't find category with id: " + id)
+    public BlogCategory getBlogCategory(Long categoryId) {
+        return categoryRepository.findById(categoryId).orElseThrow(
+                () -> new ItemNotFoundException("Can't find category with id: " + categoryId)
         );
     }
 

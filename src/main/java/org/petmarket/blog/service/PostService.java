@@ -8,7 +8,7 @@ import org.springframework.security.core.Authentication;
 import java.util.List;
 
 public interface PostService extends AbstractService<BlogPostResponseDto, BlogPostRequestDto> {
-    Post findById(Long id);
+    Post findById(Long postId);
 
     BlogPostResponseDto savePost(BlogPostRequestDto requestDto,
                                  Authentication authentication);

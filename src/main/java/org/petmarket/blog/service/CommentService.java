@@ -2,9 +2,8 @@ package org.petmarket.blog.service;
 
 import org.petmarket.blog.dto.comment.BlogPostCommentRequest;
 import org.petmarket.blog.dto.comment.BlogPostCommentResponse;
-import org.springframework.data.domain.Pageable;
+import org.petmarket.blog.dto.comment.BlogPostUpdateStatusRequest;
 import org.springframework.security.core.Authentication;
-
 import java.util.List;
 
 public interface CommentService extends AbstractService<BlogPostCommentResponse,
@@ -13,7 +12,7 @@ public interface CommentService extends AbstractService<BlogPostCommentResponse,
                                        BlogPostCommentRequest blogPostCommentRequest,
                                        Authentication authentication);
 
-    List<BlogPostCommentResponse> findAllCommentAdmin(Pageable pageable);
+    List<BlogPostCommentResponse> findAllCommentAdmin();
 
-    BlogPostCommentResponse updateStatus(Long commentId, String status);
+    List<BlogPostCommentResponse> updateStatus(BlogPostUpdateStatusRequest request);
 }

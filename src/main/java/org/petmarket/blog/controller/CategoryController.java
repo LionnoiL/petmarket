@@ -16,7 +16,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/v1/blog/categories")
 @RequiredArgsConstructor
-@Tag(name = "Blog Categories Management", description = "Endpoints for managing blog categories")
+@Tag(name = "Blog Categories", description = "Endpoints for managing blog categories")
 public class CategoryController {
     private final CategoryService categoryService;
 
@@ -36,7 +36,7 @@ public class CategoryController {
         return categoryService.getAll(pageable, langCode);
     }
 
-    @GetMapping("/{id}/{langCode}")
+    @GetMapping("/{categoryId}/{langCode}")
     @Operation(summary = "Get a blog category by ID", description = "Get a blog category by its ID and language code")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Blog category retrieved successfully"),
@@ -44,10 +44,10 @@ public class CategoryController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     public BlogPostCategoryResponseDto get(
-            @PathVariable(name = "id")
-            @Parameter(description = "Category ID", required = true) Long id,
+            @PathVariable(name = "categoryId")
+            @Parameter(description = "Category ID", required = true) Long categoryId,
             @PathVariable(name = "langCode")
             @Parameter(description = "Language code", required = true) String langCode) {
-        return categoryService.get(id, langCode);
+        return categoryService.get(categoryId, langCode);
     }
 }

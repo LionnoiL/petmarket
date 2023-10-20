@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/v1/admin/blog")
 @RequiredArgsConstructor
-@Tag(name = "Admin Blog Post Management", description = "Admin Blog Post")
+@Tag(name = "Blog Posts", description = "Blog Post endpoints")
 public class BlogPostAdminController {
     private final PostService postService;
 
@@ -39,7 +39,6 @@ public class BlogPostAdminController {
     }
 
     @PostMapping("/{postId}/{langCode}")
-    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Add a translation",
             description = "Add a new translation for a blog post.")
     @ApiResponses(value = {
@@ -57,7 +56,6 @@ public class BlogPostAdminController {
     }
 
     @PutMapping("/{postId}/status/{status}")
-    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Update post status",
             description = "Update the status of a blog post.")
     @ApiResponses(value = {
@@ -74,7 +72,6 @@ public class BlogPostAdminController {
     }
 
     @PutMapping("/{postId}/{langCode}")
-    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Update a post",
             description = "Update the content of a blog post.")
     @ApiResponses(value = {
@@ -96,7 +93,6 @@ public class BlogPostAdminController {
             @ApiResponse(responseCode = "404", description = "Blog post not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")})
     @DeleteMapping("/{postId}")
-    @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable(name = "postId")
                        @Parameter(description = "Post ID", required = true) Long postId) {

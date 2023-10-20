@@ -6,7 +6,7 @@ import org.petmarket.blog.entity.BlogCategory;
 
 public interface CategoryService extends AbstractService<BlogPostCategoryResponseDto,
         BlogPostCategoryRequestDto> {
-    BlogCategory getBlogCategory(Long id);
+    BlogCategory getBlogCategory(Long categoryId);
 
     BlogPostCategoryResponseDto addTranslation(Long categoryId,
                                                String langCode, BlogPostCategoryRequestDto requestDto);

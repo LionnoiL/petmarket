@@ -8,6 +8,4 @@ import java.util.Optional;
 public interface LanguageRepository extends LanguageRepositoryBasic {
 
     Optional<Language> findByLangCodeAndEnableIsTrue(String langCode);
-
-    Optional<Language> findByLangCode(String langCode);
 }

@@ -11,18 +11,16 @@ import org.petmarket.blog.dto.category.BlogPostCategoryRequestDto;
 import org.petmarket.blog.dto.category.BlogPostCategoryResponseDto;
 import org.petmarket.blog.service.CategoryService;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/v1/admin/blog/categories")
 @RequiredArgsConstructor
-@Tag(name = "Admin Blog Categories Management", description = "Endpoints for managing blog categories by admin")
+@Tag(name = "Blog Categories", description = "Endpoints for managing blog categories")
 public class CategoryAdminController {
     private final CategoryService categoryService;
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Save a new blog category",
             description = "Create a new blog category with the default language code")
     @ApiResponses({
@@ -34,8 +32,7 @@ public class CategoryAdminController {
         return categoryService.save(requestDto);
     }
 
-    @PostMapping("/{id}/{langCode}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/{categoryId}/{langCode}")
     @Operation(summary = "Add translation to a blog category",
             description = "Add translation to an existing blog category" +
                     " with the specified language code")
@@ -45,18 +42,17 @@ public class CategoryAdminController {
             @ApiResponse(responseCode = "400", description = "Invalid input data"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public BlogPostCategoryResponseDto addTranslation(@PathVariable(name = "id")
+    public BlogPostCategoryResponseDto addTranslation(@PathVariable(name = "categoryId")
                                                       @Parameter(description = "Category ID",
-                                                              required = true) Long id,
+                                                              required = true) Long categoryId,
                                                       @PathVariable(name = "langCode")
                                                       @Parameter(description = "Language code",
                                                               required = true) String langCode,
                                                       @RequestBody @Valid BlogPostCategoryRequestDto requestDto) {
-        return categoryService.addTranslation(id, langCode, requestDto);
+        return categoryService.addTranslation(categoryId, langCode, requestDto);
     }
 
-    @PutMapping("/{id}/{langCode}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/{categoryId}/{langCode}")
     @Operation(summary = "Add translation to a blog category",
             description = "Add translation to an existing blog category" +
                     " with the specified language code")
@@ -66,18 +62,17 @@ public class CategoryAdminController {
             @ApiResponse(responseCode = "400", description = "Invalid input data"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public BlogPostCategoryResponseDto updateCategory(@PathVariable(name = "id")
+    public BlogPostCategoryResponseDto updateCategory(@PathVariable(name = "categoryId")
                                                       @Parameter(description = "Category ID",
-                                                              required = true) Long id,
+                                                              required = true) Long categoryId,
                                                       @PathVariable(name = "langCode")
                                                       @Parameter(description = "Language code",
                                                               required = true) String langCode,
                                                       @RequestBody @Valid BlogPostCategoryRequestDto requestDto) {
-        return categoryService.updateById(id, langCode, requestDto);
+        return categoryService.updateById(categoryId, langCode, requestDto);
     }
 
-    @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/{categoryId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Delete a blog category", description = "Delete a blog category by ID")
     @ApiResponses({
@@ -85,10 +80,10 @@ public class CategoryAdminController {
             @ApiResponse(responseCode = "404", description = "Category not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public void deleteCategory(@PathVariable(name = "id")
+    public void deleteCategory(@PathVariable(name = "categoryId")
                                    @Parameter(description = "Category ID",
-                                           required = true) Long id) {
-        categoryService.delete(id);
+                                           required = true) Long categoryId) {
+        categoryService.delete(categoryId);
     }
 }
 

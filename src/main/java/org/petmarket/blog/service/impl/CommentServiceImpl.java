@@ -3,6 +3,7 @@ package org.petmarket.blog.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.petmarket.blog.dto.comment.BlogPostCommentRequest;
 import org.petmarket.blog.dto.comment.BlogPostCommentResponse;
+import org.petmarket.blog.dto.comment.BlogPostUpdateStatusRequest;
 import org.petmarket.blog.entity.BlogComment;
 import org.petmarket.blog.entity.CommentStatus;
 import org.petmarket.blog.mapper.BlogCommentMapper;
@@ -15,7 +16,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 @Service
 @RequiredArgsConstructor
@@ -39,18 +42,29 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public List<BlogPostCommentResponse> findAllCommentAdmin(Pageable pageable) {
-        return commentRepository.findAll(pageable).stream()
+    public List<BlogPostCommentResponse> findAllCommentAdmin() {
+        return commentRepository.findAll().stream()
                 .map(mapper::toDto)
                 .toList();
     }
 
     @Override
-    public BlogPostCommentResponse updateStatus(Long commentId, String status) {
-        BlogComment comment = getBlogComment(commentId);
-        comment.setStatus(CommentStatus.valueOf(status));
-        commentRepository.save(comment);
-        return mapper.toDto(comment);
+    public List<BlogPostCommentResponse> updateStatus(BlogPostUpdateStatusRequest requestDto) {
+
+        Stack<Long> commentsIds = requestDto.getCommentsIds();
+        List<BlogPostCommentResponse> resultList = new ArrayList<>();
+        while (!commentsIds.isEmpty()) {
+            Long commentId = commentsIds.pop();
+            BlogComment comment = getBlogComment(commentId);
+
+            if (comment != null) {
+                comment.setStatus(CommentStatus.valueOf(requestDto.getStatus()));
+                commentRepository.save(comment);
+                resultList.add(mapper.toDto(comment));
+            }
+        }
+
+        return resultList;
     }
 
     @Override
@@ -65,7 +79,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public List<BlogPostCommentResponse> getAll(Pageable pageable, String langCode) {
-        return findAllCommentAdmin(pageable);
+        return findAllCommentAdmin();
     }
 
     @Override

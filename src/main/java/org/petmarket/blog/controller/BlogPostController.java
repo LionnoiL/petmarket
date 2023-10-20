@@ -2,6 +2,7 @@ package org.petmarket.blog.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.petmarket.blog.dto.posts.BlogPostResponseDto;
 import org.petmarket.blog.service.PostService;
@@ -13,6 +14,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/v1/blog")
 @RequiredArgsConstructor
+@Tag(name = "Blog Posts", description = "Blog Post endpoints")
 public class BlogPostController {
     private final PostService postService;
 

@@ -17,18 +17,19 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/v1/blog/comments")
 @RequiredArgsConstructor
-@Tag(name = "Blog Comments Management", description = "Endpoints for managing blog comments")
+@Tag(name = "Blog Comments", description = "Endpoints for managing blog comments")
 public class CommentController {
     private final CommentService commentService;
 
     @PostMapping("/{postId}")
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Create a new comment for a blog post",
             description = "Create a new comment for a specific blog post")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Comment created successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid input data"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "404", description = "Comment not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     public BlogPostCommentResponse createComment(

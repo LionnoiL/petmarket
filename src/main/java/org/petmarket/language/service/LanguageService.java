@@ -36,7 +36,7 @@ public class LanguageService {
     }
 
     public Language getByLangCode(String langCode) {
-        return languageRepository.findByLangCode(langCode).orElseThrow(() -> {
+        return languageRepository.findByLangCodeAndEnableIsTrue(langCode).orElseThrow(() -> {
             throw new ItemNotFoundException("Language " + "-" + langCode + "-" + " not found");
         });
     }

@@ -10,6 +10,9 @@ import org.petmarket.config.MapperConfig;
 public interface BlogCommentMapper {
 
     @Mapping(target = "userName", source = "user.username")
+    @Mapping(target = "userId", source = "user.id")
+    @Mapping(target = "firstName", source = "user.firstName")
+    @Mapping(target = "lastName", source = "user.lastName")
     @Mapping(target = "postId", source = "post.id")
     BlogPostCommentResponse toDto(BlogComment blogComment);
 
