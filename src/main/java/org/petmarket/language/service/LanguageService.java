@@ -35,6 +35,12 @@ public class LanguageService {
         return languageMapper.mapEntityToDto(languages);
     }
 
+    public Language getByLangCode(String langCode) {
+        return languageRepository.findByLangCodeAndEnableIsTrue(langCode).orElseThrow(() -> {
+            throw new ItemNotFoundException("Language " + "-" + langCode + "-" + " not found");
+        });
+    }
+
     @Transactional
     public LanguageResponseDto enableLanguage(String langCode) {
         Language language = languageRepository.findById(langCode).orElseThrow(() -> {

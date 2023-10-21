@@ -61,7 +61,8 @@ public class AdvertisementCategoryAdminController {
     @PostMapping
     @ResponseBody
     public AdvertisementCategoryResponseDto addCategory(
-            @RequestBody @Valid @NotNull(message = "Request body is mandatory") final AdvertisementCategoryCreateRequestDto request, BindingResult bindingResult) {
+            @RequestBody @Valid @NotNull(message = "Request body is mandatory")
+            final AdvertisementCategoryCreateRequestDto request, BindingResult bindingResult) {
         log.info("Received request to create Advertisement Category - {}.", request);
         return categoryService.addCategory(request, bindingResult);
     }
@@ -100,7 +101,8 @@ public class AdvertisementCategoryAdminController {
                     schema = @Schema(type = "string")
             )
             @PathVariable String langCode,
-            @RequestBody @Valid @NotNull(message = "Request body is mandatory") final AdvertisementCategoryUpdateRequestDto request, BindingResult bindingResult) {
+            @RequestBody @Valid @NotNull(message = "Request body is mandatory")
+            final AdvertisementCategoryUpdateRequestDto request, BindingResult bindingResult) {
         log.info("Received request to update advertisement category - {} with id {}.", request, id);
         return categoryService.updateCategory(id, langCode, request, bindingResult);
     }

@@ -1,0 +1,2 @@
+ALTER TABLE blog_posts
+ADD alias VARCHAR(500) NOT NULL;

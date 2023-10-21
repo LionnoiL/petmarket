@@ -21,5 +21,5 @@ public class CategoryTranslation {
     private String categoryDescription;
     @ManyToOne
     @JoinColumn(name = "owner_id", nullable = false)
-    private Category category;
+    private BlogCategory blogCategory;
 }

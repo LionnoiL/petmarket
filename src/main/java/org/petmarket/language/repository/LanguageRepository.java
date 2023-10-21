@@ -2,7 +2,6 @@ package org.petmarket.language.repository;
 
 import org.petmarket.language.entity.Language;
 import org.springframework.stereotype.Repository;
-
 import java.util.Optional;
 
 @Repository
