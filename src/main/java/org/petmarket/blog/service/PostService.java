@@ -20,5 +20,5 @@ public interface PostService extends AbstractService<BlogPostResponseDto, BlogPo
     List<BlogPostResponseDto> getAllByCategory(String langCode,
                                                Long categoryId);
 
-    BlogPostResponseDto updateStatus(Long postId, String status);
+    BlogPostResponseDto updateStatus(Long postId, Post.Status status);
 }

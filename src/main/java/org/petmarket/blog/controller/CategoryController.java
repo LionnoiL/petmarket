@@ -26,6 +26,8 @@ public class CategoryController {
     @ApiResponses({
             @ApiResponse(responseCode = "200",
                     description = "List of blog categories returned successfully"),
+            @ApiResponse(responseCode = "400",
+                    description = "Language not found"),
             @ApiResponse(responseCode = "500",
                     description = "Internal server error")
     })

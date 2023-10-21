@@ -5,14 +5,14 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.petmarket.blog.dto.comment.BlogPostCommentResponse;
-import org.petmarket.blog.dto.comment.BlogPostUpdateStatusRequest;
+import org.petmarket.blog.entity.CommentStatus;
 import org.petmarket.blog.service.CommentService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Stack;
 
 @RestController
 @RequestMapping("/v1/admin/blog/comments")
@@ -31,7 +31,7 @@ public class CommentAdminController {
         return commentService.findAllCommentAdmin();
     }
 
-    @PutMapping("/updateStatus")
+    @PutMapping("/{commentsIds}/updateStatus")
     @Operation(summary = "Change comment status", description = "Change the status of a comment by ID")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Comment status changed successfully"),
@@ -40,8 +40,9 @@ public class CommentAdminController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     public List<BlogPostCommentResponse> changeCommentStatus(
-            @RequestBody @Valid BlogPostUpdateStatusRequest requestDto) {
-        return commentService.updateStatus(requestDto);
+            @PathVariable Stack<Long> commentsIds,
+            @RequestParam CommentStatus status) {
+        return commentService.updateStatus(commentsIds, status);
     }
 
     @Operation(summary = "Delete a comment", description = "Delete a comment by ID")

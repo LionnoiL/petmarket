@@ -12,6 +12,8 @@ import java.util.List;
 public class BlogPostResponseDto {
     private Long id;
     private String userName;
+    private String firstName;
+    private String lastName;
     private LocalDateTime created;
     private LocalDateTime updated;
     private int readingMinutes;

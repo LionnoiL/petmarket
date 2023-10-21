@@ -29,7 +29,7 @@ public class CommentController {
             @ApiResponse(responseCode = "200", description = "Comment created successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid input data"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "404", description = "Comment not found"),
+            @ApiResponse(responseCode = "404", description = "Post not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     public BlogPostCommentResponse createComment(

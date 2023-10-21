@@ -3,7 +3,6 @@ package org.petmarket.blog.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.petmarket.blog.dto.comment.BlogPostCommentRequest;
 import org.petmarket.blog.dto.comment.BlogPostCommentResponse;
-import org.petmarket.blog.dto.comment.BlogPostUpdateStatusRequest;
 import org.petmarket.blog.entity.BlogComment;
 import org.petmarket.blog.entity.CommentStatus;
 import org.petmarket.blog.mapper.BlogCommentMapper;
@@ -15,7 +14,6 @@ import org.petmarket.users.service.UserService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -37,7 +35,6 @@ public class CommentServiceImpl implements CommentService {
         comment.setPost(postService.findById(postId));
         comment.setStatus(CommentStatus.PENDING);
         comment.setComment(request.getComment());
-        comment.setCreated(LocalDateTime.now());
         return mapper.toDto(commentRepository.save(comment));
     }
 
@@ -49,16 +46,15 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public List<BlogPostCommentResponse> updateStatus(BlogPostUpdateStatusRequest requestDto) {
+    public List<BlogPostCommentResponse> updateStatus(Stack<Long> commentIds, CommentStatus status) {
 
-        Stack<Long> commentsIds = requestDto.getCommentsIds();
         List<BlogPostCommentResponse> resultList = new ArrayList<>();
-        while (!commentsIds.isEmpty()) {
-            Long commentId = commentsIds.pop();
+        while (!commentIds.isEmpty()) {
+            Long commentId = commentIds.pop();
             BlogComment comment = getBlogComment(commentId);
 
             if (comment != null) {
-                comment.setStatus(CommentStatus.valueOf(requestDto.getStatus()));
+                comment.setStatus(status);
                 commentRepository.save(comment);
                 resultList.add(mapper.toDto(comment));
             }

@@ -14,6 +14,7 @@ import org.petmarket.language.service.LanguageService;
 import org.petmarket.options.service.OptionsService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -65,14 +66,23 @@ public class CategoryServiceImpl implements CategoryService {
                                                   String langCode,
                                                   BlogPostCategoryRequestDto requestDto) {
         BlogCategory category = getBlogCategory(categoryId);
-        category.getTranslations().stream()
-                .filter(translation -> translation.getLangCode().equals(checkedLang(langCode)))
-                .peek(translation -> {
-                    translation.setCategoryName(requestDto.getTitle());
-                    translation.setCategoryDescription(requestDto.getDescription());
-                })
-                .toList();
-        categoryRepository.save(category);
+
+        boolean langCodeExist = category.getTranslations().stream()
+                .anyMatch(translation -> translation.getLangCode().equals(checkedLang(langCode)));
+        if (langCodeExist) {
+            category.getTranslations().stream()
+                    .filter(translation -> translation.getLangCode().equals(checkedLang(langCode)))
+                    .peek(translation -> {
+                        translation.setCategoryName(requestDto.getTitle());
+                        translation.setCategoryDescription(requestDto.getDescription());
+                    })
+                    .toList();
+            categoryRepository.save(category);
+        } else {
+            throw new ItemNotUpdatedException("No Translation for this Language: "
+                    + langCode + ". Create translation first");
+        }
+
         return mapper.categoryToDto(category);
     }
 

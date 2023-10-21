@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.petmarket.blog.dto.posts.BlogPostRequestDto;
 import org.petmarket.blog.dto.posts.BlogPostResponseDto;
+import org.petmarket.blog.entity.Post;
 import org.petmarket.blog.service.PostService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -67,7 +68,7 @@ public class BlogPostAdminController {
     public BlogPostResponseDto updateStatus(@Parameter(description = "Post ID", required = true)
                                             @PathVariable Long postId,
                                             @Parameter(description = "New status", required = true)
-                                            @PathVariable String status) {
+                                            @PathVariable Post.Status status) {
         return postService.updateStatus(postId, status);
     }
 

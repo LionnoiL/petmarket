@@ -20,8 +20,6 @@ import org.petmarket.utils.TransliterateUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,7 +28,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PostServiceImpl implements PostService {
     private static final int AVERAGE_READING_WORDS_AMOUNT = 150;
-    private static final String TEMPORARY_USER_NAME = "admin@email.com";
     private final PostRepository postRepository;
     private final BlogPostMapper postMapper;
     private final UserService userService;
@@ -130,9 +127,9 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public BlogPostResponseDto updateStatus(Long postId, String status) {
+    public BlogPostResponseDto updateStatus(Long postId, Post.Status status) {
         Post post = findById(postId);
-        post.setStatus(Post.Status.valueOf(status));
+        post.setStatus(status);
         postRepository.save(post);
         return postMapper.toDto(post);
     }
@@ -185,8 +182,6 @@ public class PostServiceImpl implements PostService {
                 .collect(Collectors.toList()));
         post.setTranslations(postTranslations);
         post.setStatus(Post.Status.DRAFT);
-        post.setCreated(LocalDateTime.now());
-        post.setUpdated(LocalDateTime.now());
         post.setReadingMinutes(getReadingMinutes(requestDto.getText()));
         post.setAlias(transliterateUtils.getAlias(Post.class.getSimpleName(), translation.getTitle()));
         return post;
@@ -197,15 +192,10 @@ public class PostServiceImpl implements PostService {
     }
 
     private List<Post> findAllByBlogCategoryId(Long categoryId) {
-        List<Post> posts = postRepository.findAll().stream()
-                .filter(post -> post.getCategories().stream()
-                        .anyMatch(category -> category.getId().equals(categoryId)))
-                .collect(Collectors.toList());
-
+        List<Post> posts = postRepository.findPostsByCategoryId(categoryId);
         if (posts.isEmpty()) {
             throw new ItemNotFoundException("Can't find posts for category: " + categoryId);
         }
-
         return posts;
     }
 
