@@ -1,6 +1,8 @@
 package org.petmarket.location.entity;
 
 import jakarta.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.*;
 
 @Entity
@@ -25,4 +27,7 @@ public class State {
     @ManyToOne
     @JoinColumn(name = "country_id")
     private Country country;
+
+    @OneToMany(mappedBy = "state", fetch = FetchType.LAZY)
+    private Set<City> cities = new HashSet<>();
 }

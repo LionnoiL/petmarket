@@ -12,8 +12,9 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.errorhandling.ErrorResponse;
-import org.petmarket.location.dto.CityResponseDto;
-import org.petmarket.location.service.CityService;
+import org.petmarket.location.dto.CountryResponseDto;
+import org.petmarket.location.dto.StateResponseDto;
+import org.petmarket.location.service.CountryService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,82 +25,78 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping(value = "/v1/cities")
-public class CityController {
+@RequestMapping(value = "/v1/countries")
+public class CountryController {
 
-    private final CityService cityService;
+    private final CountryService countryService;
 
-    @Operation(summary = "Get City by ID")
+    @Operation(summary = "Get Country by ID")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Successful operation", content = {
             @Content(mediaType = "application/json", schema =
-            @Schema(implementation = CityResponseDto.class))
+            @Schema(implementation = CountryResponseDto.class))
         }),
-        @ApiResponse(responseCode = "404", description = "City not found", content = {
+        @ApiResponse(responseCode = "404", description = "Country not found", content = {
             @Content(mediaType = "application/json", schema =
             @Schema(implementation = ErrorResponse.class))
         })
     })
     @GetMapping("/{id}")
     @ResponseBody
-    public CityResponseDto getCityById(
-        @Parameter(description = "The ID of the city to retrieve", required = true,
+    public CountryResponseDto getStateById(
+        @Parameter(description = "The ID of the Country to retrieve", required = true,
             schema = @Schema(type = "integer", format = "int64")
         )
         @PathVariable Long id) {
-        log.info("Received request to get the City with id - {}.", id);
-        CityResponseDto dto = cityService.findById(id);
-        log.info("the City with id - {} was retrieved - {}.", id, dto);
+        log.info("Received request to get the Country with id - {}.", id);
+        CountryResponseDto dto = countryService.findById(id);
+        log.info("the Country with id - {} was retrieved - {}.", id, dto);
         return dto;
     }
 
-    @Operation(summary = "Get City by Name")
+    @Operation(summary = "Get Country by Name")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Successful operation", content = {
             @Content(
                 mediaType = "application/json",
                 array = @ArraySchema(schema = @Schema(
-                    implementation = CityResponseDto.class))
+                    implementation = CountryResponseDto.class))
             )
         })
     })
     @GetMapping("/byName/{name}")
     @ResponseBody
-    public List<CityResponseDto> getCityByName(
-        @Parameter(description = "The Name of the city to retrieve", required = true,
+    public List<CountryResponseDto> getCountryByName(
+        @Parameter(description = "The Name of the Country to retrieve", required = true,
             schema = @Schema(type = "string")
         )
         @PathVariable String name) {
-        log.info("Received request to get the City with name - {}.", name);
-        List<CityResponseDto> dto = cityService.findByName(name);
-        log.info("the City with name - {} was retrieved - {}.", name, dto);
+        log.info("Received request to get the Country with name - {}.", name);
+        List<CountryResponseDto> dto = countryService.findByName(name);
+        log.info("the Country with name - {} was retrieved - {}.", name, dto);
         return dto;
     }
 
-    @Operation(summary = "Get City by Name and State ID")
+    @Operation(summary = "Get the states of the Country")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Successful operation", content = {
             @Content(
                 mediaType = "application/json",
                 array = @ArraySchema(schema = @Schema(
-                    implementation = CityResponseDto.class))
+                    implementation = StateResponseDto.class))
             )
         })
     })
-    @GetMapping("/byName/{name}/byStateId/{id}")
+    @GetMapping("/{id}/states")
     @ResponseBody
-    public List<CityResponseDto> getCityByNameAndStateId(
-        @Parameter(description = "The Name of the city to retrieve", required = true,
-            schema = @Schema(type = "string")
-        )
-        @PathVariable String name,
+    public List<StateResponseDto> getStatesByState(
         @Parameter(description = "The ID of the state to retrieve", required = true,
             schema = @Schema(type = "integer", format = "int64")
         )
         @PathVariable Long id) {
-        log.info("Received request to get the City with name - {}.", name);
-        List<CityResponseDto> dto = cityService.findByNameAndStateId(name, id);
-        log.info("the City with name - {} was retrieved - {}.", name, dto);
+        log.info("Received request to get the states of the country with id - {}.", id);
+        List<StateResponseDto> dto = countryService.getStatesByCountryId(id);
+        log.info("States of the country with id {} - {}", id, dto);
         return dto;
     }
 }

@@ -43,6 +43,16 @@ public class CityService {
             .toList();
     }
 
+    public List<CityResponseDto> findByNameAndStateId(String name, Long id) {
+        State state = stateRepository.findById(id).orElseThrow(() -> {
+            throw new ItemNotFoundException(STATE_NOT_FOUND_MESSAGE);
+        });
+        return cityRepository.findByStateAndNameContainingOrderByName(state, name)
+            .stream()
+            .map(cityMapper::mapEntityToDto)
+            .toList();
+    }
+
     public void deleteCity(Long id) {
         City city = cityRepository.findById(id).orElseThrow(() -> {
             throw new ItemNotFoundException(CITY_NOT_FOUND_MESSAGE);

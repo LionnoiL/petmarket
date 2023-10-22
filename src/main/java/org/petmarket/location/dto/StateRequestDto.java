@@ -1,5 +1,6 @@
 package org.petmarket.location.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -25,10 +26,12 @@ public class StateRequestDto {
         = "Name must be between 1 and 250 characters")
     private String name;
 
+    @Schema(example = "1", description = "Country ID")
     public Long getCountryId() {
         return countryId;
     }
 
+    @Schema(example = "Одеська область", description = "State name")
     public String getName() {
         return name;
     }
