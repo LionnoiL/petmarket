@@ -41,7 +41,6 @@ public class AdvertisementCategoryService {
     private final AdvertisementRepository advertisementRepository;
     private final AdvertisementCategoryMapper categoryMapper;
     private final AdvertisementCategoryResponseTranslateMapper categoryResponseTranslateMapper;
-    private final ErrorUtils errorUtils;
     private final OptionsService optionsService;
     private final TransliterateUtils transliterateUtils;
 
@@ -85,7 +84,7 @@ public class AdvertisementCategoryService {
     public AdvertisementCategoryResponseDto addCategory(
             AdvertisementCategoryCreateRequestDto request, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            throw new ItemNotCreatedException(errorUtils.getErrorsString(bindingResult));
+            throw new ItemNotCreatedException(ErrorUtils.getErrorsString(bindingResult));
         }
 
         AdvertisementCategory parentCategory = null;
@@ -124,7 +123,7 @@ public class AdvertisementCategoryService {
     public AdvertisementCategoryResponseDto updateCategory(
             Long id, String langCode, AdvertisementCategoryUpdateRequestDto request, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            throw new ItemNotUpdatedException(errorUtils.getErrorsString(bindingResult));
+            throw new ItemNotUpdatedException(ErrorUtils.getErrorsString(bindingResult));
         }
 
         Language language = getLanguage(langCode);

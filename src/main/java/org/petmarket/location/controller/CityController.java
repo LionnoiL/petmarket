@@ -53,7 +53,7 @@ public class CityController {
         return dto;
     }
 
-    @Operation(summary = "Get City by ID")
+    @Operation(summary = "Get City by Name")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Successful operation", content = {
             @Content(
@@ -63,7 +63,7 @@ public class CityController {
             )
         })
     })
-    @GetMapping("/{name}")
+    @GetMapping("/byName/{name}")
     @ResponseBody
     public List<CityResponseDto> getCityByName(
         @Parameter(description = "The Name of the city to retrieve", required = true,

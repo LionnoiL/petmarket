@@ -14,6 +14,7 @@ public class CityResponseDto {
     private Long id;
     private Long stateId;
     private String name;
+    private String alias;
 
     public Long getId() {
         return id;
@@ -25,5 +26,9 @@ public class CityResponseDto {
 
     public String getName() {
         return name;
+    }
+
+    public String getAlias() {
+        return alias;
     }
 }

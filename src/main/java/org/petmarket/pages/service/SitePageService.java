@@ -40,7 +40,6 @@ public class SitePageService {
     private final LanguageRepository languageRepository;
     private final SitePageMapper pageMapper;
     private final SitePageResponseTranslateMapper sitePageResponseTranslateMapper;
-    private final ErrorUtils errorUtils;
     private final OptionsService optionsService;
 
     private SitePageTranslate getTranslation(SitePage page, Language language) {
@@ -75,7 +74,7 @@ public class SitePageService {
     @Transactional
     public SitePageResponseDto addPage(SitePageCreateRequestDto request, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            throw new ItemNotCreatedException(errorUtils.getErrorsString(bindingResult));
+            throw new ItemNotCreatedException(ErrorUtils.getErrorsString(bindingResult));
         }
 
         Language defaultSiteLanguage = optionsService.getDefaultSiteLanguage();
@@ -100,7 +99,7 @@ public class SitePageService {
     public SitePageResponseDto updatePage(Long id, String langCode, SitePageUpdateRequestDto request,
                                           BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            throw new ItemNotUpdatedException(errorUtils.getErrorsString(bindingResult));
+            throw new ItemNotUpdatedException(ErrorUtils.getErrorsString(bindingResult));
         }
         Language language = languageRepository.findByLangCodeAndEnableIsTrue(langCode).orElseThrow(() -> {
             throw new ItemNotFoundException(LANGUAGE_NOT_FOUND_MESSAGE);
