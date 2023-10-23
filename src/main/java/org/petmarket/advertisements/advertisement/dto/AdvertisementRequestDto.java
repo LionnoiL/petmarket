@@ -10,4 +10,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AdvertisementRequestDto {
+
+    private String title;
+    private String description;
 }

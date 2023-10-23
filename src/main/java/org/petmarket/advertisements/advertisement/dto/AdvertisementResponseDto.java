@@ -11,6 +11,7 @@ import org.petmarket.advertisements.category.dto.AdvertisementCategoryResponseDt
 import org.petmarket.advertisements.images.dto.AdvertisementImageResponseDto;
 import org.petmarket.advertisements.review.dto.AdvertisementReviewResponseDto;
 import org.petmarket.delivery.dto.DeliveryResponseDto;
+import org.petmarket.location.dto.LocationResponseDto;
 import org.petmarket.payment.dto.PaymentResponseDto;
 import org.petmarket.users.dto.UserResponseDto;
 
@@ -35,7 +36,7 @@ public class AdvertisementResponseDto {
     private String title;
     private String description;
     private BigDecimal price;
-    private String location;
+    private LocationResponseDto location;
     private AdvertisementCategoryResponseDto category;
     private List<DeliveryResponseDto> deliveries;
     private List<PaymentResponseDto> payments;
@@ -46,5 +47,87 @@ public class AdvertisementResponseDto {
     private List<AdvertisementReviewResponseDto> reviews;
     private List<AdvertisementImageResponseDto> images;
 
+    public Long getId() {
+        return id;
+    }
 
+    public LocalDate getCreated() {
+        return created;
+    }
+
+    public LocalDate getUpdated() {
+        return updated;
+    }
+
+    public LocalDate getEnding() {
+        return ending;
+    }
+
+    public String getLangCode() {
+        return langCode;
+    }
+
+    public AdvertisementStatus getStatus() {
+        return status;
+    }
+
+    public UserResponseDto getAuthor() {
+        return author;
+    }
+
+    public String getAlias() {
+        return alias;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public LocationResponseDto getLocation() {
+        return location;
+    }
+
+    public AdvertisementCategoryResponseDto getCategory() {
+        return category;
+    }
+
+    public List<DeliveryResponseDto> getDeliveries() {
+        return deliveries;
+    }
+
+    public List<PaymentResponseDto> getPayments() {
+        return payments;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public AdvertisementType getType() {
+        return type;
+    }
+
+    public int getRating() {
+        return rating;
+    }
+
+    public List<AttributeValueResponseDto> getAttributes() {
+        return attributes;
+    }
+
+    public List<AdvertisementReviewResponseDto> getReviews() {
+        return reviews;
+    }
+
+    public List<AdvertisementImageResponseDto> getImages() {
+        return images;
+    }
 }
