@@ -31,7 +31,7 @@ public class AdvertisementResponseDto {
     private LocalDate ending;
     private String langCode;
     private AdvertisementStatus status;
-    private UserResponseDto author;
+    private AuthorResponseDto author;
     private String alias;
     private String title;
     private String description;
@@ -71,7 +71,7 @@ public class AdvertisementResponseDto {
         return status;
     }
 
-    public UserResponseDto getAuthor() {
+    public AuthorResponseDto getAuthor() {
         return author;
     }
 

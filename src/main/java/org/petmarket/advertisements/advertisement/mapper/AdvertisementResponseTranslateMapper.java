@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.petmarket.advertisements.advertisement.dto.AdvertisementResponseDto;
 import org.petmarket.advertisements.advertisement.entity.Advertisement;
 import org.petmarket.advertisements.advertisement.entity.AdvertisementTranslate;
+import org.petmarket.advertisements.category.mapper.AdvertisementCategoryResponseTranslateMapper;
 import org.petmarket.language.entity.Language;
 import org.petmarket.options.service.OptionsService;
 import org.petmarket.translate.LanguageHolder;
@@ -22,6 +23,7 @@ public class AdvertisementResponseTranslateMapper {
     private final OptionsService optionsService;
     private final TranslationService translationService;
     private final AdvertisementMapper mapper;
+    private final AdvertisementCategoryResponseTranslateMapper categoryMapper;
 
     public AdvertisementResponseDto mapEntityToDto(Advertisement entity, Language language) {
         AdvertisementTranslate translation = (AdvertisementTranslate) translationService.getTranslate(
@@ -33,6 +35,7 @@ public class AdvertisementResponseTranslateMapper {
         dto.setTitle(translation.getTitle());
         dto.setDescription(translation.getDescription());
         dto.setLangCode(language.getLangCode());
+        dto.setCategory(categoryMapper.mapEntityToDto(entity.getCategory(), language));
 
         return dto;
     }
