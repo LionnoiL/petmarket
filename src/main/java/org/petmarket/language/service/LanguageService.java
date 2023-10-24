@@ -42,9 +42,7 @@ public class LanguageService {
 
     @Transactional
     public LanguageResponseDto enableLanguage(String langCode) {
-        Language language = languageRepository.findById(langCode).orElseThrow(() -> {
-            throw new ItemNotFoundException("Language not found");
-        });
+        Language language = getLanguage(langCode);
         language.setEnable(true);
         languageRepository.save(language);
         return languageMapper.mapEntityToDto(language);
@@ -52,11 +50,9 @@ public class LanguageService {
 
     @Transactional
     public LanguageResponseDto disableLanguage(String langCode) {
-        Language language = languageRepository.findById(langCode).orElseThrow(() -> {
-            throw new ItemNotFoundException("Language not found");
-        });
-
+        Language language = getLanguage(langCode);
         Language defaultSiteLanguage = optionsService.getDefaultSiteLanguage();
+
         if (language.equals(defaultSiteLanguage)) {
             throw new ItemNotUpdatedException("Language is default in site options");
         }
@@ -68,9 +64,7 @@ public class LanguageService {
 
     @Transactional
     public LanguageResponseDto addLanguage(LanguageCreateRequestDto dto, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            throw new ItemNotCreatedException(ErrorUtils.getErrorsString(bindingResult));
-        }
+        ErrorUtils.checkItemNotCreatedException(bindingResult);
         languageRepository.findById(dto.getLangCode())
                 .ifPresent(language -> {
                     throw new ItemNotCreatedException("The language is already in the database");
@@ -85,17 +79,19 @@ public class LanguageService {
     @Transactional
     public LanguageResponseDto updateLanguage(String langCode, LanguageUpdateRequestDto dto,
                                               BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            throw new ItemNotUpdatedException(ErrorUtils.getErrorsString(bindingResult));
-        }
+        ErrorUtils.checkItemNotUpdatedException(bindingResult);
 
-        Language language = languageRepository.findById(langCode).orElseThrow(() -> {
-            throw new ItemNotFoundException("Language not found");
-        });
+        Language language = getLanguage(langCode);
         language.setName(dto.getName());
         language.setEnable(dto.getEnable());
 
         languageRepository.save(language);
         return languageMapper.mapEntityToDto(language);
+    }
+
+    private Language getLanguage(String langCode) {
+        return languageRepository.findById(langCode).orElseThrow(() -> {
+            throw new ItemNotFoundException("Language not found");
+        });
     }
 }

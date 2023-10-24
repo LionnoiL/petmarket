@@ -3,6 +3,7 @@ package org.petmarket.advertisements.advertisement.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.advertisements.advertisement.dto.AdvertisementResponseDto;
+import org.petmarket.advertisements.advertisement.entity.Advertisement;
 import org.petmarket.advertisements.advertisement.mapper.AdvertisementResponseTranslateMapper;
 import org.petmarket.advertisements.advertisement.repository.AdvertisementRepository;
 import org.petmarket.errorhandling.ItemNotFoundException;
@@ -27,6 +28,11 @@ public class AdvertisementService {
     private final OptionsService optionsService;
     private final TransliterateUtils transliterateUtils;
 
+    public AdvertisementResponseDto findById(Long id, String langCode) {
+        Language language = getLanguage(langCode);
+        return translateMapper.mapEntityToDto(getAdvertisement(id), language);
+    }
+
     private Language getLanguage(String langCode) {
         return languageRepository.findByLangCodeAndEnableIsTrue(langCode)
                 .orElseThrow(() -> {
@@ -34,11 +40,8 @@ public class AdvertisementService {
                 });
     }
 
-    public AdvertisementResponseDto findById(Long id, String langCode) {
-        Language language = getLanguage(langCode);
-
+    private Advertisement getAdvertisement(Long id) {
         return advertisementRepository.findById(id)
-                .map(category -> translateMapper.mapEntityToDto(category, language))
                 .orElseThrow(() -> new ItemNotFoundException(ADVERTISEMENT_NOT_FOUND_MESSAGE));
     }
 }
