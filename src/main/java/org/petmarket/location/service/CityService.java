@@ -30,9 +30,7 @@ public class CityService {
     private final TransliterateUtils transliterateUtils;
 
     public CityResponseDto findById(Long id) {
-        return cityRepository.findById(id)
-                .map(cityMapper::mapEntityToDto)
-                .orElseThrow(() -> new ItemNotFoundException(CITY_NOT_FOUND_MESSAGE));
+        return cityMapper.mapEntityToDto(getCity(id));
     }
 
     public List<CityResponseDto> findByName(String name) {
