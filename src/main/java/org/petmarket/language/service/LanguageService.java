@@ -28,7 +28,6 @@ public class LanguageService {
     private final LanguageRepository languageRepository;
     private final OptionsService optionsService;
     private final LanguageMapper languageMapper;
-    private final ErrorUtils errorUtils;
 
     public Collection<LanguageResponseDto> getAll() {
         List<Language> languages = languageRepository.findAll();
@@ -70,7 +69,7 @@ public class LanguageService {
     @Transactional
     public LanguageResponseDto addLanguage(LanguageCreateRequestDto dto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            throw new ItemNotCreatedException(errorUtils.getErrorsString(bindingResult));
+            throw new ItemNotCreatedException(ErrorUtils.getErrorsString(bindingResult));
         }
         languageRepository.findById(dto.getLangCode())
                 .ifPresent(language -> {
@@ -87,7 +86,7 @@ public class LanguageService {
     public LanguageResponseDto updateLanguage(String langCode, LanguageUpdateRequestDto dto,
                                               BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            throw new ItemNotUpdatedException(errorUtils.getErrorsString(bindingResult));
+            throw new ItemNotUpdatedException(ErrorUtils.getErrorsString(bindingResult));
         }
 
         Language language = languageRepository.findById(langCode).orElseThrow(() -> {
