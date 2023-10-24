@@ -1,7 +1,5 @@
 package org.petmarket.location.service;
 
-import java.util.Comparator;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.errorhandling.ItemNotFoundException;
@@ -16,6 +14,9 @@ import org.petmarket.location.repository.CountryRepository;
 import org.petmarket.location.repository.StateRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
+import java.util.List;
+
 @Slf4j
 @RequiredArgsConstructor
 @Service
@@ -29,33 +30,39 @@ public class StateService {
     private final CityMapper cityMapper;
 
     public StateResponseDto findById(Long id) {
-        return stateRepository.findById(id)
-            .map(stateMapper::mapEntityToDto)
-            .orElseThrow(() -> new ItemNotFoundException(STATE_NOT_FOUND_MESSAGE));
+        return stateMapper.mapEntityToDto(getState(id));
     }
 
     public List<StateResponseDto> findByName(String name) {
         return stateRepository.findByNameContainingOrderByName(name)
-            .stream()
-            .map(stateMapper::mapEntityToDto)
-            .toList();
+                .stream()
+                .map(stateMapper::mapEntityToDto)
+                .toList();
     }
 
     public List<CityResponseDto> getCitiesByStateId(Long id) {
-        State state = stateRepository.findById(id)
-            .orElseThrow(() -> new ItemNotFoundException(STATE_NOT_FOUND_MESSAGE));
+        State state = getState(id);
         return state.getCities().stream()
-            .sorted(Comparator.comparing(City::getName))
-            .map(cityMapper::mapEntityToDto).toList();
+                .sorted(Comparator.comparing(City::getName))
+                .map(cityMapper::mapEntityToDto).toList();
     }
 
     public List<StateResponseDto> findByNameAndCountryId(String name, Long id) {
-        Country country = countryRepository.findById(id).orElseThrow(() -> {
-            throw new ItemNotFoundException(COUNTRY_NOT_FOUND_MESSAGE);
-        });
+        Country country = getCountry(id);
         return stateRepository.findByCountryAndNameContainingOrderByName(country, name)
-            .stream()
-            .map(stateMapper::mapEntityToDto)
-            .toList();
+                .stream()
+                .map(stateMapper::mapEntityToDto)
+                .toList();
+    }
+
+    private State getState(Long stateId) {
+        return stateRepository.findById(stateId).orElseThrow(() -> {
+            throw new ItemNotFoundException(STATE_NOT_FOUND_MESSAGE);
+        });
+    }
+
+    private Country getCountry(Long id) {
+        return countryRepository.findById(id)
+                .orElseThrow(() -> new ItemNotFoundException(COUNTRY_NOT_FOUND_MESSAGE));
     }
 }

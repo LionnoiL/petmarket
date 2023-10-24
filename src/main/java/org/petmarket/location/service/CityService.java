@@ -1,11 +1,8 @@
 package org.petmarket.location.service;
 
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.petmarket.errorhandling.ItemNotCreatedException;
 import org.petmarket.errorhandling.ItemNotFoundException;
-import org.petmarket.errorhandling.ItemNotUpdatedException;
 import org.petmarket.location.dto.CityRequestDto;
 import org.petmarket.location.dto.CityResponseDto;
 import org.petmarket.location.entity.City;
@@ -17,6 +14,8 @@ import org.petmarket.utils.ErrorUtils;
 import org.petmarket.utils.TransliterateUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
+
+import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -32,66 +31,54 @@ public class CityService {
 
     public CityResponseDto findById(Long id) {
         return cityRepository.findById(id)
-            .map(cityMapper::mapEntityToDto)
-            .orElseThrow(() -> new ItemNotFoundException(CITY_NOT_FOUND_MESSAGE));
+                .map(cityMapper::mapEntityToDto)
+                .orElseThrow(() -> new ItemNotFoundException(CITY_NOT_FOUND_MESSAGE));
     }
 
     public List<CityResponseDto> findByName(String name) {
         return cityRepository.findByNameContainingOrderByName(name)
-            .stream()
-            .map(cityMapper::mapEntityToDto)
-            .toList();
+                .stream()
+                .map(cityMapper::mapEntityToDto)
+                .toList();
     }
 
     public List<CityResponseDto> findByNameAndStateId(String name, Long id) {
-        State state = stateRepository.findById(id).orElseThrow(() -> {
-            throw new ItemNotFoundException(STATE_NOT_FOUND_MESSAGE);
-        });
+        State state = getState(id);
         return cityRepository.findByStateAndNameContainingOrderByName(state, name)
-            .stream()
-            .map(cityMapper::mapEntityToDto)
-            .toList();
+                .stream()
+                .map(cityMapper::mapEntityToDto)
+                .toList();
     }
 
     public void deleteCity(Long id) {
-        City city = cityRepository.findById(id).orElseThrow(() -> {
-            throw new ItemNotFoundException(CITY_NOT_FOUND_MESSAGE);
-        });
+        City city = getCity(id);
         cityRepository.delete(city);
     }
 
     public CityResponseDto addCity(CityRequestDto request, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            throw new ItemNotCreatedException(ErrorUtils.getErrorsString(bindingResult));
-        }
-        State state = stateRepository.findById(request.getStateId()).orElseThrow(() -> {
-            throw new ItemNotFoundException(STATE_NOT_FOUND_MESSAGE);
-        });
+        ErrorUtils.checkItemNotCreatedException(bindingResult);
+
+        State state = getState(request.getStateId());
         City city = City.builder()
-            .state(state)
-            .name(request.getName())
-            .alias(transliterateUtils.getAlias(City.class.getSimpleName(), request.getName()))
-            .build();
+                .state(state)
+                .name(request.getName())
+                .alias(transliterateUtils.getAlias(City.class.getSimpleName(), request.getName()))
+                .build();
         cityRepository.save(city);
 
         return cityMapper.mapEntityToDto(city);
     }
 
     public CityResponseDto updateCity(Long id, CityRequestDto request,
-        BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            throw new ItemNotUpdatedException(ErrorUtils.getErrorsString(bindingResult));
-        }
-        City city = cityRepository.findById(id).orElseThrow(() -> {
-            throw new ItemNotFoundException(CITY_NOT_FOUND_MESSAGE);
-        });
-        State state = stateRepository.findById(request.getStateId()).orElseThrow(() -> {
-            throw new ItemNotFoundException(STATE_NOT_FOUND_MESSAGE);
-        });
+                                      BindingResult bindingResult) {
+        ErrorUtils.checkItemNotUpdatedException(bindingResult);
+
+        City city = getCity(id);
+        State state = getState(request.getStateId());
 
         if (!city.getName().equals(request.getName())) {
             city.setAlias(
-                transliterateUtils.getAlias(City.class.getSimpleName(), request.getName())
+                    transliterateUtils.getAlias(City.class.getSimpleName(), request.getName())
             );
         }
         city.setName(request.getName());
@@ -99,5 +86,17 @@ public class CityService {
         cityRepository.save(city);
 
         return cityMapper.mapEntityToDto(city);
+    }
+
+    private City getCity(Long id) {
+        return cityRepository.findById(id).orElseThrow(() -> {
+            throw new ItemNotFoundException(CITY_NOT_FOUND_MESSAGE);
+        });
+    }
+
+    private State getState(Long stateId) {
+        return stateRepository.findById(stateId).orElseThrow(() -> {
+            throw new ItemNotFoundException(STATE_NOT_FOUND_MESSAGE);
+        });
     }
 }
