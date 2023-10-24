@@ -6,8 +6,10 @@ import org.petmarket.advertisements.advertisement.dto.AdvertisementResponseDto;
 import org.petmarket.advertisements.advertisement.entity.Advertisement;
 import org.petmarket.advertisements.advertisement.entity.AdvertisementTranslate;
 import org.petmarket.advertisements.category.mapper.AdvertisementCategoryResponseTranslateMapper;
+import org.petmarket.delivery.mapper.DeliveryResponseTranslateMapper;
 import org.petmarket.language.entity.Language;
 import org.petmarket.options.service.OptionsService;
+import org.petmarket.payment.mapper.PaymentResponseTranslateMapper;
 import org.petmarket.translate.LanguageHolder;
 import org.petmarket.translate.TranslationService;
 import org.springframework.stereotype.Component;
@@ -24,6 +26,8 @@ public class AdvertisementResponseTranslateMapper {
     private final TranslationService translationService;
     private final AdvertisementMapper mapper;
     private final AdvertisementCategoryResponseTranslateMapper categoryMapper;
+    private final PaymentResponseTranslateMapper paymentMapper;
+    private final DeliveryResponseTranslateMapper deliveryMapper;
 
     public AdvertisementResponseDto mapEntityToDto(Advertisement entity, Language language) {
         AdvertisementTranslate translation = (AdvertisementTranslate) translationService.getTranslate(
@@ -36,6 +40,8 @@ public class AdvertisementResponseTranslateMapper {
         dto.setDescription(translation.getDescription());
         dto.setLangCode(language.getLangCode());
         dto.setCategory(categoryMapper.mapEntityToDto(entity.getCategory(), language));
+        dto.setPayments(paymentMapper.mapEntityToDto(entity.getPayments(), language));
+        dto.setDeliveries(deliveryMapper.mapEntityToDto(entity.getDeliveries(), language));
 
         return dto;
     }

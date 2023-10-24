@@ -11,6 +11,7 @@ import org.petmarket.translate.LanguageHolder;
 import org.petmarket.translate.TranslationService;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -34,5 +35,12 @@ public class PaymentResponseTranslateMapper {
         paymentResponseDto.setLangCode(language.getLangCode());
 
         return paymentResponseDto;
+    }
+
+    public List<PaymentResponseDto> mapEntityToDto(List<Payment> payments,
+                                                   Language language) {
+        return payments.stream()
+                .map(p -> mapEntityToDto(p, language))
+                .toList();
     }
 }
