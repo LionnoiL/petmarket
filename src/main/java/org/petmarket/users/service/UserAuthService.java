@@ -49,7 +49,6 @@ public class UserAuthService {
     private final UserMapper userMapper;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
-    private final ErrorUtils errorUtils;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
     private final UserService userService;
@@ -63,7 +62,7 @@ public class UserAuthService {
 
     public UserResponseDto register(UserRequestDto userRequestDto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            throw new ItemNotCreatedException(errorUtils.getErrorsString(bindingResult));
+            throw new ItemNotCreatedException(ErrorUtils.getErrorsString(bindingResult));
         }
 
         User user = userMapper.mapDtoRequestToDto(userRequestDto);
@@ -86,7 +85,7 @@ public class UserAuthService {
 
     public ResponseEntity<JwtResponseDto> login(UserRequestDto requestDto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            throw new LoginException(errorUtils.getErrorsString(bindingResult));
+            throw new LoginException(ErrorUtils.getErrorsString(bindingResult));
         }
 
         try {
@@ -152,7 +151,7 @@ public class UserAuthService {
     public void resetPassword(ResetPasswordRequestDto resetPasswordRequestDto,
                               BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            throw new ItemNotCreatedException(errorUtils.getErrorsString(bindingResult));
+            throw new ItemNotCreatedException(ErrorUtils.getErrorsString(bindingResult));
         }
 
         User user = userRepository.findByEmailConfirmCode(
