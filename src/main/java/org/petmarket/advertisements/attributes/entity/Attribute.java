@@ -2,6 +2,9 @@ package org.petmarket.advertisements.attributes.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.petmarket.translate.TranslateHolder;
+
+import java.util.Set;
 
 @Entity
 @Table(name = "attribute")
@@ -10,7 +13,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Attribute {
+public class Attribute implements TranslateHolder {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,4 +26,7 @@ public class Attribute {
     @ManyToOne
     @JoinColumn(name = "attribute_group_id")
     private AttributeGroup group;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "attribute", fetch = FetchType.LAZY, orphanRemoval = true)
+    private Set<AttributeTranslate> translations;
 }

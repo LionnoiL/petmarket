@@ -3,6 +3,7 @@ package org.petmarket.advertisements.attributes.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.petmarket.advertisements.category.entity.AdvertisementCategory;
+import org.petmarket.translate.TranslateHolder;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -18,7 +19,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
-public class AttributeGroup {
+public class AttributeGroup implements TranslateHolder {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
