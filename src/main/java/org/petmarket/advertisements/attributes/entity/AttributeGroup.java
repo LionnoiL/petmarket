@@ -42,6 +42,12 @@ public class AttributeGroup implements TranslateHolder {
     @Enumerated(EnumType.STRING)
     private AttributeType type;
 
+    @Column(name = "sort_order")
+    private int sortValue;
+
+    @Column(name = "use_in_filter")
+    private boolean useInFilter;
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "group", fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<AttributeGroupTranslate> translations;
 }
