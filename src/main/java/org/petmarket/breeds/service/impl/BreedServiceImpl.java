@@ -110,13 +110,13 @@ public class BreedServiceImpl implements BreedService {
         return translations;
     }
 
-    private Breed findBreedById(Long breedId) {
+    public Breed findBreedById(Long breedId) {
         return breedRepository.findById(breedId).orElseThrow(
                 () -> new ItemNotFoundException("Can't find breed with id: " + breedId)
         );
     }
 
-    private BreedTranslation createTranslation (BreedRequestDto requestDto, String langCode, Breed breed) {
+    private BreedTranslation createTranslation(BreedRequestDto requestDto, String langCode, Breed breed) {
         BreedTranslation newTranslation = new BreedTranslation();
         newTranslation.setLangCode(langCode);
         newTranslation.setTitle(requestDto.getTitle());

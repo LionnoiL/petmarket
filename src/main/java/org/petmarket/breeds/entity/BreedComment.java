@@ -1,6 +1,7 @@
 package org.petmarket.breeds.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.petmarket.blog.entity.CommentStatus;
 import org.petmarket.users.entity.User;
@@ -29,5 +30,7 @@ public class BreedComment {
     @Column(name = "comment")
     private String comment;
     @Column(name = "status")
+    @NotNull
+    @Enumerated(EnumType.STRING)
     private CommentStatus status;
 }
