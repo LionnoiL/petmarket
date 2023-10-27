@@ -1,7 +1,6 @@
 package org.petmarket.users.service;
 
 import jakarta.servlet.http.HttpServletRequest;
-import java.util.HashMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.errorhandling.ItemNotCreatedException;
@@ -36,10 +35,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -91,7 +87,7 @@ public class UserAuthService {
         try {
             String username = requestDto.getEmail();
             authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(username, requestDto.getPassword()));
+                    new UsernamePasswordAuthenticationToken(username, requestDto.getPassword()));
             User user = userService.findByUsername(username);
 
             if (user == null) {
@@ -99,7 +95,10 @@ public class UserAuthService {
             }
 
             String accessToken = jwtTokenProvider.createToken(username, user.getRoles());
-            String refreshToken = jwtTokenProvider.createRefreshToken(username, user.getRoles());
+            String refreshToken = "";
+            if (requestDto.getRememberMe() != null && requestDto.getRememberMe()) {
+                refreshToken = jwtTokenProvider.createRefreshToken(username, user.getRoles());
+            }
 
             JwtResponseDto response = new JwtResponseDto(username, accessToken, refreshToken);
 
