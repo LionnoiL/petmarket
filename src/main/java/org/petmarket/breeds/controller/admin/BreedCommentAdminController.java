@@ -41,7 +41,8 @@ public class BreedCommentAdminController {
     @ApiResponse(responseCode = "204", description = "Comment deleted successfully")
     @ApiResponse(responseCode = "404", description = "Comment not found")
     @DeleteMapping("/{commentId}/delete")
-    public void deleteComment(@PathVariable(name = "commentId") @Schema(description = "ID of the comment") Long commentId) {
+    public void deleteComment(@PathVariable(name = "commentId")
+                              @Schema(description = "ID of the comment") Long commentId) {
         commentService.delete(commentId);
     }
 }
