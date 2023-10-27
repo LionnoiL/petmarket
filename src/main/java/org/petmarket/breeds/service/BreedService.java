@@ -3,7 +3,6 @@ package org.petmarket.breeds.service;
 import org.petmarket.breeds.dto.BreedRequestDto;
 import org.petmarket.breeds.dto.BreedResponseDto;
 import org.petmarket.breeds.entity.Breed;
-import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -16,7 +15,7 @@ public interface BreedService {
 
     Breed findBreedById(Long breedId);
 
-    List<BreedResponseDto> getAll(Pageable pageable, String langCode);
+    List<BreedResponseDto> getAllByCategory(String langCode, Long categoryId);
 
     void delete(Long breedId);
 

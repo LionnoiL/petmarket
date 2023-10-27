@@ -1,13 +1,10 @@
 package org.petmarket.breeds.controller;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import org.petmarket.breeds.dto.BreedResponseDto;
 import org.petmarket.breeds.service.BreedService;
-import org.springframework.data.domain.Pageable;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -24,8 +21,11 @@ public class BreedController {
     }
 
     @GetMapping("/{langCode}")
-    public List<BreedResponseDto> getAll(@PathVariable String langCode,
-                                         Pageable pageable) {
-        return breedService.getAll(pageable, langCode);
+    public List<BreedResponseDto> getAll(
+            @PathVariable
+            @Parameter(description = "Language code", example = "en") String langCode,
+            @RequestParam(required = false)
+            @Parameter(description = "ID of the category", example = "1") Long categoryId) {
+        return breedService.getAllByCategory(langCode, categoryId);
     }
 }

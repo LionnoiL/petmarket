@@ -13,7 +13,6 @@ import org.petmarket.errorhandling.ItemNotFoundException;
 import org.petmarket.errorhandling.ItemNotUpdatedException;
 import org.petmarket.language.service.LanguageService;
 import org.petmarket.options.service.OptionsService;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -37,7 +36,7 @@ public class BreedServiceImpl implements BreedService {
                 breed);
         translatioinsList.add(translation);
         breed.setTranslations(translatioinsList);
-        breed.setCategoryId(requestDto.getCategoryId());
+        breed.setCategory(requestDto.getCategoryId());
         breedRepository.save(breed);
         return breedMapper.toDto(breed);
     }
@@ -66,17 +65,6 @@ public class BreedServiceImpl implements BreedService {
                 .filter(comment -> comment.getStatus().equals(CommentStatus.APPROVED))
                 .collect(Collectors.toList()));
         return breedMapper.toDto(breed);
-    }
-
-    @Override
-    public List<BreedResponseDto> getAll(Pageable pageable, String langCode) {
-        List<BreedResponseDto> breedsList = breedRepository.getAllByLangCode(checkedLang(langCode), pageable).stream()
-                .map(breedMapper::toDto)
-                .toList();
-        if (!breedsList.isEmpty()) {
-            return breedsList;
-        }
-        throw new ItemNotFoundException("No translation with langCode: " + langCode);
     }
 
     @Override
@@ -116,6 +104,26 @@ public class BreedServiceImpl implements BreedService {
         );
     }
 
+    @Override
+    public List<BreedResponseDto> getAllByCategory(String langCode, Long categoryId) {
+        List<Breed> allBreeds;
+        if (categoryId != null) {
+            allBreeds = findAllByBreedCategoryId(categoryId);
+        } else {
+            allBreeds = breedRepository.findAll();
+        }
+        return allBreeds.stream()
+                .peek(breed -> {
+                    breed.setCategory(breed.getCategory());
+                    breed.setComments(breed.getComments().stream()
+                            .filter(breedComment -> breedComment.getStatus().equals(CommentStatus.APPROVED))
+                            .collect(Collectors.toList()));
+                    breed.setTranslations(getTranslation(breed.getId(), langCode));
+                })
+                .map(breedMapper::toDto)
+                .toList();
+    }
+
     private BreedTranslation createTranslation(BreedRequestDto requestDto, String langCode, Breed breed) {
         BreedTranslation newTranslation = new BreedTranslation();
         newTranslation.setLangCode(langCode);
@@ -123,5 +131,13 @@ public class BreedServiceImpl implements BreedService {
         newTranslation.setDescription(requestDto.getDescription());
         newTranslation.setBreed(breed);
         return newTranslation;
+    }
+
+    private List<Breed> findAllByBreedCategoryId(Long categoryId) {
+        List<Breed> breeds = breedRepository.findBreedByCategoryId(categoryId);
+        if (breeds.isEmpty()) {
+            throw new ItemNotFoundException("Can't find breed for category: " + categoryId);
+        }
+        return breeds;
     }
 }

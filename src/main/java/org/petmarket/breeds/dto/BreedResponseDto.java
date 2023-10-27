@@ -10,7 +10,7 @@ public class BreedResponseDto {
     private Long id;
     private LocalDateTime created;
     private LocalDateTime updated;
-    //private Long categoryId;
+    private Long category;
     private List<BreedTranslationResponseDto> translations;
     private List<BreedCommentResponseDto> comments;
 }

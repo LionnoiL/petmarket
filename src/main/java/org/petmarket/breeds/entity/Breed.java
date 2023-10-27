@@ -32,7 +32,7 @@ public class Breed {
     @Column(name = "updated")
     private LocalDateTime updated;
     @Column(name = "category_id")
-    private Long categoryId;
+    private Long category;
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "breed", cascade = CascadeType.ALL)
     private List<BreedTranslation> translations;
 
