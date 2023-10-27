@@ -25,6 +25,8 @@ public class UserRequestDto {
     @Pattern(regexp = "((?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,})")
     private String password;
 
+    private Boolean rememberMe;
+
     @Schema(example = "andriy@mail.com", description = "User email")
     public String getEmail() {
         return email;
@@ -33,5 +35,11 @@ public class UserRequestDto {
     @Schema(example = "Password1234", description = "User password")
     public String getPassword() {
         return password;
+    }
+
+    @Schema(example = "True", description = "If we pass this parameter, then upon successful authorization, " +
+            "an additional refresh token will be transferred.")
+    public Boolean getRememberMe() {
+        return rememberMe;
     }
 }
