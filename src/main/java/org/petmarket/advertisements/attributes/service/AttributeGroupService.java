@@ -55,8 +55,8 @@ public class AttributeGroupService {
     public Collection<AttributeGroupResponseDto> getByCategory(Long id, String langCode) {
         Language language = getLanguage(langCode);
         AdvertisementCategory category = getCategory(id);
-        List<AttributeGroup> groups = attributeGroupRepository.findAllByCategoryOrderBySortValueAsc(
-            category);
+        List<AttributeGroup> groups = attributeGroupRepository.findAllByCategoryAndUseInFilter(
+            category, true);
 
         return attributeGroupTranslateMapper.mapEntityToDto(groups, language);
     }

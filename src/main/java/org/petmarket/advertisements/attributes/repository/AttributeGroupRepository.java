@@ -10,9 +10,9 @@ public interface AttributeGroupRepository extends AttributeGroupRepositoryBasic 
 
     List<AttributeGroup> findAllByOrderBySortValueAsc();
 
-    @Query("SELECT ag FROM AttributeGroup ag JOIN ag.categories ac WHERE ac = :category ORDER BY ag.created ASC")
-    List<AttributeGroup> findAllByCategoryOrderBySortValueAsc(
-        @Param("category") AdvertisementCategory category);
+    @Query("SELECT ag FROM AttributeGroup ag JOIN ag.categories ac WHERE ag.useInFilter = :useInFilter AND ac = :category ORDER BY ag.created ASC")
+    List<AttributeGroup> findAllByCategoryAndUseInFilter(
+        @Param("category") AdvertisementCategory category, @Param("useInFilter") boolean useInFilter);
 
     List<AttributeGroup> findAllByUseInFilterOrderBySortValueAsc(boolean useInFilter);
 }
