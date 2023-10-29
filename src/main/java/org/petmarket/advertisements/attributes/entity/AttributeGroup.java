@@ -1,6 +1,8 @@
 package org.petmarket.advertisements.attributes.entity;
 
 import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.*;
 import org.petmarket.advertisements.category.entity.AdvertisementCategory;
 import org.petmarket.translate.TranslateHolder;
@@ -34,10 +36,6 @@ public class AttributeGroup implements TranslateHolder {
     @Column(name = "updated")
     private LocalDate updated;
 
-    @ManyToOne
-    @JoinColumn(name = "category_id")
-    private AdvertisementCategory category;
-
     @Column(name = "attribute_type", nullable = false)
     @Enumerated(EnumType.STRING)
     private AttributeType type;
@@ -50,4 +48,10 @@ public class AttributeGroup implements TranslateHolder {
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "group", fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<AttributeGroupTranslate> translations;
+
+    @ManyToMany
+    @JoinTable(name = "attributes_group_categories",
+        joinColumns = @JoinColumn(name = "attribute_group_id"),
+        inverseJoinColumns = @JoinColumn(name = "category_id"))
+    private List<AdvertisementCategory> categories = new ArrayList<>();
 }

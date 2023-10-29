@@ -168,26 +168,26 @@ public class AdvertisementCategoryService {
                 });
     }
 
-    private AdvertisementCategoryTranslate getTranslation(AdvertisementCategory page,
+    private AdvertisementCategoryTranslate getTranslation(AdvertisementCategory category,
                                                           Language language) {
-        return page.getTranslations().stream()
+        return category.getTranslations().stream()
                 .filter(t -> t.getLanguage().equals(language))
                 .findFirst().orElseThrow(() -> new TranslateException("No translation"));
     }
 
-    private boolean checkLanguage(AdvertisementCategory page, Language language) {
-        return page.getTranslations()
+    private boolean checkLanguage(AdvertisementCategory category, Language language) {
+        return category.getTranslations()
                 .stream()
                 .anyMatch(t -> t.getLanguage().equals(language));
     }
 
-    private void addTranslation(AdvertisementCategory page,
+    private void addTranslation(AdvertisementCategory category,
                                 AdvertisementCategoryTranslate translation) {
-        if (checkLanguage(page, translation.getLanguage())) {
+        if (checkLanguage(category, translation.getLanguage())) {
             throw new TranslateException("Language is present in list");
         }
-        translation.setCategory(page);
-        page.getTranslations().add(translation);
+        translation.setCategory(category);
+        category.getTranslations().add(translation);
     }
 
     private AdvertisementCategory getCategory(Long id) {
