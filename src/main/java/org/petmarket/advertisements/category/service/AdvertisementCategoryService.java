@@ -201,6 +201,13 @@ public class AdvertisementCategoryService {
         return categoryResponseTranslateMapper.mapEntityToTagDto(categories, language);
     }
 
+    public AdvertisementCategory findCategory(Long categoryId) {
+
+        return categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new ItemNotFoundException(CATEGORY_NOT_FOUND_MESSAGE));
+    }
+
+
     private Language getLanguage(String langCode) {
         return languageRepository.findByLangCodeAndEnableIsTrue(langCode)
                 .orElseThrow(() -> {

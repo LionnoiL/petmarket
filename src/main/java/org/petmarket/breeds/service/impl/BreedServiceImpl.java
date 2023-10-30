@@ -1,6 +1,8 @@
 package org.petmarket.breeds.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.petmarket.advertisements.category.mapper.AdvertisementCategoryMapper;
+import org.petmarket.advertisements.category.service.AdvertisementCategoryService;
 import org.petmarket.blog.entity.CommentStatus;
 import org.petmarket.breeds.dto.BreedRequestDto;
 import org.petmarket.breeds.dto.BreedResponseDto;
@@ -26,6 +28,7 @@ public class BreedServiceImpl implements BreedService {
     private final BreedMapper breedMapper;
     private final OptionsService optionsService;
     private final LanguageService languageService;
+    private final AdvertisementCategoryService categoryService;
 
     @Override
     public BreedResponseDto save(BreedRequestDto requestDto) {
@@ -36,7 +39,7 @@ public class BreedServiceImpl implements BreedService {
                 breed);
         translatioinsList.add(translation);
         breed.setTranslations(translatioinsList);
-        breed.setCategory(requestDto.getCategoryId());
+        breed.setCategory(categoryService.findCategory(requestDto.getCategoryId()));
         breedRepository.save(breed);
         return breedMapper.toDto(breed);
     }
@@ -64,6 +67,7 @@ public class BreedServiceImpl implements BreedService {
         breed.setComments(breed.getComments().stream()
                 .filter(comment -> comment.getStatus().equals(CommentStatus.APPROVED))
                 .collect(Collectors.toList()));
+
         return breedMapper.toDto(breed);
     }
 

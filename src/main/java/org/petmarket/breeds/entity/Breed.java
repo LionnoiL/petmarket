@@ -1,16 +1,8 @@
 package org.petmarket.breeds.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Column;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.CascadeType;
+import jakarta.persistence.*;
 import lombok.Data;
+import org.petmarket.advertisements.category.entity.AdvertisementCategory;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -31,8 +23,9 @@ public class Breed {
     @LastModifiedDate
     @Column(name = "updated")
     private LocalDateTime updated;
-    @Column(name = "category_id")
-    private Long category;
+    @JoinColumn(name = "category_id")
+    @ManyToOne
+    private AdvertisementCategory category;
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "breed", cascade = CascadeType.ALL)
     private List<BreedTranslation> translations;
 
