@@ -33,4 +33,9 @@ public class BreedCommentController {
                                               Authentication authentication) {
         return commentService.addComment(breedId, requestDto, authentication);
     }
+
+    @DeleteMapping("/{commentId}")
+    public void deleteMyComment(@PathVariable Long commentId, Authentication authentication) {
+        commentService.deleteMyBreedComment(commentId, authentication);
+    }
 }

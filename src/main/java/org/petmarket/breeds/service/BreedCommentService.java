@@ -19,6 +19,8 @@ public interface BreedCommentService {
 
     List<BreedCommentResponseDto> updateStatus(Stack<Long> commentsIds, CommentStatus status);
 
-    void delete(Long id);
+    void deleteMyBreedComment(Long commentsId, Authentication authentication);
+
+    void delete(Long commentId);
 }
 

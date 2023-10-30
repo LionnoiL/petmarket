@@ -207,7 +207,6 @@ public class AdvertisementCategoryService {
                 .orElseThrow(() -> new ItemNotFoundException(CATEGORY_NOT_FOUND_MESSAGE));
     }
 
-
     private Language getLanguage(String langCode) {
         return languageRepository.findByLangCodeAndEnableIsTrue(langCode)
                 .orElseThrow(() -> {

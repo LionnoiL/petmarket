@@ -1,7 +1,6 @@
 package org.petmarket.breeds.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.petmarket.advertisements.category.mapper.AdvertisementCategoryMapper;
 import org.petmarket.advertisements.category.service.AdvertisementCategoryService;
 import org.petmarket.blog.entity.CommentStatus;
 import org.petmarket.breeds.dto.BreedRequestDto;

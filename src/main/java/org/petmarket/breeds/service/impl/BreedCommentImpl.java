@@ -10,7 +10,10 @@ import org.petmarket.breeds.repository.BreedCommentRepository;
 import org.petmarket.breeds.service.BreedCommentService;
 import org.petmarket.breeds.service.BreedService;
 import org.petmarket.errorhandling.ItemNotFoundException;
+import org.petmarket.errorhandling.ItemNotUpdatedException;
+import org.petmarket.security.jwt.JwtUser;
 import org.petmarket.users.service.UserService;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
@@ -74,7 +77,21 @@ public class BreedCommentImpl implements BreedCommentService {
     }
 
     @Override
-    public void delete(Long breedId) {
-        commentRepository.deleteById(breedId);
+    public void deleteMyBreedComment(Long commentId, Authentication authentication) {
+        String commentUsername = commentRepository.findById(commentId).orElseThrow(
+                () -> new ItemNotFoundException("Can't find comment by id: " + commentId)
+        ).getUser().getUsername();
+        String sessionUsername = ((JwtUser) ((UsernamePasswordAuthenticationToken) authentication)
+                .getPrincipal()).getUsername();
+        if (!commentUsername.equals(sessionUsername)) {
+            throw new ItemNotUpdatedException("User is not comment owner: " + commentUsername);
+
+        }
+        commentRepository.deleteById(commentId);
+    }
+
+    @Override
+    public void delete(Long commentId) {
+        commentRepository.deleteById(commentId);
     }
 }
