@@ -1,6 +1,8 @@
 package org.petmarket.delivery.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -10,32 +12,23 @@ import lombok.Setter;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class DeliveryResponseDto {
+public class DeliveryRequestDto {
 
-    private Long id;
-    private Boolean enable;
-    private String langCode;
+    @NotBlank(message = "The 'name' cannot be empty")
+    @Size(min = 1, max = 250, message
+            = "Name must be between 1 and 250 characters")
     private String name;
     private String description;
+    private Boolean enable;
 
     @Schema(example = "Самовивіз", description = "Delivery name")
     public String getName() {
         return name;
     }
 
-    @Schema(example = "1", description = "ID Delivery")
-    public Long getId() {
-        return id;
-    }
-
     @Schema(example = "true", description = "Delivery enabled")
     public Boolean getEnable() {
         return enable;
-    }
-
-    @Schema(example = "ua", description = "Delivery language")
-    public String getLangCode() {
-        return langCode;
     }
 
     @Schema(example = "Покупець забирає товар самостійно", description = "Delivery description")
@@ -45,12 +38,10 @@ public class DeliveryResponseDto {
 
     @Override
     public String toString() {
-        return "DeliveryResponseDto{" +
-                "id=" + id +
-                ", enable=" + enable +
-                ", langCode='" + langCode + '\'' +
-                ", name='" + name + '\'' +
+        return "DeliveryRequestDto{" +
+                "name='" + name + '\'' +
                 ", description='" + description + '\'' +
+                ", enable=" + enable +
                 '}';
     }
 }

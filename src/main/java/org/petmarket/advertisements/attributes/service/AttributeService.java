@@ -77,20 +77,19 @@ public class AttributeService {
 
         log.info("Attribute created");
         return attributeTranslateMapper.mapEntityToDto(attribute, defaultSiteLanguage);
-
     }
 
     public AttributeResponseDto updateAttribute(Long id, String langCode,
                                                 AttributeRequestDto request, BindingResult bindingResult) {
         ErrorUtils.checkItemNotUpdatedException(bindingResult);
 
-        Language language = getLanguage(langCode);
         AttributeGroup group = getGroup(request.getGroupId());
 
         Attribute attribute = getAttribute(id);
         attribute.setSortValue(request.getSortValue());
         attribute.setGroup(group);
 
+        Language language = getLanguage(langCode);
         AttributeTranslate translation;
         if (checkLanguage(attribute, language)) {
             translation = getTranslation(attribute, language);
