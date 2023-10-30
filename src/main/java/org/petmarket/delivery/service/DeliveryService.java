@@ -90,7 +90,7 @@ public class DeliveryService {
                                               BindingResult bindingResult) {
         ErrorUtils.checkItemNotUpdatedException(bindingResult);
 
-        Delivery delivery = getEnableDelivery(id);
+        Delivery delivery = getDelivery(id);
         delivery.setEnable(request.getEnable());
 
         Language language = getLanguage(langCode);
@@ -113,8 +113,8 @@ public class DeliveryService {
     }
 
     public void deleteDelivery(Long id) {
-        Delivery attribute = getEnableDelivery(id);
-        deliveryRepository.delete(attribute);
+        Delivery delivery = getDelivery(id);
+        deliveryRepository.delete(delivery);
     }
 
     private Language getLanguage(String langCode) {
@@ -149,8 +149,8 @@ public class DeliveryService {
         delivery.getTranslations().add(translation);
     }
 
-    private boolean checkLanguage(Delivery group, Language language) {
-        return group.getTranslations()
+    private boolean checkLanguage(Delivery delivery, Language language) {
+        return delivery.getTranslations()
                 .stream()
                 .anyMatch(t -> t.getLanguage().equals(language));
     }

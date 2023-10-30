@@ -1,6 +1,7 @@
 package org.petmarket.payment.mapper;
 
 import org.mapstruct.Mapper;
+import org.petmarket.payment.dto.PaymentRequestDto;
 import org.petmarket.payment.dto.PaymentResponseDto;
 import org.petmarket.payment.entity.Payment;
 
@@ -8,4 +9,6 @@ import org.petmarket.payment.entity.Payment;
 public interface PaymentMapper {
 
     PaymentResponseDto mapEntityToDto(Payment entity);
+
+    Payment mapDtoRequestToEntity(PaymentRequestDto request);
 }
