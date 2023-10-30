@@ -32,7 +32,10 @@ public class AttributeTranslateMapper {
         );
 
         AttributeGroupTranslate translationGroup = (AttributeGroupTranslate) translationService.getTranslate(
-                entity.getGroup().getTranslations().stream().map(LanguageHolder.class::cast).collect(Collectors.toSet()),
+                entity.getGroup().getTranslations()
+                        .stream()
+                        .map(LanguageHolder.class::cast)
+                        .collect(Collectors.toSet()),
                 language,
                 optionsService.getDefaultSiteLanguage()
         );

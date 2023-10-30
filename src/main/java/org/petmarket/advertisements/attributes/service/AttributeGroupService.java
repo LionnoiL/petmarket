@@ -1,10 +1,5 @@
 package org.petmarket.advertisements.attributes.service;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.advertisements.attributes.dto.AttributeGroupRequestDto;
@@ -24,6 +19,12 @@ import org.petmarket.translate.TranslateException;
 import org.petmarket.utils.ErrorUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -105,13 +106,13 @@ public class AttributeGroupService {
         AttributeGroupRequestDto request, BindingResult bindingResult) {
         ErrorUtils.checkItemNotUpdatedException(bindingResult);
 
-        Language language = getLanguage(langCode);
         AttributeGroup group = getGroup(id);
         group.setCategories(getCategories(request.getCategoriesIds()));
         group.setType(request.getType());
         group.setSortValue(request.getSortValue());
         group.setUseInFilter(request.isUseInFilter());
 
+        Language language = getLanguage(langCode);
         AttributeGroupTranslate translation;
         if (checkLanguage(group, language)) {
             translation = getTranslation(group, language);
@@ -132,7 +133,7 @@ public class AttributeGroupService {
 
     public void deleteGroup(Long id) {
         AttributeGroup group = getGroup(id);
-        attributeGroupRepository.deleteById(group.getId());
+        attributeGroupRepository.delete(group);
     }
 
     private Language getLanguage(String langCode) {
