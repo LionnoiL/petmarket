@@ -42,4 +42,15 @@ public class PaymentResponseDto {
     public String getDescription() {
         return description;
     }
+
+    @Override
+    public String toString() {
+        return "PaymentResponseDto{" +
+                "id=" + id +
+                ", enable=" + enable +
+                ", langCode='" + langCode + '\'' +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                '}';
+    }
 }
