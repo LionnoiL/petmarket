@@ -1,5 +1,6 @@
 package org.petmarket.delivery.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.delivery.dto.DeliveryRequestDto;
@@ -59,6 +60,7 @@ public class DeliveryService {
         return deliveryResponseTranslateMapper.mapEntityToDto(deliveries, language);
     }
 
+    @Transactional
     public DeliveryResponseDto addDelivery(DeliveryRequestDto request, BindingResult bindingResult) {
         ErrorUtils.checkItemNotCreatedException(bindingResult);
 
@@ -86,6 +88,7 @@ public class DeliveryService {
         return deliveryResponseTranslateMapper.mapEntityToDto(delivery, defaultSiteLanguage);
     }
 
+    @Transactional
     public DeliveryResponseDto updateDelivery(Long id, String langCode, DeliveryRequestDto request,
                                               BindingResult bindingResult) {
         ErrorUtils.checkItemNotUpdatedException(bindingResult);
@@ -112,6 +115,7 @@ public class DeliveryService {
         return deliveryResponseTranslateMapper.mapEntityToDto(delivery, language);
     }
 
+    @Transactional
     public void deleteDelivery(Long id) {
         Delivery delivery = getDelivery(id);
         deliveryRepository.delete(delivery);

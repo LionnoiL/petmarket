@@ -1,5 +1,6 @@
 package org.petmarket.location.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.errorhandling.ItemNotFoundException;
@@ -48,11 +49,13 @@ public class CityService {
                 .toList();
     }
 
+    @Transactional
     public void deleteCity(Long id) {
         City city = getCity(id);
         cityRepository.delete(city);
     }
 
+    @Transactional
     public CityResponseDto addCity(CityRequestDto request, BindingResult bindingResult) {
         ErrorUtils.checkItemNotCreatedException(bindingResult);
 
@@ -67,6 +70,7 @@ public class CityService {
         return cityMapper.mapEntityToDto(city);
     }
 
+    @Transactional
     public CityResponseDto updateCity(Long id, CityRequestDto request,
                                       BindingResult bindingResult) {
         ErrorUtils.checkItemNotUpdatedException(bindingResult);

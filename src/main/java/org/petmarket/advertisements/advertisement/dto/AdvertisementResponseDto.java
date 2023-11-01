@@ -9,10 +9,10 @@ import org.petmarket.advertisements.advertisement.entity.AdvertisementType;
 import org.petmarket.advertisements.attributes.dto.AttributeResponseDto;
 import org.petmarket.advertisements.category.dto.AdvertisementCategoryResponseDto;
 import org.petmarket.advertisements.images.dto.AdvertisementImageResponseDto;
-import org.petmarket.advertisements.review.dto.AdvertisementReviewResponseDto;
 import org.petmarket.delivery.dto.DeliveryResponseDto;
 import org.petmarket.location.dto.LocationResponseDto;
 import org.petmarket.payment.dto.PaymentResponseDto;
+import org.petmarket.review.dto.AdvertisementReviewResponseDto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

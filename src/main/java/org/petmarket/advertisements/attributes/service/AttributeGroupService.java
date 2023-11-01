@@ -1,5 +1,6 @@
 package org.petmarket.advertisements.attributes.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.advertisements.attributes.dto.AttributeGroupRequestDto;
@@ -70,8 +71,9 @@ public class AttributeGroupService {
         return attributeGroupTranslateMapper.mapEntityToDto(groups, language);
     }
 
+    @Transactional
     public AttributeGroupResponseDto addGroup(AttributeGroupRequestDto request,
-        BindingResult bindingResult) {
+                                              BindingResult bindingResult) {
         ErrorUtils.checkItemNotCreatedException(bindingResult);
 
         Language defaultSiteLanguage = optionsService.getDefaultSiteLanguage();
@@ -81,12 +83,12 @@ public class AttributeGroupService {
 
         group.setTranslations(new HashSet<>());
         AttributeGroupTranslate translation = AttributeGroupTranslate.builder()
-            .id(null)
-            .group(group)
-            .description(request.getDescription())
-            .title(request.getTitle())
-            .language(defaultSiteLanguage)
-            .build();
+                .id(null)
+                .group(group)
+                .description(request.getDescription())
+                .title(request.getTitle())
+                .language(defaultSiteLanguage)
+                .build();
         addTranslation(group, translation);
 
         attributeGroupRepository.save(group);
@@ -102,8 +104,9 @@ public class AttributeGroupService {
             .collect(Collectors.toCollection(ArrayList::new));
     }
 
+    @Transactional
     public AttributeGroupResponseDto updateGroup(Long id, String langCode,
-        AttributeGroupRequestDto request, BindingResult bindingResult) {
+                                                 AttributeGroupRequestDto request, BindingResult bindingResult) {
         ErrorUtils.checkItemNotUpdatedException(bindingResult);
 
         AttributeGroup group = getGroup(id);
@@ -131,6 +134,7 @@ public class AttributeGroupService {
         return attributeGroupTranslateMapper.mapEntityToDto(group, language);
     }
 
+    @Transactional
     public void deleteGroup(Long id) {
         AttributeGroup group = getGroup(id);
         attributeGroupRepository.delete(group);

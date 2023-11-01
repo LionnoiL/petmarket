@@ -1,5 +1,6 @@
 package org.petmarket.advertisements.attributes.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.advertisements.attributes.dto.AttributeRequestDto;
@@ -56,6 +57,7 @@ public class AttributeService {
         return attributeTranslateMapper.mapEntityToDto(attributes, language);
     }
 
+    @Transactional
     public AttributeResponseDto addAttribute(AttributeRequestDto request, BindingResult bindingResult) {
         ErrorUtils.checkItemNotCreatedException(bindingResult);
 
@@ -79,6 +81,7 @@ public class AttributeService {
         return attributeTranslateMapper.mapEntityToDto(attribute, defaultSiteLanguage);
     }
 
+    @Transactional
     public AttributeResponseDto updateAttribute(Long id, String langCode,
                                                 AttributeRequestDto request, BindingResult bindingResult) {
         ErrorUtils.checkItemNotUpdatedException(bindingResult);
@@ -107,6 +110,7 @@ public class AttributeService {
         return attributeTranslateMapper.mapEntityToDto(attribute, language);
     }
 
+    @Transactional
     public void deleteAttribute(Long id) {
         Attribute attribute = getAttribute(id);
         attributeRepository.delete(attribute);

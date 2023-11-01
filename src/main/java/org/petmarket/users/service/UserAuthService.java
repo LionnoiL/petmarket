@@ -1,6 +1,7 @@
 package org.petmarket.users.service;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.errorhandling.ItemNotCreatedException;
@@ -56,6 +57,7 @@ public class UserAuthService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Transactional
     public UserResponseDto register(UserRequestDto userRequestDto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             throw new ItemNotCreatedException(ErrorUtils.getErrorsString(bindingResult));

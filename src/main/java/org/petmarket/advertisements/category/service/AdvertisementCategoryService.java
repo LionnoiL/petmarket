@@ -1,5 +1,6 @@
 package org.petmarket.advertisements.category.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.advertisements.advertisement.repository.AdvertisementRepository;
@@ -55,6 +56,7 @@ public class AdvertisementCategoryService {
         return categoryResponseTranslateMapper.mapEntityToDto(categories, language);
     }
 
+    @Transactional
     public AdvertisementCategoryResponseDto addCategory(
             AdvertisementCategoryCreateRequestDto request, BindingResult bindingResult) {
         ErrorUtils.checkItemNotCreatedException(bindingResult);
@@ -90,6 +92,7 @@ public class AdvertisementCategoryService {
         return categoryResponseTranslateMapper.mapEntityToDto(category, defaultSiteLanguage);
     }
 
+    @Transactional
     public AdvertisementCategoryResponseDto updateCategory(
             Long id, String langCode, AdvertisementCategoryUpdateRequestDto request, BindingResult bindingResult) {
         ErrorUtils.checkItemNotUpdatedException(bindingResult);
@@ -121,11 +124,13 @@ public class AdvertisementCategoryService {
         return categoryResponseTranslateMapper.mapEntityToDto(category, language);
     }
 
+    @Transactional
     public void deleteCategory(Long id) {
         AdvertisementCategory category = getCategory(id);
         categoryRepository.deleteById(category.getId());
     }
 
+    @Transactional
     public List<AdvertisementCategoryResponseDto> setParentCategory(List<Long> ids, Long parentId) {
         AdvertisementCategory parentCategory = null;
         if (parentId != 0) {

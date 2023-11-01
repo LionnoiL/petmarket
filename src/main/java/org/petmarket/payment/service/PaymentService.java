@@ -1,5 +1,6 @@
 package org.petmarket.payment.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.errorhandling.ItemNotFoundException;
@@ -59,6 +60,7 @@ public class PaymentService {
         return paymentResponseTranslateMapper.mapEntityToDto(payments, language);
     }
 
+    @Transactional
     public PaymentResponseDto addPayment(PaymentRequestDto request, BindingResult bindingResult) {
         ErrorUtils.checkItemNotCreatedException(bindingResult);
 
@@ -86,6 +88,7 @@ public class PaymentService {
         return paymentResponseTranslateMapper.mapEntityToDto(payment, defaultSiteLanguage);
     }
 
+    @Transactional
     public PaymentResponseDto updatePayment(Long id, String langCode, PaymentRequestDto request,
                                             BindingResult bindingResult) {
         ErrorUtils.checkItemNotUpdatedException(bindingResult);
@@ -112,6 +115,7 @@ public class PaymentService {
         return paymentResponseTranslateMapper.mapEntityToDto(payment, language);
     }
 
+    @Transactional
     public void deletePayment(Long id) {
         Payment payment = getPayment(id);
         paymentRepository.delete(payment);
