@@ -2,8 +2,11 @@ package org.petmarket.advertisements.advertisement.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.petmarket.advertisements.attributes.entity.Attribute;
 import org.petmarket.advertisements.category.entity.AdvertisementCategory;
+import org.petmarket.delivery.entity.Delivery;
 import org.petmarket.location.entity.Location;
+import org.petmarket.payment.entity.Payment;
 import org.petmarket.translate.TranslateHolder;
 import org.petmarket.users.entity.User;
 import org.springframework.data.annotation.CreatedDate;
@@ -12,6 +15,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -74,4 +79,22 @@ public class Advertisement implements TranslateHolder {
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "advertisement", fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<AdvertisementTranslate> translations;
+
+    @ManyToMany
+    @JoinTable(name = "advertisement_payments",
+            joinColumns = @JoinColumn(name = "advertisement_id"),
+            inverseJoinColumns = @JoinColumn(name = "pay_id"))
+    private List<Payment> payments = new ArrayList<>();
+
+    @ManyToMany
+    @JoinTable(name = "advertisement_deliveries",
+            joinColumns = @JoinColumn(name = "advertisement_id"),
+            inverseJoinColumns = @JoinColumn(name = "delivery_id"))
+    private List<Delivery> deliveries = new ArrayList<>();
+
+    @ManyToMany
+    @JoinTable(name = "attribute_values",
+            joinColumns = @JoinColumn(name = "advertisement_id"),
+            inverseJoinColumns = @JoinColumn(name = "attribute_id"))
+    private List<Attribute> attributes = new ArrayList<>();
 }
