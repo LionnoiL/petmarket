@@ -8,6 +8,9 @@ import lombok.RequiredArgsConstructor;
 import org.petmarket.blog.entity.CommentStatus;
 import org.petmarket.breeds.dto.BreedCommentResponseDto;
 import org.petmarket.breeds.service.BreedCommentService;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,8 +26,14 @@ public class BreedCommentAdminController {
     @Operation(summary = "Get All Comments", description = "Get a list of all breed comments.")
     @ApiResponse(responseCode = "200", description = "Successfully retrieved comments")
     @GetMapping
-    public List<BreedCommentResponseDto> getAllComments() {
-        return commentService.findAllCommentAdmin();
+    public List<BreedCommentResponseDto> getAllComments(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "ASC") String sortDirection,
+            @RequestParam(required = false) CommentStatus status) {
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), "created");
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
+        return commentService.findAllCommentAdmin(pageable, status);
     }
 
     @Operation(summary = "Change Comment Status", description = "Change the status of multiple comments.")

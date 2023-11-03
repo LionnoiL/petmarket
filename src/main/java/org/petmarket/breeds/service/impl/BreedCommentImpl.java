@@ -13,6 +13,7 @@ import org.petmarket.errorhandling.ItemNotFoundException;
 import org.petmarket.errorhandling.ItemNotUpdatedException;
 import org.petmarket.security.jwt.JwtUser;
 import org.petmarket.users.service.UserService;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -51,8 +52,14 @@ public class BreedCommentImpl implements BreedCommentService {
     }
 
     @Override
-    public List<BreedCommentResponseDto> findAllCommentAdmin() {
-        return commentRepository.findAll().stream()
+    public List<BreedCommentResponseDto> findAllCommentAdmin(Pageable pageable, CommentStatus status) {
+        List<BreedComment> comments;
+        if (status != null) {
+            comments = commentRepository.findByStatus(status, pageable);
+        } else {
+            comments = commentRepository.findAll(pageable).getContent();
+        }
+        return comments.stream()
                 .map(commentMapper::toDto)
                 .collect(Collectors.toList());
     }
