@@ -86,7 +86,9 @@ public class AdvertisementReviewController {
                     schema = @Schema(type = "integer", format = "int64")
             )
             @PathVariable Long id,
-            @RequestBody @Valid @NotNull(message = "Request body is mandatory") final AdvertisementReviewRequestDto request,
+            @RequestBody
+            @Valid
+            @NotNull(message = "Request body is mandatory") final AdvertisementReviewRequestDto request,
             BindingResult bindingResult, Authentication authentication) {
         log.info("Received request to add review - {} to advertisement with id {}.", request, id);
         return advertisementService.addReview(id, request, bindingResult, authentication);
