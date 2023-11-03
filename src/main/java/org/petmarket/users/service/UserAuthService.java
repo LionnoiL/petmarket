@@ -1,7 +1,7 @@
 package org.petmarket.users.service;
 
 import jakarta.servlet.http.HttpServletRequest;
-import java.util.HashMap;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.errorhandling.ItemNotCreatedException;
@@ -36,10 +36,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -49,7 +46,6 @@ public class UserAuthService {
     private final UserMapper userMapper;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
-    private final ErrorUtils errorUtils;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
     private final UserService userService;
@@ -61,9 +57,10 @@ public class UserAuthService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Transactional
     public UserResponseDto register(UserRequestDto userRequestDto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            throw new ItemNotCreatedException(errorUtils.getErrorsString(bindingResult));
+            throw new ItemNotCreatedException(ErrorUtils.getErrorsString(bindingResult));
         }
 
         User user = userMapper.mapDtoRequestToDto(userRequestDto);
@@ -86,13 +83,13 @@ public class UserAuthService {
 
     public ResponseEntity<JwtResponseDto> login(UserRequestDto requestDto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            throw new LoginException(errorUtils.getErrorsString(bindingResult));
+            throw new LoginException(ErrorUtils.getErrorsString(bindingResult));
         }
 
         try {
             String username = requestDto.getEmail();
             authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(username, requestDto.getPassword()));
+                    new UsernamePasswordAuthenticationToken(username, requestDto.getPassword()));
             User user = userService.findByUsername(username);
 
             if (user == null) {
@@ -100,7 +97,10 @@ public class UserAuthService {
             }
 
             String accessToken = jwtTokenProvider.createToken(username, user.getRoles());
-            String refreshToken = jwtTokenProvider.createRefreshToken(username, user.getRoles());
+            String refreshToken = "";
+            if (requestDto.getRememberMe() != null && requestDto.getRememberMe()) {
+                refreshToken = jwtTokenProvider.createRefreshToken(username, user.getRoles());
+            }
 
             JwtResponseDto response = new JwtResponseDto(username, accessToken, refreshToken);
 
@@ -152,7 +152,7 @@ public class UserAuthService {
     public void resetPassword(ResetPasswordRequestDto resetPasswordRequestDto,
                               BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            throw new ItemNotCreatedException(errorUtils.getErrorsString(bindingResult));
+            throw new ItemNotCreatedException(ErrorUtils.getErrorsString(bindingResult));
         }
 
         User user = userRepository.findByEmailConfirmCode(
