@@ -29,6 +29,8 @@ public class BreedAdminController {
     public BreedResponseDto save(@RequestBody
                                  @Schema(description = "Breed data to be saved")
                                  @Valid
+                                 @Parameter(name = "Breed Request Dto",
+                                         required = true)
                                  BreedRequestDto requestDto) {
         return breedService.save(requestDto);
     }
@@ -40,15 +42,50 @@ public class BreedAdminController {
     @ApiResponse(responseCode = "500", description = "Internal server error")
     @PostMapping("/{breedId}/{langCode}")
     public BreedResponseDto addTranslation(@PathVariable
-                                           @Schema(description = "ID of the breed")
+                                           @Parameter(name = "breedId",
+                                                   description = "Breed Id",
+                                                   example = "1")
                                            Long breedId,
                                            @PathVariable
-                                           @Schema(description = "Language code for translation")
+                                           @Parameter(name = "langCode",
+                                                   description = "Language code for translation",
+                                                   example = "en")
                                            String langCode,
                                            @RequestBody
                                            @Schema(description = "Translation data to be added")
+                                           @Parameter(name = "Breed Request Dto",
+                                                   required = true)
                                            BreedRequestDto requestDto) {
         return breedService.addTranslation(breedId, langCode, requestDto);
+    }
+
+    @Operation(summary = "Update a breed by ID and language code",
+            description = "Updates a breed with the specified ID and language code",
+            responses = {
+                    @ApiResponse(responseCode = "200",
+                            description = "Breed successfully updated"),
+                    @ApiResponse(responseCode = "400",
+                            description = "Bad request, e.g., invalid breed ID or language code"),
+                    @ApiResponse(responseCode = "404",
+                            description = "Breed not found"),
+                    @ApiResponse(responseCode = "500",
+                            description = "Internal server error")
+            })
+    @PutMapping("/{breedId}/{langCode}")
+    public BreedResponseDto updateBreed(@PathVariable
+                                        @Parameter(name = "breedId",
+                                                example = "1", required = true)
+                                        Long breedId,
+                                        @PathVariable
+                                        @Parameter(name = "langCode",
+                                                example = "ua", required = true)
+                                        String langCode,
+                                        @RequestBody
+                                        @Valid
+                                        @Parameter(name = "Breed Request Dto",
+                                                required = true)
+                                        BreedRequestDto requestDto) {
+        return breedService.update(breedId, langCode, requestDto);
     }
 
     @Operation(summary = "Delete a breed", description = "Delete a breed by ID")
@@ -58,7 +95,9 @@ public class BreedAdminController {
     @DeleteMapping("/{breedId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable(name = "breedId")
-                       @Parameter(description = "Breed ID", required = true) Long breedId) {
+                       @Parameter(name = "breedId", description = "Breed Id",
+                               example = "1", required = true)
+                       Long breedId) {
         breedService.delete(breedId);
     }
 }

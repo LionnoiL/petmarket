@@ -72,12 +72,22 @@ public class BreedServiceImpl implements BreedService {
 
     @Override
     public void delete(Long breedId) {
-        breedRepository.deleteById(breedId);
+        Breed breed = findBreedById(breedId);
+        breedRepository.deleteById(breed.getId());
     }
 
     @Override
-    public BreedResponseDto updateById(Long id, String langCode, BreedResponseDto l) {
-        return null;
+    public BreedResponseDto update(Long breedId, String langCode, BreedRequestDto requestDto) {
+        Breed breed = findBreedById(breedId);
+        breed.setTranslations(breed.getTranslations().stream()
+                .filter(t -> t.getLangCode().equals(checkedLang(langCode)))
+                .peek(translation -> {
+                    translation.setTitle(requestDto.getTitle());
+                    translation.setDescription(requestDto.getDescription());
+                })
+                .collect(Collectors.toList()));
+        breedRepository.save(breed);
+        return breedMapper.toDto(breed);
     }
 
     private String checkedLang(String langCode) {

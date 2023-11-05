@@ -1,7 +1,7 @@
 package org.petmarket.breeds.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -23,9 +23,11 @@ public class BreedController {
     @ApiResponse(responseCode = "404", description = "Breed not found")
     @GetMapping("/{breedId}/{langCode}")
     public BreedResponseDto get(@PathVariable
-                                @Schema(description = "ID of the breed") Long breedId,
+                                @Parameter(name = "breedId", description = "breed id", example = "1")
+                                Long breedId,
                                 @PathVariable
-                                @Schema(description = "Language code", example = "en") String langCode) {
+                                @Parameter(name = "langCode", description = "Code of language", example = "ua")
+                                String langCode) {
         return breedService.get(breedId, langCode);
     }
 
@@ -34,9 +36,11 @@ public class BreedController {
     @GetMapping("/{langCode}")
     public List<BreedResponseDto> getAll(
             @PathVariable
-            @Schema(description = "Language code", example = "en") String langCode,
+            @Parameter(name = "langCode", description = "Code of language", example = "ua")
+            String langCode,
             @RequestParam(required = false)
-            @Schema(description = "ID of the category", example = "1") Long categoryId) {
+            @Parameter(name = "categoryId", description = "find breeds by category", example = "1", required = false)
+            Long categoryId) {
         return breedService.getAllByCategory(langCode, categoryId);
     }
 }

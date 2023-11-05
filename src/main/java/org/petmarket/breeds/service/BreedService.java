@@ -17,7 +17,7 @@ public interface BreedService {
 
     List<BreedResponseDto> getAllByCategory(String langCode, Long categoryId);
 
-    void delete(Long breedId);
+    BreedResponseDto update(Long breedId, String langCode, BreedRequestDto requestDto);
 
-    BreedResponseDto updateById(Long breedId, String langCode, BreedResponseDto responseDto);
+    void delete(Long breedId);
 }
