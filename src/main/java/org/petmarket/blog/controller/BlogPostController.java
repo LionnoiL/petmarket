@@ -8,7 +8,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.petmarket.blog.dto.posts.BlogPostResponseDto;
 import org.petmarket.blog.service.PostService;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,7 +18,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/v1/blog")
 @RequiredArgsConstructor
-@Tag(name = "Blog Posts", description = "Blog Post endpoints")
+@Tag(name = "Blog", description = "Blog endpoints API")
 public class BlogPostController {
     private final PostService postService;
 
@@ -29,9 +31,15 @@ public class BlogPostController {
     @GetMapping("/{postId}/{langCode}")
     public BlogPostResponseDto getPost(
             @PathVariable
-            @Parameter(description = "ID of the blog post", example = "1") Long postId,
+            @Parameter(name = "postId",
+                    description = "Post ID",
+                    example = "1",
+                    required = true)
+            Long postId,
             @PathVariable
-            @Parameter(description = "Language code", example = "en") String langCode) {
+            @Parameter(name = "langCode", description = "Language code",
+                    example = "ua", required = true)
+            String langCode) {
         return postService.get(postId, langCode);
     }
 
@@ -42,11 +50,18 @@ public class BlogPostController {
     })
     @GetMapping("/{langCode}")
     public List<BlogPostResponseDto> getAll(
-            Pageable pageable,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "ASC") String sortDirection,
             @PathVariable
-            @Parameter(description = "Language code", example = "en") String langCode,
+            @Parameter(name = "langCode", description = "Language code",
+                    example = "ua", required = true)
+            String langCode,
             @RequestParam(required = false)
-            @Parameter(description = "ID of the category", example = "1") Long categoryId) {
-        return postService.getAllByCategory(langCode, categoryId);
+            @Parameter(description = "Blog post category ID",
+                    example = "1", required = false) Long categoryId) {
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), "created");
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
+        return postService.getAllByCategory(langCode, categoryId, pageable);
     }
 }

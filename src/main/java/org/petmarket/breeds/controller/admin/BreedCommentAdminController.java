@@ -20,7 +20,7 @@ import java.util.Stack;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v1/admin/breeds/comments")
-@Tag(name = "Breeds", description = "API endpoints for breed comment administration")
+@Tag(name = "Breeds", description = "API endpoints for breed administration")
 public class BreedCommentAdminController {
     private final BreedCommentService commentService;
 

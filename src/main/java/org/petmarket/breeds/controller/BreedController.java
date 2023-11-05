@@ -14,7 +14,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/v1/breeds")
 @RequiredArgsConstructor
-@Tag(name = "Breeds", description = "API endpoints for breed information")
+@Tag(name = "Breeds", description = "API endpoints for breed administration")
 public class BreedController {
     private final BreedService breedService;
 

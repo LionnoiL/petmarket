@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/v1/blog/comments")
 @RequiredArgsConstructor
-@Tag(name = "Blog Comments", description = "Endpoints for managing blog comments")
+@Tag(name = "Blog", description = "Blog endpoints API")
 public class CommentController {
     private final CommentService commentService;
 
@@ -33,8 +33,15 @@ public class CommentController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     public BlogPostCommentResponse createComment(
-            @PathVariable(name = "postId") @Parameter(description = "Post ID", required = true) Long postId,
-            @RequestBody @Valid BlogPostCommentRequest request,
+            @PathVariable(name = "postId") @Parameter(name = "postId",
+                    description = "Post ID",
+                    example = "1",
+                    required = true)
+            Long postId,
+            @RequestBody
+            @Valid
+            @Parameter(description = "Blog post comment request dto", required = true)
+            BlogPostCommentRequest request,
             Authentication authentication) {
         return commentService.addComment(postId, request, authentication);
     }

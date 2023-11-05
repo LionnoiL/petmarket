@@ -8,7 +8,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.petmarket.blog.dto.category.BlogPostCategoryResponseDto;
 import org.petmarket.blog.service.CategoryService;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,7 +18,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/v1/blog/categories")
 @RequiredArgsConstructor
-@Tag(name = "Blog Categories", description = "Endpoints for managing blog categories")
+@Tag(name = "Blog", description = "Blog endpoints API")
 public class CategoryController {
     private final CategoryService categoryService;
 
@@ -31,10 +33,15 @@ public class CategoryController {
             @ApiResponse(responseCode = "500",
                     description = "Internal server error")
     })
-    public List<BlogPostCategoryResponseDto> getAll(@PathVariable(name = "langCode")
-                                                    @Parameter(description = "Language code",
-                                                            required = true) String langCode,
-                                                    Pageable pageable) {
+    public List<BlogPostCategoryResponseDto> getAll(@RequestParam(defaultValue = "1") int page,
+                                                    @RequestParam(defaultValue = "10") int size,
+                                                    @RequestParam(defaultValue = "ASC") String sortDirection,
+                                                    @PathVariable(name = "langCode")
+                                                    @Parameter(name = "langCode", description = "Language code",
+                                                            example = "ua", required = true)
+                                                    String langCode) {
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), "id");
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
         return categoryService.getAll(pageable, langCode);
     }
 
@@ -47,9 +54,12 @@ public class CategoryController {
     })
     public BlogPostCategoryResponseDto get(
             @PathVariable(name = "categoryId")
-            @Parameter(description = "Category ID", required = true) Long categoryId,
-            @PathVariable(name = "langCode")
-            @Parameter(description = "Language code", required = true) String langCode) {
+            @Parameter(name = "categoryId", description = "Category Id",
+                    example = "1", required = true)
+            Long categoryId,
+            @Parameter(name = "langCode", description = "Language code",
+                    example = "ua", required = true)
+            String langCode) {
         return categoryService.get(categoryId, langCode);
     }
 }

@@ -11,17 +11,17 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.petmarket.blog.dto.posts.BlogPostRequestDto;
 import org.petmarket.blog.dto.posts.BlogPostResponseDto;
+import org.petmarket.blog.dto.posts.BlogPostTranslationRequestDto;
 import org.petmarket.blog.entity.Post;
 import org.petmarket.blog.service.PostService;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/v1/admin/blog")
 @RequiredArgsConstructor
-@Tag(name = "Blog Posts", description = "Blog Post endpoints")
+@Tag(name = "Blog", description = "Blog endpoints API")
 public class BlogPostAdminController {
     private final PostService postService;
 
@@ -32,9 +32,11 @@ public class BlogPostAdminController {
             @ApiResponse(responseCode = "400", description = "Invalid input data"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "500", description = "Internal server error")})
-    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-    public BlogPostResponseDto createPost(@RequestBody @Valid BlogPostRequestDto requestDto,
+    public BlogPostResponseDto createPost(@RequestBody
+                                          @Valid
+                                          @Parameter(description = "Blog post request dto", required = true)
+                                          BlogPostRequestDto requestDto,
                                           Authentication authentication) {
         return postService.savePost(requestDto, authentication);
     }
@@ -48,10 +50,16 @@ public class BlogPostAdminController {
             @ApiResponse(responseCode = "400", description = "Bad request"),
             @ApiResponse(responseCode = "404", description = "Blog post not found")
     })
-    public BlogPostResponseDto addTranslation(@RequestBody @Valid BlogPostRequestDto requestDto,
-                                              @Parameter(description = "Post ID", required = true)
+    public BlogPostResponseDto addTranslation(@RequestBody
+                                              @Valid
+                                              @Parameter(description = "Blog post translation request dto",
+                                                      required = true)
+                                              BlogPostTranslationRequestDto requestDto,
+                                              @Parameter(name = "postId", description = "Post ID",
+                                                      example = "1", required = true)
                                               @PathVariable Long postId,
-                                              @Parameter(description = "Language Code", required = true)
+                                              @Parameter(name = "langCode", description = "Language code",
+                                                      example = "en", required = true)
                                               @PathVariable String langCode) {
         return postService.addTranslation(postId, langCode, requestDto);
     }
@@ -65,10 +73,13 @@ public class BlogPostAdminController {
             @ApiResponse(responseCode = "400", description = "Bad request"),
             @ApiResponse(responseCode = "404", description = "Blog post not found")
     })
-    public BlogPostResponseDto updateStatus(@Parameter(description = "Post ID", required = true)
-                                            @PathVariable Long postId,
-                                            @Parameter(description = "New status", required = true)
-                                            @PathVariable Post.Status status) {
+    public BlogPostResponseDto updateStatus(
+            @PathVariable
+            @Parameter(name = "postId", description = "Post ID",
+                    example = "1", required = true)
+            Long postId,
+            @Parameter(description = "New status", required = true)
+            @PathVariable Post.Status status) {
         return postService.updateStatus(postId, status);
     }
 
@@ -81,11 +92,16 @@ public class BlogPostAdminController {
             @ApiResponse(responseCode = "400", description = "Bad request"),
             @ApiResponse(responseCode = "404", description = "Blog post not found")
     })
-    public BlogPostResponseDto updatePost(@Parameter(description = "Post ID", required = true)
+    public BlogPostResponseDto updatePost(@RequestBody
+                                          @Valid
+                                          @Parameter(description = "Blog post request dto", required = true)
+                                          BlogPostRequestDto requestDto,
+                                          @Parameter(name = "postId", description = "Post ID",
+                                                  example = "1", required = true)
                                           @PathVariable Long postId,
-                                          @Parameter(description = "Language Code", required = true)
-                                          @PathVariable String langCode,
-                                          @RequestBody @Valid BlogPostRequestDto requestDto) {
+                                          @Parameter(name = "langCode", description = "Language code",
+                                                  example = "ua", required = true)
+                                          @PathVariable String langCode) {
         return postService.updateById(postId, langCode, requestDto);
     }
 
@@ -96,7 +112,9 @@ public class BlogPostAdminController {
     @DeleteMapping("/{postId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable(name = "postId")
-                       @Parameter(description = "Post ID", required = true) Long postId) {
+                       @Parameter(name = "postId", description = "Post ID",
+                               example = "1", required = true)
+                       Long postId) {
         postService.delete(postId);
     }
 }

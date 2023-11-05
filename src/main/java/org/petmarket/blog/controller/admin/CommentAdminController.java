@@ -17,7 +17,7 @@ import java.util.Stack;
 @RestController
 @RequestMapping("/v1/admin/blog/comments")
 @AllArgsConstructor
-@Tag(name = "Blog Comments", description = "Endpoints for managing blog comments")
+@Tag(name = "Blog", description = "Blog endpoints API")
 public class CommentAdminController {
     private final CommentService commentService;
 
@@ -40,7 +40,10 @@ public class CommentAdminController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     public List<BlogPostCommentResponse> changeCommentStatus(
-            @PathVariable Stack<Long> commentsIds,
+            @PathVariable
+            @Parameter(name = "commentsIds", description = "List of blog comments IDs",
+                    example = "1", required = true)
+            Stack<Long> commentsIds,
             @RequestParam CommentStatus status) {
         return commentService.updateStatus(commentsIds, status);
     }
@@ -53,8 +56,11 @@ public class CommentAdminController {
     })
     @DeleteMapping("/{commentId}")
     public void deleteComment(@PathVariable(name = "commentId")
-                              @Parameter(description = "Comment ID",
-                                      required = true) Long commentId) {
+                              @Parameter(name = "commentId",
+                                      description = "Comment ID",
+                                      example = "1",
+                                      required = true)
+                              Long commentId) {
         commentService.delete(commentId);
     }
 }

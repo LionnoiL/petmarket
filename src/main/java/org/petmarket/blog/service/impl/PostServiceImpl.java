@@ -3,6 +3,7 @@ package org.petmarket.blog.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.petmarket.blog.dto.posts.BlogPostRequestDto;
 import org.petmarket.blog.dto.posts.BlogPostResponseDto;
+import org.petmarket.blog.dto.posts.BlogPostTranslationRequestDto;
 import org.petmarket.blog.entity.BlogCategory;
 import org.petmarket.blog.entity.CommentStatus;
 import org.petmarket.blog.entity.Post;
@@ -90,7 +91,9 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public BlogPostResponseDto addTranslation(Long postId, String langCode, BlogPostRequestDto requestDto) {
+    public BlogPostResponseDto addTranslation(Long postId,
+                                              String langCode,
+                                              BlogPostTranslationRequestDto requestDto) {
         Post post = findById(postId);
         List<PostTranslations> translations = post.getTranslations();
         if (translations.stream()
@@ -98,7 +101,13 @@ public class PostServiceImpl implements PostService {
                         .equals(checkedLang(langCode)))) {
             throw new ItemNotUpdatedException(langCode + " translation is already exist");
         } else {
-            translations.add(createPostTranslation(post, requestDto, langCode));
+            PostTranslations translation = new PostTranslations();
+            translation.setPost(post);
+            translation.setTitle(requestDto.getTitle());
+            translation.setText(requestDto.getText());
+            translation.setLangCode(langCode);
+            translation.setShortText(truncateStringTo500Characters(requestDto.getText()));
+            translations.add(translation);
             post.setTranslations(translations);
             postRepository.save(post);
         }
@@ -106,12 +115,14 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<BlogPostResponseDto> getAllByCategory(String langCode, Long categoryId) {
+    public List<BlogPostResponseDto> getAllByCategory(String langCode,
+                                                      Long categoryId,
+                                                      Pageable pageable) {
         List<Post> allPosts;
         if (categoryId != null) {
-            allPosts = findAllByBlogCategoryId(categoryId);
+            allPosts = findAllByBlogCategoryId(categoryId, pageable);
         } else {
-            allPosts = postRepository.findAll();
+            allPosts = postRepository.findAll(pageable).getContent();
         }
         return allPosts.stream()
                 .filter(post -> post.getStatus().equals(Post.Status.PUBLISHED))
@@ -191,8 +202,8 @@ public class PostServiceImpl implements PostService {
         return languageService.getByLangCode(langCode).getLangCode();
     }
 
-    private List<Post> findAllByBlogCategoryId(Long categoryId) {
-        List<Post> posts = postRepository.findPostsByCategoryId(categoryId);
+    private List<Post> findAllByBlogCategoryId(Long categoryId, Pageable pageable) {
+        List<Post> posts = postRepository.findPostsByCategoryId(categoryId, pageable);
         if (posts.isEmpty()) {
             throw new ItemNotFoundException("Can't find posts for category: " + categoryId);
         }

@@ -48,7 +48,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public List<BlogPostCategoryResponseDto> getAll(Pageable pageable, String langCode) {
-        return categoryRepository.findAll().stream()
+        return categoryRepository.findAll(pageable).stream()
                 .peek(category ->
                         category.setTranslations(getTranslation(category.getId(), langCode))
                 )

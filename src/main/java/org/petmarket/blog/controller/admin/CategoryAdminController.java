@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/v1/admin/blog/categories")
 @RequiredArgsConstructor
-@Tag(name = "Blog Categories", description = "Endpoints for managing blog categories")
+@Tag(name = "Blog", description = "Blog endpoints API")
 public class CategoryAdminController {
     private final CategoryService categoryService;
 
@@ -28,7 +28,11 @@ public class CategoryAdminController {
             @ApiResponse(responseCode = "400", description = "Invalid input data"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public BlogPostCategoryResponseDto save(@RequestBody @Valid BlogPostCategoryRequestDto requestDto) {
+    public BlogPostCategoryResponseDto save(@RequestBody
+                                            @Valid
+                                            @Parameter(description = "Blog post category request dto",
+                                                    required = true)
+                                            BlogPostCategoryRequestDto requestDto) {
         return categoryService.save(requestDto);
     }
 
@@ -43,12 +47,20 @@ public class CategoryAdminController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     public BlogPostCategoryResponseDto addTranslation(@PathVariable(name = "categoryId")
-                                                      @Parameter(description = "Category ID",
-                                                              required = true) Long categoryId,
+                                                      @Parameter(name = "categoryId",
+                                                              description = "Category ID",
+                                                              example = "1",
+                                                              required = true)
+                                                      Long categoryId,
                                                       @PathVariable(name = "langCode")
-                                                      @Parameter(description = "Language code",
-                                                              required = true) String langCode,
-                                                      @RequestBody @Valid BlogPostCategoryRequestDto requestDto) {
+                                                      @Parameter(name = "langCode", description = "Language code",
+                                                              example = "en", required = true)
+                                                      String langCode,
+                                                      @RequestBody
+                                                      @Valid
+                                                      @Parameter(description = "Blog post category request dto",
+                                                              required = true)
+                                                      BlogPostCategoryRequestDto requestDto) {
         return categoryService.addTranslation(categoryId, langCode, requestDto);
     }
 
@@ -63,12 +75,20 @@ public class CategoryAdminController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     public BlogPostCategoryResponseDto updateCategory(@PathVariable(name = "categoryId")
-                                                      @Parameter(description = "Category ID",
-                                                              required = true) Long categoryId,
+                                                      @Parameter(name = "categoryId",
+                                                              description = "Category ID",
+                                                              example = "1",
+                                                              required = true)
+                                                      Long categoryId,
                                                       @PathVariable(name = "langCode")
-                                                      @Parameter(description = "Language code",
-                                                              required = true) String langCode,
-                                                      @RequestBody @Valid BlogPostCategoryRequestDto requestDto) {
+                                                      @Parameter(name = "langCode", description = "Language code",
+                                                              example = "ua", required = true)
+                                                      String langCode,
+                                                      @RequestBody
+                                                      @Valid
+                                                      @Parameter(description = "Blog post category request dto",
+                                                              required = true)
+                                                      BlogPostCategoryRequestDto requestDto) {
         return categoryService.updateById(categoryId, langCode, requestDto);
     }
 
@@ -81,8 +101,11 @@ public class CategoryAdminController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     public void deleteCategory(@PathVariable(name = "categoryId")
-                                   @Parameter(description = "Category ID",
-                                           required = true) Long categoryId) {
+                               @Parameter(name = "categoryId",
+                                       description = "Category ID",
+                                       example = "1",
+                                       required = true)
+                               Long categoryId) {
         categoryService.delete(categoryId);
     }
 }

@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v1/breeds/comments")
-@Tag(name = "Breeds", description = "API endpoints for breed comments")
+@Tag(name = "Breeds", description = "API endpoints for breed administration")
 public class BreedCommentController {
     private final BreedCommentService commentService;
 

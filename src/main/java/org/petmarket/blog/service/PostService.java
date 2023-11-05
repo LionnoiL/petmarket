@@ -2,7 +2,9 @@ package org.petmarket.blog.service;
 
 import org.petmarket.blog.dto.posts.BlogPostRequestDto;
 import org.petmarket.blog.dto.posts.BlogPostResponseDto;
+import org.petmarket.blog.dto.posts.BlogPostTranslationRequestDto;
 import org.petmarket.blog.entity.Post;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 
 import java.util.List;
@@ -15,10 +17,11 @@ public interface PostService extends AbstractService<BlogPostResponseDto, BlogPo
 
     BlogPostResponseDto addTranslation(Long postId,
                                        String langCode,
-                                       BlogPostRequestDto requestDto);
+                                       BlogPostTranslationRequestDto requestDto);
 
     List<BlogPostResponseDto> getAllByCategory(String langCode,
-                                               Long categoryId);
+                                               Long categoryId,
+                                               Pageable pageable);
 
     BlogPostResponseDto updateStatus(Long postId, Post.Status status);
 }
