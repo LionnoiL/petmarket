@@ -8,18 +8,15 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.errorhandling.ErrorResponse;
 import org.petmarket.location.dto.CityResponseDto;
 import org.petmarket.location.dto.StateResponseDto;
 import org.petmarket.location.service.StateService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Tag(name = "Location", description = "the location API")
 @Slf4j
@@ -102,15 +99,15 @@ public class StateController {
 
     @Operation(summary = "Get State by Name and Country ID")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Successful operation", content = {
-            @Content(
-                mediaType = "application/json",
-                array = @ArraySchema(schema = @Schema(
-                    implementation = CityResponseDto.class))
-            )
-        })
+            @ApiResponse(responseCode = "200", description = "Successful operation", content = {
+                    @Content(
+                            mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(
+                                    implementation = CityResponseDto.class))
+                    )
+            })
     })
-    @GetMapping("/byName/{name}/byStateId/{id}")
+    @GetMapping("/byName/{name}/byCountryId/{id}")
     @ResponseBody
     public List<StateResponseDto> getStateByNameAndCountryId(
         @Parameter(description = "The Name of the states to retrieve", required = true,
