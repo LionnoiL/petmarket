@@ -8,14 +8,18 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.errorhandling.ErrorResponse;
 import org.petmarket.location.dto.CityResponseDto;
 import org.petmarket.location.service.CityService;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "Location", description = "the location API")
 @Slf4j
@@ -56,20 +60,20 @@ public class CityController {
             @Content(
                 mediaType = "application/json",
                 array = @ArraySchema(schema = @Schema(
-                        implementation = CityResponseDto.class))
+                    implementation = CityResponseDto.class))
             )
         })
     })
     @GetMapping("/byName/{name}")
     @ResponseBody
     public List<CityResponseDto> getCityByName(
-            @Parameter(description = "The Name of the city to retrieve", required = true,
-                    schema = @Schema(type = "string")
-            )
-            @PathVariable String name,
-            @Parameter(description = "The size of the page to be returned", required = true,
-                    schema = @Schema(type = "integer", defaultValue = "12")
-            ) @RequestParam(defaultValue = "12") int size
+        @Parameter(description = "The Name of the city to retrieve", required = true,
+            schema = @Schema(type = "string")
+        )
+        @PathVariable String name,
+        @Parameter(description = "The size of the page to be returned", required = true,
+            schema = @Schema(type = "integer", defaultValue = "12")
+        ) @RequestParam(defaultValue = "12") int size
     ) {
         log.info("Received request to get the City with name - {}.", name);
         List<CityResponseDto> dto = cityService.findByName(name, size);
@@ -85,6 +89,10 @@ public class CityController {
                 array = @ArraySchema(schema = @Schema(
                     implementation = CityResponseDto.class))
             )
+        }),
+        @ApiResponse(responseCode = "404", description = "State not found", content = {
+            @Content(mediaType = "application/json", schema =
+            @Schema(implementation = ErrorResponse.class))
         })
     })
     @GetMapping("/byName/{name}/byStateId/{id}")

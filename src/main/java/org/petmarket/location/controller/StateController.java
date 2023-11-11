@@ -82,6 +82,10 @@ public class StateController {
                 array = @ArraySchema(schema = @Schema(
                     implementation = CityResponseDto.class))
             )
+        }),
+        @ApiResponse(responseCode = "404", description = "State not found", content = {
+            @Content(mediaType = "application/json", schema =
+            @Schema(implementation = ErrorResponse.class))
         })
     })
     @GetMapping("/{id}/cities")
@@ -105,7 +109,11 @@ public class StateController {
                             array = @ArraySchema(schema = @Schema(
                                     implementation = CityResponseDto.class))
                     )
-            })
+            }),
+        @ApiResponse(responseCode = "404", description = "Country not found", content = {
+            @Content(mediaType = "application/json", schema =
+            @Schema(implementation = ErrorResponse.class))
+        })
     })
     @GetMapping("/byName/{name}/byCountryId/{id}")
     @ResponseBody
