@@ -17,6 +17,7 @@ import org.petmarket.location.service.CityService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -69,9 +70,13 @@ public class CityController {
         @Parameter(description = "The Name of the city to retrieve", required = true,
             schema = @Schema(type = "string")
         )
-        @PathVariable String name) {
+        @PathVariable String name,
+        @Parameter(description = "The size of the page to be returned", required = true,
+            schema = @Schema(type = "integer", defaultValue = "12")
+        ) @RequestParam(defaultValue = "12") int size
+    ) {
         log.info("Received request to get the City with name - {}.", name);
-        List<CityResponseDto> dto = cityService.findByName(name);
+        List<CityResponseDto> dto = cityService.findByName(name, size);
         log.info("the City with name - {} was retrieved - {}.", name, dto);
         return dto;
     }
@@ -84,6 +89,10 @@ public class CityController {
                 array = @ArraySchema(schema = @Schema(
                     implementation = CityResponseDto.class))
             )
+        }),
+        @ApiResponse(responseCode = "404", description = "State not found", content = {
+            @Content(mediaType = "application/json", schema =
+            @Schema(implementation = ErrorResponse.class))
         })
     })
     @GetMapping("/byName/{name}/byStateId/{id}")

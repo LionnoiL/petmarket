@@ -85,6 +85,10 @@ public class CountryController {
                 array = @ArraySchema(schema = @Schema(
                     implementation = StateResponseDto.class))
             )
+        }),
+        @ApiResponse(responseCode = "404", description = "Country not found", content = {
+            @Content(mediaType = "application/json", schema =
+            @Schema(implementation = ErrorResponse.class))
         })
     })
     @GetMapping("/{id}/states")

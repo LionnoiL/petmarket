@@ -13,6 +13,7 @@ import org.petmarket.location.repository.CityRepository;
 import org.petmarket.location.repository.StateRepository;
 import org.petmarket.utils.ErrorUtils;
 import org.petmarket.utils.TransliterateUtils;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 
@@ -34,8 +35,8 @@ public class CityService {
         return cityMapper.mapEntityToDto(getCity(id));
     }
 
-    public List<CityResponseDto> findByName(String name) {
-        return cityRepository.findByNameContainingOrderByName(name)
+    public List<CityResponseDto> findByName(String name, int size) {
+        return cityRepository.findByNameContainingOrderByName(name, PageRequest.of(0, size))
                 .stream()
                 .map(cityMapper::mapEntityToDto)
                 .toList();

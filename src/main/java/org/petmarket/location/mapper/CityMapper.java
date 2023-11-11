@@ -10,6 +10,9 @@ import org.petmarket.location.entity.City;
 public interface CityMapper {
 
     @Mapping(target = "stateId", source = "state.id")
+    @Mapping(target = "stateName", source = "state.name")
+    @Mapping(target = "countryId", source = "state.country.id")
+    @Mapping(target = "countryName", source = "state.country.name")
     CityResponseDto mapEntityToDto(City entity);
 
     City mapDtoRequestToEntity(CityRequestDto request);

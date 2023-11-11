@@ -9,5 +9,6 @@ import org.petmarket.location.entity.State;
 public interface StateMapper {
 
     @Mapping(target = "countryId", source = "country.id")
+    @Mapping(target = "countryName", source = "country.name")
     StateResponseDto mapEntityToDto(State entity);
 }
