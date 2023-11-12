@@ -1,5 +1,6 @@
 package org.petmarket.blog.service.impl;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.petmarket.blog.dto.posts.BlogPostRequestDto;
 import org.petmarket.blog.dto.posts.BlogPostResponseDto;
@@ -21,6 +22,7 @@ import org.petmarket.utils.TransliterateUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -37,6 +39,7 @@ public class PostServiceImpl implements PostService {
     private final LanguageService languageService;
     private final TransliterateUtils transliterateUtils;
 
+    @Transactional
     @Override
     public BlogPostResponseDto get(Long id, String langCode) {
         Post post = findById(id);
@@ -56,22 +59,24 @@ public class PostServiceImpl implements PostService {
                 .toList();
     }
 
+    @Transactional
     @Override
     public void delete(Long id) {
         postRepository.deleteById(id);
     }
 
+    @Transactional
     @Override
     public BlogPostResponseDto updateById(Long id, String langCode, BlogPostRequestDto requestDto) {
         Post post = findById(id);
-        post.getTranslations().stream()
-                .filter(translation -> translation.getLangCode().equals(checkedLang(langCode)))
-                .peek(translation -> {
-                    translation.setTitle(requestDto.getTitle());
-                    translation.setText(requestDto.getText());
-                    translation.setShortText(truncateStringTo500Characters(requestDto.getText()));
-                })
-                .toList();
+        for (PostTranslations translation : post.getTranslations()) {
+            if (translation.getLangCode().equals(checkedLang(langCode))) {
+                translation.setTitle(requestDto.getTitle());
+                translation.setText(requestDto.getText());
+                translation.setShortText(truncateStringTo500Characters(requestDto.getText()));
+            }
+        }
+        postRepository.save(post);
         return postMapper.toDto(post);
     }
 
@@ -82,6 +87,7 @@ public class PostServiceImpl implements PostService {
         );
     }
 
+    @Transactional
     @Override
     public BlogPostResponseDto savePost(BlogPostRequestDto requestDto,
                                         Authentication authentication) {
@@ -90,6 +96,7 @@ public class PostServiceImpl implements PostService {
         return postMapper.toDto(post);
     }
 
+    @Transactional
     @Override
     public BlogPostResponseDto addTranslation(Long postId,
                                               String langCode,
@@ -101,12 +108,13 @@ public class PostServiceImpl implements PostService {
                         .equals(checkedLang(langCode)))) {
             throw new ItemNotUpdatedException(langCode + " translation is already exist");
         } else {
-            PostTranslations translation = new PostTranslations();
-            translation.setPost(post);
-            translation.setTitle(requestDto.getTitle());
-            translation.setText(requestDto.getText());
-            translation.setLangCode(langCode);
-            translation.setShortText(truncateStringTo500Characters(requestDto.getText()));
+            PostTranslations translation = PostTranslations.builder()
+                    .post(post)
+                    .title(requestDto.getTitle())
+                    .text(requestDto.getText())
+                    .langCode(langCode)
+                    .shortText(truncateStringTo500Characters(requestDto.getText()))
+                    .build();
             translations.add(translation);
             post.setTranslations(translations);
             postRepository.save(post);
@@ -126,17 +134,19 @@ public class PostServiceImpl implements PostService {
         }
         return allPosts.stream()
                 .filter(post -> post.getStatus().equals(Post.Status.PUBLISHED))
-                .peek(post -> {
+                .map(post -> {
                     post.setCategories(getFilteredCategories(post, langCode));
                     post.setComments(post.getComments().stream()
                             .filter(blogComment -> blogComment.getStatus().equals(CommentStatus.APPROVED))
                             .collect(Collectors.toList()));
                     post.setTranslations(getTranslation(post.getId(), langCode));
+                    return post;
                 })
                 .map(postMapper::toDto)
                 .toList();
     }
 
+    @Transactional
     @Override
     public BlogPostResponseDto updateStatus(Long postId, Post.Status status) {
         Post post = findById(postId);
@@ -145,6 +155,7 @@ public class PostServiceImpl implements PostService {
         return postMapper.toDto(post);
     }
 
+    @Transactional
     @Override
     public BlogPostResponseDto save(BlogPostRequestDto requestDto) {
         return null;
@@ -159,13 +170,13 @@ public class PostServiceImpl implements PostService {
     }
 
     private PostTranslations createPostTranslation(Post post, BlogPostRequestDto requestDto, String langCode) {
-        PostTranslations translation = new PostTranslations();
-        translation.setPost(post);
-        translation.setTitle(requestDto.getTitle());
-        translation.setText(requestDto.getText());
-        translation.setLangCode(langCode);
-        translation.setShortText(truncateStringTo500Characters(requestDto.getText()));
-        return translation;
+        return PostTranslations.builder()
+                .post(post)
+                .title(requestDto.getTitle())
+                .text(requestDto.getText())
+                .langCode(langCode)
+                .shortText(truncateStringTo500Characters(requestDto.getText()))
+                .build();
     }
 
     private int getReadingMinutes(String text) {
@@ -203,11 +214,7 @@ public class PostServiceImpl implements PostService {
     }
 
     private List<Post> findAllByBlogCategoryId(Long categoryId, Pageable pageable) {
-        List<Post> posts = postRepository.findPostsByCategoryId(categoryId, pageable);
-        if (posts.isEmpty()) {
-            throw new ItemNotFoundException("Can't find posts for category: " + categoryId);
-        }
-        return posts;
+        return postRepository.findPostsByCategoryId(categoryId, pageable);
     }
 
     private List<BlogCategory> getFilteredCategories(Post post, String langCode) {

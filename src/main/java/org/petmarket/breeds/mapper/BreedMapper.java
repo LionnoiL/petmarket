@@ -7,7 +7,10 @@ import org.petmarket.breeds.dto.BreedResponseDto;
 import org.petmarket.breeds.entity.Breed;
 import org.petmarket.config.MapperConfig;
 
-@Mapper(config = MapperConfig.class, uses = {BreedCommentMapper.class, AdvertisementCategoryMapper.class})
+@Mapper(config = MapperConfig.class, uses = {
+        BreedCommentMapper.class,
+        AdvertisementCategoryMapper.class,
+        BreedTranslationMapper.class})
 public interface BreedMapper {
     @Mapping(target = "category", source = "category.id")
     BreedResponseDto toDto(Breed breed);

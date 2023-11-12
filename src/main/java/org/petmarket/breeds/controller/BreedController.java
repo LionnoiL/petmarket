@@ -33,6 +33,9 @@ public class BreedController {
 
     @Operation(summary = "Get All Breeds", description = "Get a list of all breeds.")
     @ApiResponse(responseCode = "200", description = "Successfully retrieved breeds")
+    @ApiResponse(responseCode = "400", description = "Bad Request")
+    @ApiResponse(responseCode = "404", description = "Not Found")
+    @ApiResponse(responseCode = "500", description = "Internal Server Error")
     @GetMapping("/{langCode}")
     public List<BreedResponseDto> getAll(
             @PathVariable

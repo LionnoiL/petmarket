@@ -1,5 +1,6 @@
 package org.petmarket.blog.service.impl;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.petmarket.blog.dto.category.BlogPostCategoryRequestDto;
 import org.petmarket.blog.dto.category.BlogPostCategoryResponseDto;
@@ -27,6 +28,7 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryMapper mapper;
     private final LanguageService languageService;
 
+    @Transactional
     @Override
     public BlogPostCategoryResponseDto save(BlogPostCategoryRequestDto requestDto) {
         BlogCategory blogCategory = new BlogCategory();
@@ -56,11 +58,13 @@ public class CategoryServiceImpl implements CategoryService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     @Override
     public void delete(Long id) {
         categoryRepository.deleteById(id);
     }
 
+    @Transactional
     @Override
     public BlogPostCategoryResponseDto updateById(Long categoryId,
                                                   String langCode,
@@ -93,6 +97,7 @@ public class CategoryServiceImpl implements CategoryService {
         );
     }
 
+    @Transactional
     @Override
     public BlogPostCategoryResponseDto addTranslation(Long categoryId,
                                                       String langCode,
@@ -113,12 +118,11 @@ public class CategoryServiceImpl implements CategoryService {
 
     private CategoryTranslation createTranslation(BlogPostCategoryRequestDto requestDto,
                                                   String langCode, BlogCategory category) {
-        CategoryTranslation newTranslation = new CategoryTranslation();
-        newTranslation.setCategoryName(requestDto.getTitle());
-        newTranslation.setCategoryDescription(requestDto.getDescription());
-        newTranslation.setBlogCategory(category);
-        newTranslation.setLangCode(checkedLang(langCode));
-        return newTranslation;
+        return CategoryTranslation.builder()
+                .categoryName(requestDto.getTitle())
+                .categoryDescription(requestDto.getDescription())
+                .blogCategory(category)
+                .langCode(checkedLang(langCode)).build();
     }
 
     private String checkedLang(String langCode) {

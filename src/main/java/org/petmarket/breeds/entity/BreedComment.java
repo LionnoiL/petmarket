@@ -2,7 +2,7 @@ package org.petmarket.breeds.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
+import lombok.*;
 import org.petmarket.blog.entity.CommentStatus;
 import org.petmarket.users.entity.User;
 import org.springframework.data.annotation.CreatedDate;
@@ -14,6 +14,9 @@ import java.time.LocalDateTime;
 @Data
 @Table(name = "animal_breeds_comments")
 @EntityListeners(AuditingEntityListener.class)
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class BreedComment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -28,7 +28,6 @@ public class Breed {
     private AdvertisementCategory category;
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "breed", cascade = CascadeType.ALL)
     private List<BreedTranslation> translations;
-
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "breed", cascade = CascadeType.REMOVE)
     private List<BreedComment> comments;
 }

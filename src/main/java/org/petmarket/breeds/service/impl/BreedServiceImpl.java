@@ -1,5 +1,6 @@
 package org.petmarket.breeds.service.impl;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.petmarket.advertisements.category.service.AdvertisementCategoryService;
 import org.petmarket.blog.entity.CommentStatus;
@@ -12,6 +13,7 @@ import org.petmarket.breeds.repository.BreedRepository;
 import org.petmarket.breeds.service.BreedService;
 import org.petmarket.errorhandling.ItemNotFoundException;
 import org.petmarket.errorhandling.ItemNotUpdatedException;
+import org.petmarket.language.entity.Language;
 import org.petmarket.language.service.LanguageService;
 import org.petmarket.options.service.OptionsService;
 import org.springframework.stereotype.Service;
@@ -30,11 +32,12 @@ public class BreedServiceImpl implements BreedService {
     private final AdvertisementCategoryService categoryService;
 
     @Override
+    @Transactional
     public BreedResponseDto save(BreedRequestDto requestDto) {
         Breed breed = new Breed();
         List<BreedTranslation> translatioinsList = new ArrayList<>();
         BreedTranslation translation = createTranslation(requestDto,
-                optionsService.getDefaultSiteLanguage().getLangCode(),
+                optionsService.getDefaultSiteLanguage(),
                 breed);
         translatioinsList.add(translation);
         breed.setTranslations(translatioinsList);
@@ -44,14 +47,18 @@ public class BreedServiceImpl implements BreedService {
     }
 
     @Override
+    @Transactional
     public BreedResponseDto addTranslation(Long breedId, String langCode, BreedRequestDto requestDto) {
         Breed breed = findBreedById(breedId);
         List<BreedTranslation> breedTranslations = breed.getTranslations();
         if (breedTranslations.stream()
-                .anyMatch(t -> t.getLangCode().equals(checkedLang(langCode)))) {
+                .anyMatch(t -> t.getLanguage().getLangCode().equals(checkedLang(langCode)))) {
             throw new ItemNotUpdatedException(langCode + " translation is already exist");
         } else {
-            BreedTranslation newTranslation = createTranslation(requestDto, langCode, breed);
+            BreedTranslation newTranslation = createTranslation(
+                    requestDto,
+                    languageService.getByLangCode(langCode),
+                    breed);
             breedTranslations.add(newTranslation);
             breed.setTranslations(breedTranslations);
             breedRepository.save(breed);
@@ -62,7 +69,7 @@ public class BreedServiceImpl implements BreedService {
     @Override
     public BreedResponseDto get(Long breedId, String langCode) {
         Breed breed = findBreedById(breedId);
-        breed.setTranslations(getTranslation(breedId, langCode));
+        breed.setTranslations(getTranslation(breed, langCode));
         breed.setComments(breed.getComments().stream()
                 .filter(comment -> comment.getStatus().equals(CommentStatus.APPROVED))
                 .collect(Collectors.toList()));
@@ -71,6 +78,7 @@ public class BreedServiceImpl implements BreedService {
     }
 
     @Override
+    @Transactional
     public void delete(Long breedId) {
         Breed breed = findBreedById(breedId);
         breedRepository.deleteById(breed.getId());
@@ -79,14 +87,23 @@ public class BreedServiceImpl implements BreedService {
     @Override
     public BreedResponseDto update(Long breedId, String langCode, BreedRequestDto requestDto) {
         Breed breed = findBreedById(breedId);
-        breed.setTranslations(breed.getTranslations().stream()
-                .filter(t -> t.getLangCode().equals(checkedLang(langCode)))
-                .peek(translation -> {
-                    translation.setTitle(requestDto.getTitle());
-                    translation.setDescription(requestDto.getDescription());
-                })
-                .collect(Collectors.toList()));
-        breedRepository.save(breed);
+
+        if (!breed.getTranslations().stream().anyMatch(t -> t.getLanguage().getLangCode().equals(langCode))) {
+            addTranslation(breedId, langCode, requestDto);
+        } else {
+            List<BreedTranslation> updatedTranslations = breed.getTranslations().stream()
+                    .filter(t -> t.getLanguage().getLangCode().equals(checkedLang(langCode)))
+                    .map(translation -> {
+                        translation.setTitle(requestDto.getTitle());
+                        translation.setDescription(requestDto.getDescription());
+                        return translation;
+                    })
+                    .collect(Collectors.toList());
+            breed.setCategory(categoryService.findCategory(requestDto.getCategoryId()));
+            breed.setTranslations(updatedTranslations);
+            breedRepository.save(breed);
+
+        }
         return breedMapper.toDto(breed);
     }
 
@@ -94,19 +111,16 @@ public class BreedServiceImpl implements BreedService {
         return languageService.getByLangCode(langCode).getLangCode();
     }
 
-    private List<BreedTranslation> getTranslation(Long breedId, String langCode) {
-        Breed breed = breedRepository.findById(breedId).orElseThrow(
-                () -> new ItemNotFoundException("Can't find breed with id: " + breedId)
-        );
+    private List<BreedTranslation> getTranslation(Breed breed, String langCode) {
         List<BreedTranslation> translations = breed.getTranslations().stream()
-                .filter(t -> t.getLangCode().equals(checkedLang(langCode)))
+                .filter(t -> t.getLanguage().getLangCode().equals(checkedLang(langCode)))
                 .collect(Collectors.toList());
 
         if (translations.isEmpty()) {
             translations = breed.getTranslations().stream()
-                    .filter(postTranslations -> postTranslations.getLangCode().equals(
+                    .filter(postTranslations -> postTranslations.getLanguage().getLangCode().equals(
                             optionsService.getDefaultSiteLanguage().getLangCode()))
-                    .collect(Collectors.toList());
+                    .toList();
         }
         return translations;
     }
@@ -126,31 +140,28 @@ public class BreedServiceImpl implements BreedService {
             allBreeds = breedRepository.findAll();
         }
         return allBreeds.stream()
-                .peek(breed -> {
+                .map(breed -> {
                     breed.setCategory(breed.getCategory());
                     breed.setComments(breed.getComments().stream()
                             .filter(breedComment -> breedComment.getStatus().equals(CommentStatus.APPROVED))
                             .collect(Collectors.toList()));
-                    breed.setTranslations(getTranslation(breed.getId(), langCode));
+                    breed.setTranslations(getTranslation(breed, langCode));
+                    return breed;
                 })
                 .map(breedMapper::toDto)
                 .toList();
     }
 
-    private BreedTranslation createTranslation(BreedRequestDto requestDto, String langCode, Breed breed) {
-        BreedTranslation newTranslation = new BreedTranslation();
-        newTranslation.setLangCode(langCode);
-        newTranslation.setTitle(requestDto.getTitle());
-        newTranslation.setDescription(requestDto.getDescription());
-        newTranslation.setBreed(breed);
-        return newTranslation;
+    private BreedTranslation createTranslation(BreedRequestDto requestDto, Language language, Breed breed) {
+        return BreedTranslation.builder()
+                .language(language)
+                .title(requestDto.getTitle())
+                .description(requestDto.getDescription())
+                .breed(breed)
+                .build();
     }
 
     private List<Breed> findAllByBreedCategoryId(Long categoryId) {
-        List<Breed> breeds = breedRepository.findBreedByCategoryId(categoryId);
-        if (breeds.isEmpty()) {
-            throw new ItemNotFoundException("Can't find breed for category: " + categoryId);
-        }
-        return breeds;
+        return breedRepository.findBreedByCategoryId(categoryId);
     }
 }

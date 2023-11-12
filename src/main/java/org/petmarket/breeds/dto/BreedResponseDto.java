@@ -15,5 +15,4 @@ public class BreedResponseDto {
     @Schema (description = "Category Id", example = "1")
     private Long category;
     private List<BreedTranslationResponseDto> translations;
-    private List<BreedCommentResponseDto> comments;
 }

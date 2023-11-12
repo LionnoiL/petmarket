@@ -1,5 +1,6 @@
 package org.petmarket.blog.service.impl;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.petmarket.blog.dto.comment.BlogPostCommentRequest;
 import org.petmarket.blog.dto.comment.BlogPostCommentResponse;
@@ -14,6 +15,7 @@ import org.petmarket.users.service.UserService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -26,10 +28,11 @@ public class CommentServiceImpl implements CommentService {
     private final BlogCommentMapper mapper;
     private final UserService userService;
 
+    @Transactional
     @Override
     public BlogPostCommentResponse addComment(Long postId,
-                                                     BlogPostCommentRequest request,
-                                                     Authentication authentication) {
+                                              BlogPostCommentRequest request,
+                                              Authentication authentication) {
         BlogComment comment = new BlogComment();
         comment.setUser(userService.findByUsername(authentication.getName()));
         comment.setPost(postService.findById(postId));
@@ -45,6 +48,7 @@ public class CommentServiceImpl implements CommentService {
                 .toList();
     }
 
+    @Transactional
     @Override
     public List<BlogPostCommentResponse> updateStatus(Stack<Long> commentIds, CommentStatus status) {
 
@@ -63,6 +67,7 @@ public class CommentServiceImpl implements CommentService {
         return resultList;
     }
 
+    @Transactional
     @Override
     public BlogPostCommentResponse save(BlogPostCommentRequest request) {
         return null;
@@ -78,11 +83,13 @@ public class CommentServiceImpl implements CommentService {
         return findAllCommentAdmin();
     }
 
+    @Transactional
     @Override
     public void delete(Long id) {
         commentRepository.delete(getBlogComment(id));
     }
 
+    @Transactional
     @Override
     public BlogPostCommentResponse updateById(Long id, String langCode,
                                               BlogPostCommentRequest blogPostCommentRequest) {
