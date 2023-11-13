@@ -1,5 +1,6 @@
 package org.petmarket.advertisements.advertisement.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
@@ -33,6 +34,7 @@ public class AdvertisementRequestDto {
     private BigDecimal price;
     @NotNull
     @Schema(example = "1")
+    @JsonProperty("city_id")
     private Long cityId;
     @Schema(example = "47.750717")
     private Float latitude;
@@ -40,10 +42,13 @@ public class AdvertisementRequestDto {
     private Float longitude;
     @NotNull
     @Schema(example = "1")
+    @JsonProperty("category_id")
     private Long categoryId;
     @ArraySchema(schema = @Schema(type = "integer", format = "int64", example = "1"), uniqueItems = true)
+    @JsonProperty("deliveries_ids")
     private List<Long> deliveriesIds;
     @ArraySchema(schema = @Schema(type = "integer", format = "int64", example = "1"), uniqueItems = true)
+    @JsonProperty("payments_ids")
     private List<Long> paymentsIds;
     @Min(value = 0, message = "Price must be greater than or equal to 0")
     @Schema(example = "1")
@@ -51,5 +56,7 @@ public class AdvertisementRequestDto {
     @NotNull
     @Schema(example = "SIMPLE")
     private AdvertisementType type;
+    @ArraySchema(schema = @Schema(type = "integer", format = "int64", example = "1"), uniqueItems = true)
+    @JsonProperty("attributes_ids")
     private List<Long> attributesIds;
 }

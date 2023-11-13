@@ -12,8 +12,10 @@ public class CountryResponseDto {
 
     @Schema(example = "1", description = "Country ID")
     private Long id;
+
     @Schema(example = "Україна", description = "Country name")
     private String name;
+
     @Schema(example = "ukraine", description = "Country alias")
     private String alias;
 }

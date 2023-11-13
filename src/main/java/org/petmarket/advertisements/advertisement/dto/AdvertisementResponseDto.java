@@ -28,12 +28,16 @@ public class AdvertisementResponseDto {
     private Long id;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime created;
+
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updated;
+
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate ending;
+
     @JsonProperty("lang_code")
     private String langCode;
+
     private AdvertisementStatus status;
     private AuthorResponseDto author;
     private String alias;

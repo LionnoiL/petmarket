@@ -14,62 +14,27 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class AttributeGroupResponseDto {
 
+    @Schema(example = "1", description = "ID")
     private Long id;
+    @Schema(example = "2023-10-17", description = "The date the attribute group was created")
     private LocalDate created;
+    @Schema(example = "2023-10-17", description = "Attribute group update date")
     private LocalDate updated;
+    @Schema(example = "LIST", description = "Attribute group type")
     private AttributeType type;
+    @JsonProperty("sort_value")
+    @Schema(example = "120", description = "Sort order")
     private int sortValue;
     @JsonProperty("lang_code")
+    @Schema(example = "ua", description = "Attribute group language")
     private String langCode;
+    @Schema(example = "Довжина шерсті", description = "Attribute group title")
     private String title;
+    @Schema(example = "Градація довжини шерсті тварин", description = "Attribute group description")
     private String description;
     @JsonProperty("use_in_filter")
-    private boolean useInFilter;
-
-    @Schema(example = "1", description = "ID")
-    public Long getId() {
-        return id;
-    }
-
-    @Schema(example = "2023-10-17", description = "The date the attribute group was created")
-    public LocalDate getCreated() {
-        return created;
-    }
-
-    @Schema(example = "2023-10-17", description = "Attribute group update date")
-    public LocalDate getUpdated() {
-        return updated;
-    }
-
-    @Schema(example = "LIST", description = "Attribute group type")
-    public AttributeType getType() {
-        return type;
-    }
-
-    @Schema(example = "120", description = "Sort order")
-    public int getSortValue() {
-        return sortValue;
-    }
-
-    @Schema(example = "ua", description = "Attribute group language")
-    public String getLangCode() {
-        return langCode;
-    }
-
-    @Schema(example = "Довжина шерсті", description = "Attribute group title")
-    public String getTitle() {
-        return title;
-    }
-
-    @Schema(example = "Градація довжини шерсті тварин", description = "Attribute group description")
-    public String getDescription() {
-        return description;
-    }
-
     @Schema(example = "True", description = "The attribute group is used in the construction of the filter")
-    public boolean isUseInFilter() {
-        return useInFilter;
-    }
+    private boolean useInFilter;
 
     @Override
     public String toString() {
