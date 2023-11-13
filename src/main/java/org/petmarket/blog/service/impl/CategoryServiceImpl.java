@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -51,11 +50,12 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public List<BlogPostCategoryResponseDto> getAll(Pageable pageable, String langCode) {
         return categoryRepository.findAll(pageable).stream()
-                .peek(category ->
-                        category.setTranslations(getTranslation(category.getId(), langCode))
-                )
+                .map(category -> {
+                    category.setTranslations(getTranslation(category.getId(), langCode));
+                    return category;
+                })
                 .map(mapper::categoryToDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Transactional
@@ -74,17 +74,20 @@ public class CategoryServiceImpl implements CategoryService {
         boolean langCodeExist = category.getTranslations().stream()
                 .anyMatch(translation -> translation.getLanguage().getLangCode().equals(checkedLang(langCode)));
         if (langCodeExist) {
-            category.getTranslations().stream()
+            List<CategoryTranslation> translations = category.getTranslations().stream()
                     .filter(translation -> translation.getLanguage().getLangCode().equals(checkedLang(langCode)))
-                    .peek(translation -> {
-                        translation.setCategoryName(requestDto.getTitle());
-                        translation.setCategoryDescription(requestDto.getDescription());
-                    })
                     .toList();
+
+            for (CategoryTranslation translation : translations) {
+                translation.setCategoryName(requestDto.getTitle());
+                translation.setCategoryDescription(requestDto.getDescription());
+            }
+
             categoryRepository.save(category);
         } else {
             throw new ItemNotUpdatedException("No Translation for this Language: "
-                    + langCode + ". Create translation first");
+                    + langCode
+                    + ". Create translation first");
         }
 
         return mapper.categoryToDto(category);
@@ -132,13 +135,13 @@ public class CategoryServiceImpl implements CategoryService {
     private List<CategoryTranslation> getTranslation(Long categoryId, String langCode) {
         List<CategoryTranslation> translations = getBlogCategory(categoryId).getTranslations().stream()
                 .filter(t -> t.getLanguage().getLangCode().equals(checkedLang(langCode)))
-                .collect(Collectors.toList());
+                .toList();
 
         if (translations.isEmpty()) {
             translations = getBlogCategory(categoryId).getTranslations().stream()
                     .filter(postTranslations -> postTranslations.getLanguage().getLangCode().equals(
                             optionsService.getDefaultSiteLanguage().getLangCode()))
-                    .collect(Collectors.toList());
+                    .toList();
         }
         return translations;
     }

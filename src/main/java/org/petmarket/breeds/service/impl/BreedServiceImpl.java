@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -72,7 +71,7 @@ public class BreedServiceImpl implements BreedService {
         breed.setTranslations(getTranslation(breed, langCode));
         breed.setComments(breed.getComments().stream()
                 .filter(comment -> comment.getStatus().equals(CommentStatus.APPROVED))
-                .collect(Collectors.toList()));
+                .toList());
 
         return breedMapper.toDto(breed);
     }
@@ -88,7 +87,7 @@ public class BreedServiceImpl implements BreedService {
     public BreedResponseDto update(Long breedId, String langCode, BreedRequestDto requestDto) {
         Breed breed = findBreedById(breedId);
 
-        if (!breed.getTranslations().stream().anyMatch(t -> t.getLanguage().getLangCode().equals(langCode))) {
+        if (breed.getTranslations().stream().noneMatch(t -> t.getLanguage().getLangCode().equals(langCode))) {
             addTranslation(breedId, langCode, requestDto);
         } else {
             List<BreedTranslation> updatedTranslations = breed.getTranslations().stream()
@@ -98,7 +97,7 @@ public class BreedServiceImpl implements BreedService {
                         translation.setDescription(requestDto.getDescription());
                         return translation;
                     })
-                    .collect(Collectors.toList());
+                    .toList();
             breed.setCategory(categoryService.findCategory(requestDto.getCategoryId()));
             breed.setTranslations(updatedTranslations);
             breedRepository.save(breed);
@@ -114,7 +113,7 @@ public class BreedServiceImpl implements BreedService {
     private List<BreedTranslation> getTranslation(Breed breed, String langCode) {
         List<BreedTranslation> translations = breed.getTranslations().stream()
                 .filter(t -> t.getLanguage().getLangCode().equals(checkedLang(langCode)))
-                .collect(Collectors.toList());
+                .toList();
 
         if (translations.isEmpty()) {
             translations = breed.getTranslations().stream()
@@ -144,7 +143,7 @@ public class BreedServiceImpl implements BreedService {
                     breed.setCategory(breed.getCategory());
                     breed.setComments(breed.getComments().stream()
                             .filter(breedComment -> breedComment.getStatus().equals(CommentStatus.APPROVED))
-                            .collect(Collectors.toList()));
+                            .toList());
                     breed.setTranslations(getTranslation(breed, langCode));
                     return breed;
                 })

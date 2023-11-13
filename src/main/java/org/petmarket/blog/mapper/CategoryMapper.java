@@ -12,6 +12,7 @@ import org.petmarket.config.MapperConfig;
 public interface CategoryMapper {
     @Mapping(source = "translations", target = "translations")
     BlogPostCategoryResponseDto categoryToDto(BlogCategory blogCategory);
+
     @Mapping(target = "langCode", source = "language.langCode")
     CategoryTranslationDto mapTranslation(CategoryTranslation translation);
 }

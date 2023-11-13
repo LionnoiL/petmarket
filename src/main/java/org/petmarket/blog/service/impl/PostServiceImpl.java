@@ -5,10 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.petmarket.blog.dto.posts.BlogPostRequestDto;
 import org.petmarket.blog.dto.posts.BlogPostResponseDto;
 import org.petmarket.blog.dto.posts.BlogPostTranslationRequestDto;
-import org.petmarket.blog.entity.BlogCategory;
-import org.petmarket.blog.entity.CommentStatus;
-import org.petmarket.blog.entity.Post;
-import org.petmarket.blog.entity.PostTranslations;
+import org.petmarket.blog.entity.*;
 import org.petmarket.blog.mapper.BlogPostMapper;
 import org.petmarket.blog.repository.PostRepository;
 import org.petmarket.blog.service.CategoryService;
@@ -26,7 +23,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -48,7 +44,7 @@ public class PostServiceImpl implements PostService {
         post.setTranslations(getTranslation(id, langCode));
         post.setComments(post.getComments().stream()
                 .filter(comment -> comment.getStatus().equals(CommentStatus.APPROVED))
-                .collect(Collectors.toList()));
+                .toList());
         return postMapper.toDto(post);
     }
 
@@ -139,7 +135,7 @@ public class PostServiceImpl implements PostService {
                     post.setCategories(getFilteredCategories(post, langCode));
                     post.setComments(post.getComments().stream()
                             .filter(blogComment -> blogComment.getStatus().equals(CommentStatus.APPROVED))
-                            .collect(Collectors.toList()));
+                            .toList());
                     post.setTranslations(getTranslation(post.getId(), langCode));
                     return post;
                 })
@@ -202,7 +198,7 @@ public class PostServiceImpl implements PostService {
         post.setUser(userService.findByUsername(authentication.getName()));
         post.setCategories(requestDto.getCategoriesIds().stream()
                 .map(categoryService::getBlogCategory)
-                .collect(Collectors.toList()));
+                .toList());
         post.setTranslations(postTranslations);
         post.setStatus(Post.Status.DRAFT);
         post.setReadingMinutes(getReadingMinutes(requestDto.getText()));
@@ -220,25 +216,27 @@ public class PostServiceImpl implements PostService {
 
     private List<BlogCategory> getFilteredCategories(Post post, String langCode) {
         return post.getCategories().stream()
-                .peek(category -> category.setTranslations(
-                        category.getTranslations().stream()
-                                .filter(c -> c.getLanguage().getLangCode().equals(checkedLang(langCode)))
-                                .collect(Collectors.toList())
-                ))
+                .map(category -> {
+                    List<CategoryTranslation> translations = category.getTranslations().stream()
+                            .filter(c -> c.getLanguage().getLangCode().equals(checkedLang(langCode)))
+                            .toList();
+                    category.setTranslations(translations);
+                    return category;
+                })
                 .filter(category -> !category.getTranslations().isEmpty())
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private List<PostTranslations> getTranslation(Long postId, String langCode) {
         List<PostTranslations> translations = findById(postId).getTranslations().stream()
                 .filter(t -> t.getLanguage().getLangCode().equals(checkedLang(langCode)))
-                .collect(Collectors.toList());
+                .toList();
 
         if (translations.isEmpty()) {
             translations = findById(postId).getTranslations().stream()
                     .filter(postTranslations -> postTranslations.getLanguage().getLangCode().equals(
                             optionsService.getDefaultSiteLanguage().getLangCode()))
-                    .collect(Collectors.toList());
+                    .toList();
         }
         return translations;
     }
