@@ -21,26 +21,30 @@ import org.springframework.web.bind.annotation.*;
 public class CommentController {
     private final CommentService commentService;
 
-    @PostMapping("/{postId}")
+    @Operation(
+            summary = "Create a new comment for a blog post",
+            description = "Create a new comment for a specific blog post",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Comment created successfully"),
+                    @ApiResponse(responseCode = "400", description = "Invalid input data"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                    @ApiResponse(responseCode = "404", description = "Post not found"),
+                    @ApiResponse(responseCode = "500", description = "Internal server error")
+            },
+            parameters = {
+                    @Parameter(
+                            name = "postId",
+                            description = "Post ID",
+                            example = "1",
+                            required = true
+                    )
+            }
+    )
     @PreAuthorize("isAuthenticated()")
-    @Operation(summary = "Create a new comment for a blog post",
-            description = "Create a new comment for a specific blog post")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Comment created successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid input data"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "404", description = "Post not found"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
-    })
+    @PostMapping("/{postId}")
     public BlogPostCommentResponse createComment(
-            @PathVariable(name = "postId") @Parameter(name = "postId",
-                    description = "Post ID",
-                    example = "1",
-                    required = true)
-            Long postId,
-            @RequestBody
-            @Valid
-            @Parameter(description = "Blog post comment request dto", required = true)
+            @PathVariable(name = "postId") Long postId,
+            @RequestBody @Valid @Parameter(description = "Blog post comment request dto", required = true)
             BlogPostCommentRequest request,
             Authentication authentication) {
         return commentService.addComment(postId, request, authentication);

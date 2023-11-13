@@ -106,7 +106,7 @@ public class PostServiceImpl implements PostService {
         if (translations.stream()
                 .anyMatch(t -> t.getLangCode()
                         .equals(checkedLang(langCode)))) {
-            throw new ItemNotUpdatedException(langCode + " translation is already exist");
+            throw new ItemNotUpdatedException(langCode + " translation already exist");
         } else {
             PostTranslations translation = PostTranslations.builder()
                     .post(post)

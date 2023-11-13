@@ -24,12 +24,22 @@ import java.util.Stack;
 public class BreedCommentAdminController {
     private final BreedCommentService commentService;
 
-    @Operation(summary = "Get All Comments for Admin", description = "Get a list of all breed comments.")
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved comments")
+    @Operation(
+            summary = "Get All Comments for Admin",
+            description = "Get a list of all breed comments.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Successfully retrieved comments")
+            },
+            parameters = {
+                    @Parameter(name = "page", description = "Page number", example = "1"),
+                    @Parameter(name = "size", description = "Number of items per page", example = "12"),
+                    @Parameter(name = "sortDirection", description = "Sort direction", example = "ASC")
+            }
+    )
     @GetMapping
     public List<BreedCommentResponseDto> getAllComments(
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "12") int size,
             @RequestParam(defaultValue = "ASC") String sortDirection,
             @RequestParam(required = true) CommentStatus status) {
         Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), "created");
@@ -37,32 +47,39 @@ public class BreedCommentAdminController {
         return commentService.findAllCommentAdmin(pageable, status);
     }
 
-    @Operation(summary = "Change Comment Status for admin", description = "Change the status of multiple comments.")
-    @ApiResponse(responseCode = "200", description = "Status updated successfully")
-    @ApiResponse(responseCode = "400", description = "Bad request")
+
+    @Operation(
+            summary = "Change Comment Status for admin",
+            description = "Change the status of multiple comments.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Status updated successfully"),
+                    @ApiResponse(responseCode = "400", description = "Bad request")
+            },
+            parameters = {
+                    @Parameter(name = "commentsIds", description = "List of comments that need to be updated", example = "1")
+            }
+    )
     @PutMapping("/{commentsIds}/status/{status}")
     public List<BreedCommentResponseDto> changeCommentStatus(
-            @PathVariable
-            @Parameter(name = "commentsIds",
-                    description = "list of comments that need to be updated",
-                    example = "1")
-            Stack<Long> commentsIds,
-            @PathVariable
-            @Schema(description = "New status for comments")
-            @Parameter(description = "New status", required = true)
-            CommentStatus status) {
+            @PathVariable Stack<Long> commentsIds,
+            @PathVariable CommentStatus status) {
         return commentService.updateStatus(commentsIds, status);
     }
 
-    @Operation(summary = "Delete Comment by Admin only", description = "Delete a breed comment.")
-    @ApiResponse(responseCode = "204", description = "Comment deleted successfully")
-    @ApiResponse(responseCode = "404", description = "Comment not found")
+
+    @Operation(
+            summary = "Delete Comment by Admin only",
+            description = "Delete a breed comment.",
+            responses = {
+                    @ApiResponse(responseCode = "204", description = "Comment deleted successfully"),
+                    @ApiResponse(responseCode = "404", description = "Comment not found")
+            },
+            parameters = {
+                    @Parameter(name = "commentId", description = "Id of comment", example = "1")
+            }
+    )
     @DeleteMapping("/{commentId}/delete")
-    public void deleteComment(@PathVariable(name = "commentId")
-                              @Parameter(name = "commentId",
-                                      description = "Id of comment",
-                                      example = "1")
-                              Long commentId) {
+    public void deleteComment(@PathVariable(name = "commentId") Long commentId) {
         commentService.delete(commentId);
     }
 }

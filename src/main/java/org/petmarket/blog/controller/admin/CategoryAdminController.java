@@ -20,14 +20,16 @@ import org.springframework.web.bind.annotation.*;
 public class CategoryAdminController {
     private final CategoryService categoryService;
 
+    @Operation(
+            summary = "Save a new blog category",
+            description = "Create a new blog category with the default language code",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Blog category created successfully"),
+                    @ApiResponse(responseCode = "400", description = "Invalid input data"),
+                    @ApiResponse(responseCode = "500", description = "Internal server error")
+            }
+    )
     @PostMapping
-    @Operation(summary = "Save a new blog category",
-            description = "Create a new blog category with the default language code")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Blog category created successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid input data"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
-    })
     public BlogPostCategoryResponseDto save(@RequestBody
                                             @Valid
                                             @Parameter(description = "Blog post category request dto",
@@ -36,26 +38,22 @@ public class CategoryAdminController {
         return categoryService.save(requestDto);
     }
 
+    @Operation(
+            summary = "Add translation to a blog category",
+            description = "Add translation to an existing blog category with the specified language code",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Blog category translation added successfully"),
+                    @ApiResponse(responseCode = "400", description = "Invalid input data"),
+                    @ApiResponse(responseCode = "500", description = "Internal server error")
+            },
+            parameters = {
+                    @Parameter(name = "categoryId", description = "Category ID", example = "1", required = true),
+                    @Parameter(name = "langCode", description = "Language code", example = "en", required = true)
+            }
+    )
     @PostMapping("/{categoryId}/{langCode}")
-    @Operation(summary = "Add translation to a blog category",
-            description = "Add translation to an existing blog category" +
-                    " with the specified language code")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Blog category translation " +
-                    "added successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid input data"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
-    })
-    public BlogPostCategoryResponseDto addTranslation(@PathVariable(name = "categoryId")
-                                                      @Parameter(name = "categoryId",
-                                                              description = "Category ID",
-                                                              example = "1",
-                                                              required = true)
-                                                      Long categoryId,
-                                                      @PathVariable(name = "langCode")
-                                                      @Parameter(name = "langCode", description = "Language code",
-                                                              example = "en", required = true)
-                                                      String langCode,
+    public BlogPostCategoryResponseDto addTranslation(@PathVariable Long categoryId,
+                                                      @PathVariable String langCode,
                                                       @RequestBody
                                                       @Valid
                                                       @Parameter(description = "Blog post category request dto",
@@ -64,26 +62,22 @@ public class CategoryAdminController {
         return categoryService.addTranslation(categoryId, langCode, requestDto);
     }
 
+    @Operation(
+            summary = "Edit blog category",
+            description = "Edit translation to an existing blog category with the specified language code",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Blog category translation added successfully"),
+                    @ApiResponse(responseCode = "400", description = "Invalid input data"),
+                    @ApiResponse(responseCode = "500", description = "Internal server error")
+            },
+            parameters = {
+                    @Parameter(name = "categoryId", description = "Category ID", example = "1", required = true),
+                    @Parameter(name = "langCode", description = "Language code", example = "ua", required = true)
+            }
+    )
     @PutMapping("/{categoryId}/{langCode}")
-    @Operation(summary = "Add translation to a blog category",
-            description = "Add translation to an existing blog category" +
-                    " with the specified language code")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Blog category translation " +
-                    "added successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid input data"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
-    })
-    public BlogPostCategoryResponseDto updateCategory(@PathVariable(name = "categoryId")
-                                                      @Parameter(name = "categoryId",
-                                                              description = "Category ID",
-                                                              example = "1",
-                                                              required = true)
-                                                      Long categoryId,
-                                                      @PathVariable(name = "langCode")
-                                                      @Parameter(name = "langCode", description = "Language code",
-                                                              example = "ua", required = true)
-                                                      String langCode,
+    public BlogPostCategoryResponseDto updateCategory(@PathVariable Long categoryId,
+                                                      @PathVariable String langCode,
                                                       @RequestBody
                                                       @Valid
                                                       @Parameter(description = "Blog post category request dto",
@@ -92,21 +86,21 @@ public class CategoryAdminController {
         return categoryService.updateById(categoryId, langCode, requestDto);
     }
 
-    @DeleteMapping("/{categoryId}")
+    @Operation(
+            summary = "Delete a blog category",
+            description = "Delete a blog category by ID",
+            responses = {
+                    @ApiResponse(responseCode = "204", description = "Blog category deleted successfully"),
+                    @ApiResponse(responseCode = "404", description = "Category not found"),
+                    @ApiResponse(responseCode = "500", description = "Internal server error")
+            },
+            parameters = {
+                    @Parameter(name = "categoryId", description = "Category ID", example = "1", required = true)
+            }
+    )
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Operation(summary = "Delete a blog category", description = "Delete a blog category by ID")
-    @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Blog category deleted successfully"),
-            @ApiResponse(responseCode = "404", description = "Category not found"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
-    })
-    public void deleteCategory(@PathVariable(name = "categoryId")
-                               @Parameter(name = "categoryId",
-                                       description = "Category ID",
-                                       example = "1",
-                                       required = true)
-                               Long categoryId) {
+    @DeleteMapping("/{categoryId}")
+    public void deleteCategory(@PathVariable Long categoryId) {
         categoryService.delete(categoryId);
     }
 }
-

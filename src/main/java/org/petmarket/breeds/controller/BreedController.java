@@ -18,32 +18,43 @@ import java.util.List;
 public class BreedController {
     private final BreedService breedService;
 
-    @Operation(summary = "Get Breed", description = "Get information about a breed.")
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved breed")
-    @ApiResponse(responseCode = "404", description = "Breed not found")
+    @Operation(
+            summary = "Get Breed",
+            description = "Get information about a breed.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Successfully retrieved breed"),
+                    @ApiResponse(responseCode = "404", description = "Breed not found")
+            },
+            parameters = {
+                    @Parameter(name = "breedId", description = "breed id", example = "1"),
+                    @Parameter(name = "langCode", description = "Code of language", example = "ua")
+            }
+    )
     @GetMapping("/{breedId}/{langCode}")
-    public BreedResponseDto get(@PathVariable
-                                @Parameter(name = "breedId", description = "breed id", example = "1")
-                                Long breedId,
-                                @PathVariable
-                                @Parameter(name = "langCode", description = "Code of language", example = "ua")
-                                String langCode) {
+    public BreedResponseDto get(@PathVariable Long breedId, @PathVariable String langCode) {
         return breedService.get(breedId, langCode);
     }
 
-    @Operation(summary = "Get All Breeds", description = "Get a list of all breeds.")
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved breeds")
-    @ApiResponse(responseCode = "400", description = "Bad Request")
-    @ApiResponse(responseCode = "404", description = "Not Found")
-    @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    @Operation(
+            summary = "Get All Breeds",
+            description = "Get a list of all breeds.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Successfully retrieved breeds"),
+                    @ApiResponse(responseCode = "400", description = "Bad Request"),
+                    @ApiResponse(responseCode = "404", description = "Not Found"),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error")
+            },
+            parameters = {
+                    @Parameter(name = "langCode", description = "Code of language", example = "ua"),
+                    @Parameter(name = "categoryId", description = "find breeds by category", example = "1",
+                            required = false)
+            }
+    )
     @GetMapping("/{langCode}")
     public List<BreedResponseDto> getAll(
-            @PathVariable
-            @Parameter(name = "langCode", description = "Code of language", example = "ua")
-            String langCode,
-            @RequestParam(required = false)
-            @Parameter(name = "categoryId", description = "find breeds by category", example = "1", required = false)
-            Long categoryId) {
+            @PathVariable String langCode,
+            @RequestParam(required = false) Long categoryId) {
         return breedService.getAllByCategory(langCode, categoryId);
     }
+
 }
