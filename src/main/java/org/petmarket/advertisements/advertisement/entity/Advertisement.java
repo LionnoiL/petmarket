@@ -15,6 +15,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -36,11 +37,11 @@ public class Advertisement implements TranslateHolder {
 
     @CreatedDate
     @Column(name = "created")
-    private LocalDate created;
+    private LocalDateTime created;
 
     @LastModifiedDate
     @Column(name = "updated")
-    private LocalDate updated;
+    private LocalDateTime updated;
 
     @Column(name = "ending")
     private LocalDate ending;
@@ -56,7 +57,7 @@ public class Advertisement implements TranslateHolder {
     @Column(name = "alias", nullable = false)
     private String alias;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "location_id")
     private Location location;
 

@@ -1,25 +1,31 @@
 package org.petmarket.advertisements.advertisement.service;
 
-import static org.petmarket.utils.MessageUtils.ADVERTISEMENT_NOT_FOUND;
-import static org.petmarket.utils.MessageUtils.LANGUAGE_NOT_FOUND;
-import static org.petmarket.utils.MessageUtils.USER_NOT_FOUND;
-
-import java.util.HashSet;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.advertisements.advertisement.dto.AdvertisementRequestDto;
 import org.petmarket.advertisements.advertisement.dto.AdvertisementResponseDto;
 import org.petmarket.advertisements.advertisement.entity.Advertisement;
+import org.petmarket.advertisements.advertisement.entity.AdvertisementStatus;
 import org.petmarket.advertisements.advertisement.entity.AdvertisementTranslate;
 import org.petmarket.advertisements.advertisement.mapper.AdvertisementMapper;
 import org.petmarket.advertisements.advertisement.mapper.AdvertisementResponseTranslateMapper;
 import org.petmarket.advertisements.advertisement.repository.AdvertisementRepository;
+import org.petmarket.advertisements.attributes.entity.Attribute;
+import org.petmarket.advertisements.attributes.repository.AttributeRepository;
+import org.petmarket.advertisements.category.entity.AdvertisementCategory;
+import org.petmarket.advertisements.category.repository.AdvertisementCategoryRepository;
 import org.petmarket.delivery.entity.Delivery;
-import org.petmarket.delivery.entity.DeliveryTranslate;
+import org.petmarket.delivery.repository.DeliveryRepository;
 import org.petmarket.errorhandling.ItemNotFoundException;
 import org.petmarket.language.entity.Language;
 import org.petmarket.language.repository.LanguageRepository;
+import org.petmarket.location.entity.City;
+import org.petmarket.location.entity.Location;
+import org.petmarket.location.repository.CityRepository;
 import org.petmarket.options.service.OptionsService;
+import org.petmarket.payment.entity.Payment;
+import org.petmarket.payment.repository.PaymentRepository;
 import org.petmarket.review.dto.AdvertisementReviewRequestDto;
 import org.petmarket.review.dto.AdvertisementReviewResponseDto;
 import org.petmarket.review.entity.Review;
@@ -35,7 +41,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 
+import java.time.LocalDate;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+
+import static org.petmarket.utils.MessageUtils.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -46,39 +57,102 @@ public class AdvertisementService {
     private final AdvertisementRepository advertisementRepository;
     private final ReviewRepository reviewRepository;
     private final UserRepository userRepository;
+    private final AdvertisementCategoryRepository categoryRepository;
+    private final AttributeRepository attributeRepository;
+    private final PaymentRepository paymentRepository;
+    private final DeliveryRepository deliveryRepository;
+    private final CityRepository cityRepository;
     private final AdvertisementResponseTranslateMapper translateMapper;
     private final AdvertisementMapper advertisementMapper;
     private final ReviewMapper reviewMapper;
-
     private final OptionsService optionsService;
     private final TransliterateUtils transliterateUtils;
 
+    @Transactional
     public AdvertisementResponseDto addAdvertisement(AdvertisementRequestDto request,
-        BindingResult bindingResult) {
+                                                     BindingResult bindingResult, Authentication authentication) {
         ErrorUtils.checkItemNotCreatedException(bindingResult);
 
         Language defaultSiteLanguage = optionsService.getDefaultSiteLanguage();
 
         Advertisement advertisement = advertisementMapper.mapDtoRequestToEntity(request);
         advertisement.setAlias(
-            transliterateUtils.getAlias(
-                Delivery.class.getSimpleName(),
-                request.getTitle()));
+                transliterateUtils.getAlias(
+                        Advertisement.class.getSimpleName(),
+                        request.getTitle()
+                )
+        );
+        advertisement.setAuthor(getUserByEmail(authentication.getName()));
+        advertisement.setStatus(AdvertisementStatus.NO_ACTIVE);
 
-        advertisement.setTranslations(new HashSet<>());
-        AdvertisementTranslate translation = AdvertisementTranslate.builder()
-            .id(null)
-            .advertisement(advertisement)
-            .title(request.getTitle())
-            .description(request.getDescription())
-            .language(defaultSiteLanguage)
-            .build();
-        addTranslation(advertisement, translation);
+        fillDateEnding(advertisement);
+        fillCategory(advertisement, request);
+        fillLocation(advertisement, request);
+        fillAttributes(advertisement, request);
+        fillPayments(advertisement, request);
+        fillDeliveries(advertisement, request);
+        fillTranslation(advertisement, request, defaultSiteLanguage);
 
         advertisementRepository.save(advertisement);
 
         log.info("Advertisement created");
         return translateMapper.mapEntityToDto(advertisement, defaultSiteLanguage);
+    }
+
+    private static void fillDateEnding(Advertisement advertisement) {
+        LocalDate currentDate = LocalDate.now();
+        LocalDate dateEnding = currentDate.plusDays(10);
+        advertisement.setEnding(dateEnding);
+    }
+
+    private void fillPayments(Advertisement advertisement, AdvertisementRequestDto request) {
+        List<Payment> payments = paymentRepository.getPaymentsFromIds(request.getPaymentsIds());
+        advertisement.setPayments(payments);
+    }
+
+    private void fillDeliveries(Advertisement advertisement, AdvertisementRequestDto request) {
+        List<Delivery> deliveries = deliveryRepository.getDeliveriesFromIds(request.getDeliveriesIds());
+        advertisement.setDeliveries(deliveries);
+    }
+
+    private void fillTranslation(Advertisement advertisement, AdvertisementRequestDto request, Language defaultSiteLanguage) {
+        advertisement.setTranslations(new HashSet<>());
+        AdvertisementTranslate translation = AdvertisementTranslate.builder()
+                .id(null)
+                .advertisement(advertisement)
+                .title(request.getTitle())
+                .description(request.getDescription())
+                .language(defaultSiteLanguage)
+                .build();
+        addTranslation(advertisement, translation);
+    }
+
+    private void fillCategory(Advertisement advertisement, AdvertisementRequestDto request) {
+        AdvertisementCategory category = categoryRepository.findById(request.getCategoryId()).orElseThrow(
+                () -> {
+                    throw new ItemNotFoundException(CATEGORY_NOT_FOUND);
+                }
+        );
+        advertisement.setCategory(category);
+    }
+
+    private void fillLocation(Advertisement advertisement, AdvertisementRequestDto request) {
+        City city = cityRepository.findById(request.getCityId()).orElseThrow(
+                () -> {
+                    throw new ItemNotFoundException(CITY_NOT_FOUND);
+                }
+        );
+        Location location = Location.builder()
+                .city(city)
+                .latitude(request.getLatitude())
+                .longitude(request.getLongitude())
+                .build();
+        advertisement.setLocation(location);
+    }
+
+    private void fillAttributes(Advertisement advertisement, AdvertisementRequestDto request) {
+        List<Attribute> attributes = attributeRepository.getAttributesFromIds(request.getAttributesIds());
+        advertisement.setAttributes(attributes);
     }
 
     public AdvertisementResponseDto findById(Long id, String langCode) {
@@ -129,8 +203,8 @@ public class AdvertisementService {
 
     private AdvertisementTranslate getTranslation(Advertisement advertisement, Language language) {
         return advertisement.getTranslations().stream()
-            .filter(t -> t.getLanguage().equals(language))
-            .findFirst().orElseThrow(() -> new TranslateException("No translation"));
+                .filter(t -> t.getLanguage().equals(language))
+                .findFirst().orElseThrow(() -> new TranslateException("No translation"));
     }
 
     private void addTranslation(Advertisement advertisement, AdvertisementTranslate translation) {
@@ -143,7 +217,7 @@ public class AdvertisementService {
 
     private boolean checkLanguage(Advertisement advertisement, Language language) {
         return advertisement.getTranslations()
-            .stream()
-            .anyMatch(t -> t.getLanguage().equals(language));
+                .stream()
+                .anyMatch(t -> t.getLanguage().equals(language));
     }
 }

@@ -1,10 +1,7 @@
 package org.petmarket.advertisements.advertisement.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.*;
 
 @Setter
 @Getter
@@ -14,38 +11,12 @@ import lombok.Setter;
 public class AuthorResponseDto {
 
     private long id;
+    @JsonProperty("first_name")
     private String firstName;
+    @JsonProperty("last_name")
     private String lastName;
     private String email;
     private String phone;
     private String site;
     private int rating;
-
-    public long getId() {
-        return id;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public String getSite() {
-        return site;
-    }
-
-    public int getRating() {
-        return rating;
-    }
 }

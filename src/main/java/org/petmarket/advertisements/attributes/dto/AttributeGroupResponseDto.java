@@ -1,15 +1,14 @@
 package org.petmarket.advertisements.attributes.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.petmarket.advertisements.attributes.entity.AttributeType;
 
 import java.time.LocalDate;
 
 @Setter
+@Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -20,9 +19,11 @@ public class AttributeGroupResponseDto {
     private LocalDate updated;
     private AttributeType type;
     private int sortValue;
+    @JsonProperty("lang_code")
     private String langCode;
     private String title;
     private String description;
+    @JsonProperty("use_in_filter")
     private boolean useInFilter;
 
     @Schema(example = "1", description = "ID")

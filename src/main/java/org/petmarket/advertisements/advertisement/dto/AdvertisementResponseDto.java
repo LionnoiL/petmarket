@@ -1,10 +1,8 @@
 package org.petmarket.advertisements.advertisement.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.*;
 import org.petmarket.advertisements.advertisement.entity.AdvertisementStatus;
 import org.petmarket.advertisements.advertisement.entity.AdvertisementType;
 import org.petmarket.advertisements.attributes.dto.AttributeResponseDto;
@@ -17,6 +15,7 @@ import org.petmarket.review.dto.AdvertisementReviewResponseDto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Setter
@@ -27,9 +26,13 @@ import java.util.List;
 public class AdvertisementResponseDto {
 
     private Long id;
-    private LocalDate created;
-    private LocalDate updated;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime created;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime updated;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate ending;
+    @JsonProperty("lang_code")
     private String langCode;
     private AdvertisementStatus status;
     private AuthorResponseDto author;

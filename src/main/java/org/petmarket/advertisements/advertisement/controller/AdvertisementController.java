@@ -1,13 +1,5 @@
 package org.petmarket.advertisements.advertisement.controller;
 
-import static org.petmarket.utils.MessageUtils.ADVERTISEMENT_NOT_FOUND;
-import static org.petmarket.utils.MessageUtils.BAD_REQUEST;
-import static org.petmarket.utils.MessageUtils.FORBIDDEN;
-import static org.petmarket.utils.MessageUtils.REQUEST_BODY_IS_MANDATORY;
-import static org.petmarket.utils.MessageUtils.SUCCESSFULLY_OPERATION;
-import static org.petmarket.utils.MessageUtils.UNAUTHORIZED;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -22,17 +14,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.petmarket.advertisements.advertisement.dto.AdvertisementRequestDto;
 import org.petmarket.advertisements.advertisement.dto.AdvertisementResponseDto;
 import org.petmarket.advertisements.advertisement.service.AdvertisementService;
-import org.petmarket.delivery.dto.DeliveryResponseDto;
 import org.petmarket.errorhandling.ErrorResponse;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import static org.petmarket.utils.MessageUtils.*;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Tag(name = "Advertisement")
 @Slf4j
@@ -73,30 +62,30 @@ public class AdvertisementController {
 
     @Operation(summary = "Create a new Advertisement")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
-            @Content(mediaType = APPLICATION_JSON_VALUE, schema =
-            @Schema(implementation = AdvertisementResponseDto.class))
-        }),
-        @ApiResponse(responseCode = "400", description = BAD_REQUEST, content = {
-            @Content(mediaType = APPLICATION_JSON_VALUE, schema =
-            @Schema(implementation = ErrorResponse.class))
-        }),
-        @ApiResponse(responseCode = "401", description = UNAUTHORIZED, content = {
-            @Content(mediaType = APPLICATION_JSON_VALUE, schema =
-            @Schema(implementation = ErrorResponse.class))
-        }),
-        @ApiResponse(responseCode = "403", description = FORBIDDEN, content = {
-            @Content(mediaType = APPLICATION_JSON_VALUE, schema =
-            @Schema(implementation = ErrorResponse.class))
-        })
+            @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
+                    @Schema(implementation = AdvertisementResponseDto.class))
+            }),
+            @ApiResponse(responseCode = "400", description = BAD_REQUEST, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
+                    @Schema(implementation = ErrorResponse.class))
+            }),
+            @ApiResponse(responseCode = "401", description = UNAUTHORIZED, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
+                    @Schema(implementation = ErrorResponse.class))
+            }),
+            @ApiResponse(responseCode = "403", description = FORBIDDEN, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
+                    @Schema(implementation = ErrorResponse.class))
+            })
     })
     @PreAuthorize("isAuthenticated()")
     @PostMapping
     @ResponseBody
     public AdvertisementResponseDto addAdvertisement(
-        @RequestBody @Valid @NotNull(message = REQUEST_BODY_IS_MANDATORY) final AdvertisementRequestDto request,
-        BindingResult bindingResult) {
+            @RequestBody @Valid @NotNull(message = REQUEST_BODY_IS_MANDATORY) final AdvertisementRequestDto request,
+            BindingResult bindingResult, Authentication authentication) {
         log.info("Received request to create Delivery - {}.", request);
-        return advertisementService.addAdvertisement(request, bindingResult);
+        return advertisementService.addAdvertisement(request, bindingResult, authentication);
     }
 }
