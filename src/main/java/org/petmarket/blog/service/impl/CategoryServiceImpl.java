@@ -72,10 +72,10 @@ public class CategoryServiceImpl implements CategoryService {
         BlogCategory category = getBlogCategory(categoryId);
 
         boolean langCodeExist = category.getTranslations().stream()
-                .anyMatch(translation -> translation.getLangCode().equals(checkedLang(langCode)));
+                .anyMatch(translation -> translation.getLanguage().getLangCode().equals(checkedLang(langCode)));
         if (langCodeExist) {
             category.getTranslations().stream()
-                    .filter(translation -> translation.getLangCode().equals(checkedLang(langCode)))
+                    .filter(translation -> translation.getLanguage().getLangCode().equals(checkedLang(langCode)))
                     .peek(translation -> {
                         translation.setCategoryName(requestDto.getTitle());
                         translation.setCategoryDescription(requestDto.getDescription());
@@ -105,7 +105,7 @@ public class CategoryServiceImpl implements CategoryService {
         BlogCategory category = getBlogCategory(categoryId);
         List<CategoryTranslation> translations = category.getTranslations();
         if (translations.stream()
-                .anyMatch(t -> t.getLangCode()
+                .anyMatch(t -> t.getLanguage().getLangCode()
                         .equals(checkedLang(langCode)))) {
             throw new ItemNotUpdatedException(langCode + " translation is already exist");
         } else {
@@ -122,7 +122,7 @@ public class CategoryServiceImpl implements CategoryService {
                 .categoryName(requestDto.getTitle())
                 .categoryDescription(requestDto.getDescription())
                 .blogCategory(category)
-                .langCode(checkedLang(langCode)).build();
+                .language(languageService.getByLangCode(langCode)).build();
     }
 
     private String checkedLang(String langCode) {
@@ -131,12 +131,12 @@ public class CategoryServiceImpl implements CategoryService {
 
     private List<CategoryTranslation> getTranslation(Long categoryId, String langCode) {
         List<CategoryTranslation> translations = getBlogCategory(categoryId).getTranslations().stream()
-                .filter(t -> t.getLangCode().equals(checkedLang(langCode)))
+                .filter(t -> t.getLanguage().getLangCode().equals(checkedLang(langCode)))
                 .collect(Collectors.toList());
 
         if (translations.isEmpty()) {
             translations = getBlogCategory(categoryId).getTranslations().stream()
-                    .filter(postTranslations -> postTranslations.getLangCode().equals(
+                    .filter(postTranslations -> postTranslations.getLanguage().getLangCode().equals(
                             optionsService.getDefaultSiteLanguage().getLangCode()))
                     .collect(Collectors.toList());
         }

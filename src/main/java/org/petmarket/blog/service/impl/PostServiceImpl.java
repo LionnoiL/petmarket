@@ -15,6 +15,7 @@ import org.petmarket.blog.service.CategoryService;
 import org.petmarket.blog.service.PostService;
 import org.petmarket.errorhandling.ItemNotFoundException;
 import org.petmarket.errorhandling.ItemNotUpdatedException;
+import org.petmarket.language.entity.Language;
 import org.petmarket.language.service.LanguageService;
 import org.petmarket.options.service.OptionsService;
 import org.petmarket.users.service.UserService;
@@ -70,7 +71,7 @@ public class PostServiceImpl implements PostService {
     public BlogPostResponseDto updateById(Long id, String langCode, BlogPostRequestDto requestDto) {
         Post post = findById(id);
         for (PostTranslations translation : post.getTranslations()) {
-            if (translation.getLangCode().equals(checkedLang(langCode))) {
+            if (translation.getLanguage().getLangCode().equals(checkedLang(langCode))) {
                 translation.setTitle(requestDto.getTitle());
                 translation.setText(requestDto.getText());
                 translation.setShortText(truncateStringTo500Characters(requestDto.getText()));
@@ -104,7 +105,7 @@ public class PostServiceImpl implements PostService {
         Post post = findById(postId);
         List<PostTranslations> translations = post.getTranslations();
         if (translations.stream()
-                .anyMatch(t -> t.getLangCode()
+                .anyMatch(t -> t.getLanguage().getLangCode()
                         .equals(checkedLang(langCode)))) {
             throw new ItemNotUpdatedException(langCode + " translation already exist");
         } else {
@@ -112,7 +113,7 @@ public class PostServiceImpl implements PostService {
                     .post(post)
                     .title(requestDto.getTitle())
                     .text(requestDto.getText())
-                    .langCode(langCode)
+                    .language(languageService.getByLangCode(langCode))
                     .shortText(truncateStringTo500Characters(requestDto.getText()))
                     .build();
             translations.add(translation);
@@ -169,12 +170,12 @@ public class PostServiceImpl implements PostService {
         }
     }
 
-    private PostTranslations createPostTranslation(Post post, BlogPostRequestDto requestDto, String langCode) {
+    private PostTranslations createPostTranslation(Post post, BlogPostRequestDto requestDto, Language language) {
         return PostTranslations.builder()
                 .post(post)
                 .title(requestDto.getTitle())
                 .text(requestDto.getText())
-                .langCode(langCode)
+                .language(language)
                 .shortText(truncateStringTo500Characters(requestDto.getText()))
                 .build();
     }
@@ -195,7 +196,7 @@ public class PostServiceImpl implements PostService {
         PostTranslations translation = createPostTranslation(
                 post,
                 requestDto,
-                optionsService.getDefaultSiteLanguage().getLangCode());
+                optionsService.getDefaultSiteLanguage());
         postTranslations.add(translation);
 
         post.setUser(userService.findByUsername(authentication.getName()));
@@ -221,7 +222,7 @@ public class PostServiceImpl implements PostService {
         return post.getCategories().stream()
                 .peek(category -> category.setTranslations(
                         category.getTranslations().stream()
-                                .filter(c -> c.getLangCode().equals(checkedLang(langCode)))
+                                .filter(c -> c.getLanguage().getLangCode().equals(checkedLang(langCode)))
                                 .collect(Collectors.toList())
                 ))
                 .filter(category -> !category.getTranslations().isEmpty())
@@ -230,12 +231,12 @@ public class PostServiceImpl implements PostService {
 
     private List<PostTranslations> getTranslation(Long postId, String langCode) {
         List<PostTranslations> translations = findById(postId).getTranslations().stream()
-                .filter(t -> t.getLangCode().equals(checkedLang(langCode)))
+                .filter(t -> t.getLanguage().getLangCode().equals(checkedLang(langCode)))
                 .collect(Collectors.toList());
 
         if (translations.isEmpty()) {
             translations = findById(postId).getTranslations().stream()
-                    .filter(postTranslations -> postTranslations.getLangCode().equals(
+                    .filter(postTranslations -> postTranslations.getLanguage().getLangCode().equals(
                             optionsService.getDefaultSiteLanguage().getLangCode()))
                     .collect(Collectors.toList());
         }

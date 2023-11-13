@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.petmarket.language.entity.Language;
 
 @Entity
 @Table(name = "blog_posts_translations")
@@ -17,9 +18,9 @@ public class PostTranslations {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @NotNull
-    @Column(name = "lang_code")
-    private String langCode;
+    @ManyToOne
+    @JoinColumn(name = "lang_code")
+    private Language language;
     @NotNull
     @Column(name = "title")
     private String title;

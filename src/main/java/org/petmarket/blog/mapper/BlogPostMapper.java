@@ -16,7 +16,7 @@ public interface BlogPostMapper {
     @Mapping(source = "comments", target = "comments")
     BlogPostResponseDto toDto(Post post);
 
-    @Mapping(source = "langCode", target = "langCode")
+    @Mapping(target = "langCode", source = "language.langCode")
     BlogPostTranslationResponseDto mapTranslation(PostTranslations translation);
 
 }
