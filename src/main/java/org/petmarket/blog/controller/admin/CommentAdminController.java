@@ -3,7 +3,6 @@ package org.petmarket.blog.controller.admin;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.petmarket.blog.dto.comment.BlogPostCommentResponse;
@@ -58,7 +57,6 @@ public class CommentAdminController {
             @RequestParam CommentStatus status) {
         return commentService.updateStatus(commentsIds, status);
     }
-
 
     @Operation(
             summary = "Delete a comment",

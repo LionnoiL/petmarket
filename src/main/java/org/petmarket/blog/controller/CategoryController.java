@@ -3,7 +3,6 @@ package org.petmarket.blog.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.petmarket.blog.dto.category.BlogPostCategoryResponseDto;
@@ -52,7 +51,6 @@ public class CategoryController {
         Pageable pageable = PageRequest.of(page - 1, size, sort);
         return categoryService.getAll(pageable, langCode);
     }
-
 
     @Operation(
             summary = "Get a blog category by ID",

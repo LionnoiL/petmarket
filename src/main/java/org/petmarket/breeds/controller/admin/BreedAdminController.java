@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -71,7 +70,8 @@ public class BreedAdminController {
             description = "Updates a breed with the specified ID and language code",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Breed successfully updated"),
-                    @ApiResponse(responseCode = "400", description = "Bad request, e.g., invalid breed ID or language code"),
+                    @ApiResponse(responseCode = "400",
+                            description = "Bad request, e.g., invalid breed ID or language code"),
                     @ApiResponse(responseCode = "404", description = "Breed not found"),
                     @ApiResponse(responseCode = "500", description = "Internal server error")
             },

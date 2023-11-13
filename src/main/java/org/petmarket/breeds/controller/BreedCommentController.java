@@ -96,7 +96,8 @@ public class BreedCommentController {
                     @ApiResponse(responseCode = "204", description = "Comment successfully deleted"),
                     @ApiResponse(responseCode = "400", description = "Bad request, e.g., invalid comment ID"),
                     @ApiResponse(responseCode = "404", description = "Comment not found"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden, e.g., user does not have permission to delete the comment"),
+                    @ApiResponse(responseCode = "403",
+                            description = "Forbidden, e.g., user does not have permission to delete the comment"),
                     @ApiResponse(responseCode = "500", description = "Internal server error")
             },
             parameters = {

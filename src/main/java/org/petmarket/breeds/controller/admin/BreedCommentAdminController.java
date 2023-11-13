@@ -2,7 +2,6 @@ package org.petmarket.breeds.controller.admin;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -47,7 +46,6 @@ public class BreedCommentAdminController {
         return commentService.findAllCommentAdmin(pageable, status);
     }
 
-
     @Operation(
             summary = "Change Comment Status for admin",
             description = "Change the status of multiple comments.",
@@ -56,7 +54,8 @@ public class BreedCommentAdminController {
                     @ApiResponse(responseCode = "400", description = "Bad request")
             },
             parameters = {
-                    @Parameter(name = "commentsIds", description = "List of comments that need to be updated", example = "1")
+                    @Parameter(name = "commentsIds",
+                            description = "List of comments that need to be updated", example = "1")
             }
     )
     @PutMapping("/{commentsIds}/status/{status}")
@@ -65,7 +64,6 @@ public class BreedCommentAdminController {
             @PathVariable CommentStatus status) {
         return commentService.updateStatus(commentsIds, status);
     }
-
 
     @Operation(
             summary = "Delete Comment by Admin only",
