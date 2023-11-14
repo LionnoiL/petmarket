@@ -17,13 +17,6 @@ public class BlogCategory {
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "blogCategory", cascade = CascadeType.ALL)
     private List<CategoryTranslation> translations = new ArrayList<>();
 
-    /*@Enumerated(EnumType.STRING)
-    private CategoryStatus status;
-
-    public enum CategoryStatus {
-        ENABLED, DISABLED
-    }*/
-
     @Override
     public String toString() {
         return "BlogCategory{" +
