@@ -78,7 +78,7 @@ public class AttributeAdminController {
                     @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             }),
-            @ApiResponse(responseCode = "404", description = "Language or Attribute not found", content = {
+            @ApiResponse(responseCode = "404", description = LANGUAGE_OR_ATTRIBUTE_NOT_FOUND, content = {
                     @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             })
@@ -94,7 +94,7 @@ public class AttributeAdminController {
                     schema = @Schema(type = "string")
             )
             @PathVariable String langCode,
-            @RequestBody @Valid @NotNull(message = "Request body is mandatory") final AttributeRequestDto request,
+            @RequestBody @Valid @NotNull(message = REQUEST_BODY_IS_MANDATORY) final AttributeRequestDto request,
             BindingResult bindingResult) {
         log.info("Received request to update attribute - {} with id {}.", request, id);
         return attributeService.updateAttribute(id, langCode, request, bindingResult);

@@ -1,6 +1,17 @@
 package org.petmarket.advertisements.attributes.service;
 
+import static org.petmarket.utils.MessageUtils.ATTRIBUTE_GROUP_NOT_FOUND;
+import static org.petmarket.utils.MessageUtils.CATEGORY_NOT_FOUND;
+import static org.petmarket.utils.MessageUtils.LANGUAGE_IS_PRESENT_IN_LIST;
+import static org.petmarket.utils.MessageUtils.LANGUAGE_NOT_FOUND;
+import static org.petmarket.utils.MessageUtils.NO_TRANSLATION;
+
 import jakarta.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.advertisements.attributes.dto.AttributeGroupRequestDto;
@@ -21,20 +32,11 @@ import org.petmarket.utils.ErrorUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class AttributeGroupService {
 
-    public static final String LANGUAGE_NOT_FOUND_MESSAGE = "Language not found";
-    private static final String GROUP_NOT_FOUND_MESSAGE = "Attribute group not found";
-    private static final String CATEGORY_NOT_FOUND_MESSAGE = "Category not found";
     private final AttributeGroupRepository attributeGroupRepository;
     private final AdvertisementCategoryRepository categoryRepository;
     private final LanguageRepository languageRepository;
@@ -73,7 +75,7 @@ public class AttributeGroupService {
 
     @Transactional
     public AttributeGroupResponseDto addGroup(AttributeGroupRequestDto request,
-                                              BindingResult bindingResult) {
+        BindingResult bindingResult) {
         ErrorUtils.checkItemNotCreatedException(bindingResult);
 
         Language defaultSiteLanguage = optionsService.getDefaultSiteLanguage();
@@ -83,12 +85,12 @@ public class AttributeGroupService {
 
         group.setTranslations(new HashSet<>());
         AttributeGroupTranslate translation = AttributeGroupTranslate.builder()
-                .id(null)
-                .group(group)
-                .description(request.getDescription())
-                .title(request.getTitle())
-                .language(defaultSiteLanguage)
-                .build();
+            .id(null)
+            .group(group)
+            .description(request.getDescription())
+            .title(request.getTitle())
+            .language(defaultSiteLanguage)
+            .build();
         addTranslation(group, translation);
 
         attributeGroupRepository.save(group);
@@ -106,7 +108,7 @@ public class AttributeGroupService {
 
     @Transactional
     public AttributeGroupResponseDto updateGroup(Long id, String langCode,
-                                                 AttributeGroupRequestDto request, BindingResult bindingResult) {
+        AttributeGroupRequestDto request, BindingResult bindingResult) {
         ErrorUtils.checkItemNotUpdatedException(bindingResult);
 
         AttributeGroup group = getGroup(id);
@@ -142,19 +144,19 @@ public class AttributeGroupService {
 
     private Language getLanguage(String langCode) {
         return languageRepository.findByLangCodeAndEnableIsTrue(langCode).orElseThrow(() -> {
-            throw new ItemNotFoundException(LANGUAGE_NOT_FOUND_MESSAGE);
+            throw new ItemNotFoundException(LANGUAGE_NOT_FOUND);
         });
     }
 
     private AttributeGroup getGroup(Long id) {
         return attributeGroupRepository.findById(id).orElseThrow(() -> {
-            throw new ItemNotFoundException(GROUP_NOT_FOUND_MESSAGE);
+            throw new ItemNotFoundException(ATTRIBUTE_GROUP_NOT_FOUND);
         });
     }
 
     private AdvertisementCategory getCategory(Long id) {
         return categoryRepository.findById(id).orElseThrow(() -> {
-            throw new ItemNotFoundException(CATEGORY_NOT_FOUND_MESSAGE);
+            throw new ItemNotFoundException(CATEGORY_NOT_FOUND);
         });
     }
 
@@ -168,13 +170,13 @@ public class AttributeGroupService {
         Language language) {
         return group.getTranslations().stream()
             .filter(t -> t.getLanguage().equals(language))
-            .findFirst().orElseThrow(() -> new TranslateException("No translation"));
+            .findFirst().orElseThrow(() -> new TranslateException(NO_TRANSLATION));
     }
 
     private void addTranslation(AttributeGroup group,
         AttributeGroupTranslate translation) {
         if (checkLanguage(group, translation.getLanguage())) {
-            throw new TranslateException("Language is present in list");
+            throw new TranslateException(LANGUAGE_IS_PRESENT_IN_LIST);
         }
         translation.setGroup(group);
         group.getTranslations().add(translation);

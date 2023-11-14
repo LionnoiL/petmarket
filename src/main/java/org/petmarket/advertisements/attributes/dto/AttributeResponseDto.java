@@ -14,17 +14,22 @@ public class AttributeResponseDto {
     @JsonProperty("lang_code")
     @Schema(example = "2", description = "ID")
     private String langCode;
+
     @JsonProperty("group_id")
     @Schema(example = "ua", description = "Attribute language")
     private Long groupId;
+
     @JsonProperty("group_title")
     @Schema(example = "Коротка", description = "Attribute title")
     private String groupTitle;
+
     @JsonProperty("attribute_id")
     @Schema(example = "1", description = "Attribute group ID")
     private Long attributeId;
+
     @Schema(example = "Довжина шерсті", description = "Attribute group title")
     private String title;
+
     @JsonProperty("sort_value")
     @Schema(example = "120", description = "Sort order")
     private int sortValue;

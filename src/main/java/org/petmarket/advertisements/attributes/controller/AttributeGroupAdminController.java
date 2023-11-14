@@ -1,5 +1,14 @@
 package org.petmarket.advertisements.attributes.controller;
 
+import static org.petmarket.utils.MessageUtils.ATTRIBUTE_GROUP_NOT_FOUND;
+import static org.petmarket.utils.MessageUtils.BAD_REQUEST;
+import static org.petmarket.utils.MessageUtils.FORBIDDEN;
+import static org.petmarket.utils.MessageUtils.LANGUAGE_OR_ATTRIBUTE_GROUP_NOT_FOUND;
+import static org.petmarket.utils.MessageUtils.REQUEST_BODY_IS_MANDATORY;
+import static org.petmarket.utils.MessageUtils.SUCCESSFULLY_OPERATION;
+import static org.petmarket.utils.MessageUtils.UNAUTHORIZED;
+import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -38,29 +47,29 @@ public class AttributeGroupAdminController {
 
     @Operation(summary = "Create a new Attribute group")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Successful operation", content = {
-            @Content(mediaType = "application/json", schema =
+        @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
+            @Content(mediaType = APPLICATION_JSON_VALUE, schema =
             @Schema(implementation = AttributeGroupResponseDto.class))
         }),
         @ApiResponse(responseCode = "400", description =
             "The Attribute group has already been added " +
                 "or some data is missing", content = {
-            @Content(mediaType = "application/json", schema =
+            @Content(mediaType = APPLICATION_JSON_VALUE, schema =
             @Schema(implementation = ErrorResponse.class))
         }),
-        @ApiResponse(responseCode = "401", description = "Unauthorized", content = {
-            @Content(mediaType = "application/json", schema =
+        @ApiResponse(responseCode = "401", description = UNAUTHORIZED, content = {
+            @Content(mediaType = APPLICATION_JSON_VALUE, schema =
             @Schema(implementation = ErrorResponse.class))
         }),
-        @ApiResponse(responseCode = "403", description = "Forbidden", content = {
-            @Content(mediaType = "application/json", schema =
+        @ApiResponse(responseCode = "403", description = FORBIDDEN, content = {
+            @Content(mediaType = APPLICATION_JSON_VALUE, schema =
             @Schema(implementation = ErrorResponse.class))
         })
     })
     @PostMapping
     @ResponseBody
     public AttributeGroupResponseDto addGroup(
-        @RequestBody @Valid @NotNull(message = "Request body is mandatory") final AttributeGroupRequestDto request,
+        @RequestBody @Valid @NotNull(message = REQUEST_BODY_IS_MANDATORY) final AttributeGroupRequestDto request,
         BindingResult bindingResult) {
         log.info("Received request to create Attribute group - {}.", request);
         return attributeGroupService.addGroup(request, bindingResult);
@@ -68,24 +77,24 @@ public class AttributeGroupAdminController {
 
     @Operation(summary = "Update Attribute group by ID")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "201", description = "Successful operation", content = {
-            @Content(mediaType = "application/json", schema =
+        @ApiResponse(responseCode = "201", description = SUCCESSFULLY_OPERATION, content = {
+            @Content(mediaType = APPLICATION_JSON_VALUE, schema =
             @Schema(implementation = AttributeGroupResponseDto.class))
         }),
-        @ApiResponse(responseCode = "400", description = "Some data is missing", content = {
-            @Content(mediaType = "application/json", schema =
+        @ApiResponse(responseCode = "400", description = BAD_REQUEST, content = {
+            @Content(mediaType = APPLICATION_JSON_VALUE, schema =
             @Schema(implementation = ErrorResponse.class))
         }),
-        @ApiResponse(responseCode = "401", description = "Unauthorized", content = {
-            @Content(mediaType = "application/json", schema =
+        @ApiResponse(responseCode = "401", description = UNAUTHORIZED, content = {
+            @Content(mediaType = APPLICATION_JSON_VALUE, schema =
             @Schema(implementation = ErrorResponse.class))
         }),
-        @ApiResponse(responseCode = "403", description = "Forbidden", content = {
-            @Content(mediaType = "application/json", schema =
+        @ApiResponse(responseCode = "403", description = FORBIDDEN, content = {
+            @Content(mediaType = APPLICATION_JSON_VALUE, schema =
             @Schema(implementation = ErrorResponse.class))
         }),
-        @ApiResponse(responseCode = "404", description = "Language or Attribute group not found", content = {
-            @Content(mediaType = "application/json", schema =
+        @ApiResponse(responseCode = "404", description = LANGUAGE_OR_ATTRIBUTE_GROUP_NOT_FOUND, content = {
+            @Content(mediaType = APPLICATION_JSON_VALUE, schema =
             @Schema(implementation = ErrorResponse.class))
         })
     })
@@ -100,7 +109,7 @@ public class AttributeGroupAdminController {
             schema = @Schema(type = "string")
         )
         @PathVariable String langCode,
-        @RequestBody @Valid @NotNull(message = "Request body is mandatory") final AttributeGroupRequestDto request,
+        @RequestBody @Valid @NotNull(message = REQUEST_BODY_IS_MANDATORY) final AttributeGroupRequestDto request,
         BindingResult bindingResult) {
         log.info("Received request to update attribute group - {} with id {}.", request, id);
         return attributeGroupService.updateGroup(id, langCode, request, bindingResult);
@@ -108,17 +117,17 @@ public class AttributeGroupAdminController {
 
     @Operation(summary = "Delete Attribute group by ID")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "204", description = "Successful operation"),
-        @ApiResponse(responseCode = "401", description = "Unauthorized", content = {
-            @Content(mediaType = "application/json", schema =
+        @ApiResponse(responseCode = "204", description = SUCCESSFULLY_OPERATION),
+        @ApiResponse(responseCode = "401", description = UNAUTHORIZED, content = {
+            @Content(mediaType = APPLICATION_JSON_VALUE, schema =
             @Schema(implementation = ErrorResponse.class))
         }),
-        @ApiResponse(responseCode = "403", description = "Forbidden", content = {
-            @Content(mediaType = "application/json", schema =
+        @ApiResponse(responseCode = "403", description = FORBIDDEN, content = {
+            @Content(mediaType = APPLICATION_JSON_VALUE, schema =
             @Schema(implementation = ErrorResponse.class))
         }),
-        @ApiResponse(responseCode = "404", description = "Attribute group not found", content = {
-            @Content(mediaType = "application/json", schema =
+        @ApiResponse(responseCode = "404", description = ATTRIBUTE_GROUP_NOT_FOUND, content = {
+            @Content(mediaType = APPLICATION_JSON_VALUE, schema =
             @Schema(implementation = ErrorResponse.class))
         })
     })

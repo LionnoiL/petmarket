@@ -22,5 +22,4 @@ public class AdvertisementCategoryTagResponseDto {
     @JsonProperty("tag_title")
     @Schema(example = "песики", description = "Title for category tag")
     private String tagTitle;
-
 }
