@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.petmarket.advertisements.attributes.entity.Attribute;
 import org.petmarket.advertisements.category.entity.AdvertisementCategory;
+import org.petmarket.breeds.entity.Breed;
 import org.petmarket.delivery.entity.Delivery;
 import org.petmarket.location.entity.Location;
 import org.petmarket.payment.entity.Payment;
@@ -77,6 +78,10 @@ public class Advertisement implements TranslateHolder {
 
     @Column(name = "rating")
     private int rating;
+
+    @ManyToOne
+    @JoinColumn(name = "breed_id")
+    private Breed breed;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "advertisement", fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<AdvertisementTranslate> translations;

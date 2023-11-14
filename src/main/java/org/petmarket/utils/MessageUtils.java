@@ -19,4 +19,5 @@ public final class MessageUtils {
     public static final String PAYMENT_NOT_FOUND = "Payment not found";
     public static final String DELIVERY_NOT_FOUND = "Delivery not found";
     public static final String USER_NOT_FOUND = "User not found";
+    public static final String BREED_NOT_FOUND = "Breed not found";
 }

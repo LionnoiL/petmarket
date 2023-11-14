@@ -8,6 +8,7 @@ import org.petmarket.advertisements.advertisement.entity.AdvertisementType;
 import org.petmarket.advertisements.attributes.dto.AttributeResponseDto;
 import org.petmarket.advertisements.category.dto.AdvertisementCategoryResponseDto;
 import org.petmarket.advertisements.images.dto.AdvertisementImageResponseDto;
+import org.petmarket.breeds.dto.BreedResponseDto;
 import org.petmarket.delivery.dto.DeliveryResponseDto;
 import org.petmarket.location.dto.LocationResponseDto;
 import org.petmarket.payment.dto.PaymentResponseDto;
@@ -51,6 +52,7 @@ public class AdvertisementResponseDto {
     private int quantity;
     private AdvertisementType type;
     private int rating;
+    private BreedResponseDto breed;
     private List<AttributeResponseDto> attributes;
     private List<AdvertisementReviewResponseDto> reviews;
     private List<AdvertisementImageResponseDto> images;

@@ -15,6 +15,8 @@ import org.petmarket.advertisements.attributes.entity.Attribute;
 import org.petmarket.advertisements.attributes.repository.AttributeRepository;
 import org.petmarket.advertisements.category.entity.AdvertisementCategory;
 import org.petmarket.advertisements.category.repository.AdvertisementCategoryRepository;
+import org.petmarket.breeds.entity.Breed;
+import org.petmarket.breeds.repository.BreedRepository;
 import org.petmarket.delivery.entity.Delivery;
 import org.petmarket.delivery.repository.DeliveryRepository;
 import org.petmarket.errorhandling.ItemNotFoundException;
@@ -62,6 +64,7 @@ public class AdvertisementService {
     private final PaymentRepository paymentRepository;
     private final DeliveryRepository deliveryRepository;
     private final CityRepository cityRepository;
+    private final BreedRepository breedRepository;
     private final AdvertisementResponseTranslateMapper translateMapper;
     private final AdvertisementMapper advertisementMapper;
     private final ReviewMapper reviewMapper;
@@ -87,6 +90,7 @@ public class AdvertisementService {
 
         fillDateEnding(advertisement);
         fillCategory(advertisement, request);
+        fillBreed(advertisement, request);
         fillLocation(advertisement, request);
         fillAttributes(advertisement, request);
         fillPayments(advertisement, request);
@@ -134,6 +138,18 @@ public class AdvertisementService {
                 }
         );
         advertisement.setCategory(category);
+    }
+
+    private void fillBreed(Advertisement advertisement, AdvertisementRequestDto request) {
+        Breed breed = null;
+        if (request.getBreedId() != null) {
+            breed = breedRepository.findById(request.getBreedId()).orElseThrow(
+                    () -> {
+                        throw new ItemNotFoundException(BREED_NOT_FOUND);
+                    }
+            );
+        }
+        advertisement.setBreed(breed);
     }
 
     private void fillLocation(Advertisement advertisement, AdvertisementRequestDto request) {

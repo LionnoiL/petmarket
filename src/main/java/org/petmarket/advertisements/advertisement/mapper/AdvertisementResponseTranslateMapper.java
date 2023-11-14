@@ -7,6 +7,7 @@ import org.petmarket.advertisements.advertisement.entity.Advertisement;
 import org.petmarket.advertisements.advertisement.entity.AdvertisementTranslate;
 import org.petmarket.advertisements.attributes.mapper.AttributeTranslateMapper;
 import org.petmarket.advertisements.category.mapper.AdvertisementCategoryResponseTranslateMapper;
+import org.petmarket.breeds.mapper.BreedMapper;
 import org.petmarket.delivery.mapper.DeliveryResponseTranslateMapper;
 import org.petmarket.language.entity.Language;
 import org.petmarket.options.service.OptionsService;
@@ -31,6 +32,7 @@ public class AdvertisementResponseTranslateMapper {
     private final PaymentResponseTranslateMapper paymentMapper;
     private final DeliveryResponseTranslateMapper deliveryMapper;
     private final AttributeTranslateMapper attributeMapper;
+    private final BreedMapper breedMapper;
 
     public AdvertisementResponseDto mapEntityToDto(Advertisement entity, Language language) {
         AdvertisementTranslate translation = (AdvertisementTranslate) translationService.getTranslate(
@@ -46,6 +48,8 @@ public class AdvertisementResponseTranslateMapper {
         dto.setPayments(paymentMapper.mapEntityToDto(entity.getPayments(), language));
         dto.setDeliveries(deliveryMapper.mapEntityToDto(entity.getDeliveries(), language));
         dto.setAttributes(attributeMapper.mapEntityToDto(entity.getAttributes(), language));
+        //TODO after complete breed mapper
+        //dto.setBreed(breedMapper.toDto(entity.getBreed()));
 
         return dto;
     }
