@@ -3,7 +3,6 @@ package org.petmarket.breeds.service.impl;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.petmarket.advertisements.category.service.AdvertisementCategoryService;
-import org.petmarket.blog.entity.CommentStatus;
 import org.petmarket.breeds.dto.BreedRequestDto;
 import org.petmarket.breeds.dto.BreedResponseDto;
 import org.petmarket.breeds.entity.Breed;
@@ -69,9 +68,6 @@ public class BreedServiceImpl implements BreedService {
     public BreedResponseDto get(Long breedId, String langCode) {
         Breed breed = findBreedById(breedId);
         breed.setTranslations(getTranslation(breed, langCode));
-        breed.setComments(breed.getComments().stream()
-                .filter(comment -> comment.getStatus().equals(CommentStatus.APPROVED))
-                .toList());
 
         return breedMapper.toDto(breed);
     }
@@ -141,9 +137,6 @@ public class BreedServiceImpl implements BreedService {
         return allBreeds.stream()
                 .map(breed -> {
                     breed.setCategory(breed.getCategory());
-                    breed.setComments(breed.getComments().stream()
-                            .filter(breedComment -> breedComment.getStatus().equals(CommentStatus.APPROVED))
-                            .toList());
                     breed.setTranslations(getTranslation(breed, langCode));
                     return breed;
                 })
