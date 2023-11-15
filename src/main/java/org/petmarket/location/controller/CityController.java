@@ -8,18 +8,17 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.errorhandling.ErrorResponse;
 import org.petmarket.location.dto.CityResponseDto;
 import org.petmarket.location.service.CityService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+import static org.petmarket.utils.MessageUtils.*;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Tag(name = "Location", description = "the location API")
 @Slf4j
@@ -32,14 +31,14 @@ public class CityController {
 
     @Operation(summary = "Get City by ID")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Successful operation", content = {
-            @Content(mediaType = "application/json", schema =
-            @Schema(implementation = CityResponseDto.class))
-        }),
-        @ApiResponse(responseCode = "404", description = "City not found", content = {
-            @Content(mediaType = "application/json", schema =
-            @Schema(implementation = ErrorResponse.class))
-        })
+            @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
+                    @Schema(implementation = CityResponseDto.class))
+            }),
+            @ApiResponse(responseCode = "404", description = CITY_NOT_FOUND, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
+                    @Schema(implementation = ErrorResponse.class))
+            })
     })
     @GetMapping("/{id}")
     @ResponseBody
@@ -56,13 +55,13 @@ public class CityController {
 
     @Operation(summary = "Get City by Name")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Successful operation", content = {
-            @Content(
-                mediaType = "application/json",
-                array = @ArraySchema(schema = @Schema(
-                    implementation = CityResponseDto.class))
-            )
-        })
+            @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
+                    @Content(
+                            mediaType = APPLICATION_JSON_VALUE,
+                            array = @ArraySchema(schema = @Schema(
+                                    implementation = CityResponseDto.class))
+                    )
+            })
     })
     @GetMapping("/byName/{name}")
     @ResponseBody
@@ -83,17 +82,17 @@ public class CityController {
 
     @Operation(summary = "Get City by Name and State ID")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Successful operation", content = {
-            @Content(
-                mediaType = "application/json",
-                array = @ArraySchema(schema = @Schema(
-                    implementation = CityResponseDto.class))
-            )
-        }),
-        @ApiResponse(responseCode = "404", description = "State not found", content = {
-            @Content(mediaType = "application/json", schema =
-            @Schema(implementation = ErrorResponse.class))
-        })
+            @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
+                    @Content(
+                            mediaType = APPLICATION_JSON_VALUE,
+                            array = @ArraySchema(schema = @Schema(
+                                    implementation = CityResponseDto.class))
+                    )
+            }),
+            @ApiResponse(responseCode = "404", description = STATE_NOT_FOUND, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
+                    @Schema(implementation = ErrorResponse.class))
+            })
     })
     @GetMapping("/byName/{name}/byStateId/{id}")
     @ResponseBody

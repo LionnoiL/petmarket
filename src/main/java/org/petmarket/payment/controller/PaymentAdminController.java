@@ -23,6 +23,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
 
+import static org.petmarket.utils.MessageUtils.*;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+
 @Tag(name = "Payment", description = "the payments methods API")
 @Slf4j
 @RequiredArgsConstructor
@@ -34,29 +37,27 @@ public class PaymentAdminController {
 
     @Operation(summary = "Create a new Payment")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successful operation", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = PaymentResponseDto.class))
             }),
-            @ApiResponse(responseCode = "400", description =
-                    "The Payment has already been added " +
-                            "or some data is missing", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "400", description = BAD_REQUEST, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             }),
-            @ApiResponse(responseCode = "401", description = "Unauthorized", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "401", description = UNAUTHORIZED, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             }),
-            @ApiResponse(responseCode = "403", description = "Forbidden", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "403", description = FORBIDDEN, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             })
     })
     @PostMapping
     @ResponseBody
     public PaymentResponseDto addPayment(
-            @RequestBody @Valid @NotNull(message = "Request body is mandatory") final PaymentRequestDto request,
+            @RequestBody @Valid @NotNull(message = REQUEST_BODY_IS_MANDATORY) final PaymentRequestDto request,
             BindingResult bindingResult) {
         log.info("Received request to create Payment - {}.", request);
         return paymentService.addPayment(request, bindingResult);
@@ -64,24 +65,24 @@ public class PaymentAdminController {
 
     @Operation(summary = "Update Payment by ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Successful operation", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "201", description = SUCCESSFULLY_OPERATION, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = PaymentResponseDto.class))
             }),
-            @ApiResponse(responseCode = "400", description = "Some data is missing", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "400", description = BAD_REQUEST, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             }),
-            @ApiResponse(responseCode = "401", description = "Unauthorized", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "401", description = UNAUTHORIZED, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             }),
-            @ApiResponse(responseCode = "403", description = "Forbidden", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "403", description = FORBIDDEN, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             }),
-            @ApiResponse(responseCode = "404", description = "Language or Payment not found", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "404", description = LANGUAGE_OR_PAYMENT_NOT_FOUND, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             })
     })
@@ -96,7 +97,7 @@ public class PaymentAdminController {
                     schema = @Schema(type = "string")
             )
             @PathVariable String langCode,
-            @RequestBody @Valid @NotNull(message = "Request body is mandatory") final PaymentRequestDto request,
+            @RequestBody @Valid @NotNull(message = REQUEST_BODY_IS_MANDATORY) final PaymentRequestDto request,
             BindingResult bindingResult) {
         log.info("Received request to update payment - {} with id {}.", request, id);
         return paymentService.updatePayment(id, langCode, request, bindingResult);
@@ -104,17 +105,17 @@ public class PaymentAdminController {
 
     @Operation(summary = "Delete Payment by ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Successful operation"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "204", description = SUCCESSFULLY_OPERATION),
+            @ApiResponse(responseCode = "401", description = UNAUTHORIZED, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             }),
-            @ApiResponse(responseCode = "403", description = "Forbidden", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "403", description = FORBIDDEN, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             }),
-            @ApiResponse(responseCode = "404", description = "Payment not found", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "404", description = PAYMENT_NOT_FOUND, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             })
     })
@@ -133,12 +134,12 @@ public class PaymentAdminController {
 
     @Operation(summary = "Get Payment by ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successful operation", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = PaymentResponseDto.class))
             }),
-            @ApiResponse(responseCode = "404", description = "Payment or Language not found", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "404", description = LANGUAGE_OR_PAYMENT_NOT_FOUND, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             })
     })
@@ -161,9 +162,9 @@ public class PaymentAdminController {
 
     @Operation(summary = "Get all payments.", description = "Obtaining all payments")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successful operation", content = {
+            @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
                     @Content(
-                            mediaType = "application/json",
+                            mediaType = APPLICATION_JSON_VALUE,
                             array = @ArraySchema(schema = @Schema(
                                     implementation = PaymentResponseDto.class))
                     )

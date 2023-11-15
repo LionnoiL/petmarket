@@ -21,6 +21,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import static org.petmarket.utils.MessageUtils.*;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+
 @Tag(name = "Pages", description = "the site pages API")
 @Slf4j
 @RequiredArgsConstructor
@@ -32,28 +35,27 @@ public class PageAdminController {
 
     @Operation(summary = "Create a new Page")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successful operation", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = SitePageResponseDto.class))
             }),
-            @ApiResponse(responseCode = "400", description = "The Page has already been added " +
-                    "or some data is missing", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "400", description = BAD_REQUEST, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             }),
-            @ApiResponse(responseCode = "401", description = "Unauthorized", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "401", description = UNAUTHORIZED, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             }),
-            @ApiResponse(responseCode = "403", description = "Forbidden", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "403", description = FORBIDDEN, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             })
     })
     @PostMapping
     @ResponseBody
     public SitePageResponseDto addPage(
-            @RequestBody @Valid @NotNull(message = "Request body is mandatory") final SitePageCreateRequestDto request,
+            @RequestBody @Valid @NotNull(message = REQUEST_BODY_IS_MANDATORY) final SitePageCreateRequestDto request,
             BindingResult bindingResult) {
         log.info("Received request to create Page - {}.", request);
         return pageService.addPage(request, bindingResult);
@@ -61,24 +63,24 @@ public class PageAdminController {
 
     @Operation(summary = "Update Page by ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Successful operation", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "201", description = SUCCESSFULLY_OPERATION, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = SitePageResponseDto.class))
             }),
-            @ApiResponse(responseCode = "400", description = "Some data is missing", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "400", description = BAD_REQUEST, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             }),
-            @ApiResponse(responseCode = "401", description = "Unauthorized", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "401", description = UNAUTHORIZED, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             }),
-            @ApiResponse(responseCode = "403", description = "Forbidden", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "403", description = FORBIDDEN, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             }),
-            @ApiResponse(responseCode = "404", description = "Language not found", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "404", description = LANGUAGE_NOT_FOUND, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             })
     })
@@ -93,7 +95,7 @@ public class PageAdminController {
                     schema = @Schema(type = "string")
             )
             @PathVariable String langCode,
-            @RequestBody @Valid @NotNull(message = "Request body is mandatory") final SitePageUpdateRequestDto request,
+            @RequestBody @Valid @NotNull(message = REQUEST_BODY_IS_MANDATORY) final SitePageUpdateRequestDto request,
             BindingResult bindingResult) {
         log.info("Received request to update Page - {} with id {}.", request, id);
         return pageService.updatePage(id, langCode, request, bindingResult);
@@ -101,17 +103,17 @@ public class PageAdminController {
 
     @Operation(summary = "Delete Page by ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Successful operation"),
+            @ApiResponse(responseCode = "204", description = SUCCESSFULLY_OPERATION),
             @ApiResponse(responseCode = "401", description = "Unauthorized", content = {
-                    @Content(mediaType = "application/json", schema =
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             }),
             @ApiResponse(responseCode = "403", description = "Forbidden", content = {
-                    @Content(mediaType = "application/json", schema =
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             }),
             @ApiResponse(responseCode = "404", description = "Page not found", content = {
-                    @Content(mediaType = "application/json", schema =
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             })
     })

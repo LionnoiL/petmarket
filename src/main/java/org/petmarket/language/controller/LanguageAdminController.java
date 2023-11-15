@@ -19,6 +19,9 @@ import org.petmarket.language.service.LanguageService;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import static org.petmarket.utils.MessageUtils.*;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+
 @Tag(name = "Languages", description = "the language API")
 @Slf4j
 @RequiredArgsConstructor
@@ -30,28 +33,27 @@ public class LanguageAdminController {
 
     @Operation(summary = "Create a new Language")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Successful operation", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "201", description = SUCCESSFULLY_OPERATION, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = LanguageResponseDto.class))
             }),
-            @ApiResponse(responseCode = "400", description = "The Language has already been added " +
-                    "or some data is missing", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "400", description = BAD_REQUEST, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             }),
-            @ApiResponse(responseCode = "401", description = "Unauthorized", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "401", description = UNAUTHORIZED, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             }),
-            @ApiResponse(responseCode = "403", description = "Forbidden", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "403", description = FORBIDDEN, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             })
     })
     @PostMapping
     @ResponseBody
     public LanguageResponseDto addLanguage(
-            @RequestBody @Valid @NotNull(message = "Request body is mandatory") final LanguageCreateRequestDto request,
+            @RequestBody @Valid @NotNull(message = REQUEST_BODY_IS_MANDATORY) final LanguageCreateRequestDto request,
             BindingResult bindingResult) {
         log.info("Received request to create Language - {}.", request);
         return languageService.addLanguage(request, bindingResult);
@@ -59,31 +61,31 @@ public class LanguageAdminController {
 
     @Operation(summary = "Update Language by CODE")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successful operation", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = LanguageResponseDto.class))
             }),
-            @ApiResponse(responseCode = "400", description = "Some data is missing", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "400", description = BAD_REQUEST, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             }),
-            @ApiResponse(responseCode = "401", description = "Unauthorized", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "401", description = UNAUTHORIZED, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             }),
-            @ApiResponse(responseCode = "403", description = "Forbidden", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "403", description = FORBIDDEN, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             }),
-            @ApiResponse(responseCode = "404", description = "Language not found", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "404", description = LANGUAGE_NOT_FOUND, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             })
     })
     @PutMapping("/{langCode}")
     @ResponseBody
     public LanguageResponseDto updateLanguage(
-            @RequestBody @Valid @NotNull(message = "Request body is mandatory") final LanguageUpdateRequestDto request,
+            @RequestBody @Valid @NotNull(message = REQUEST_BODY_IS_MANDATORY) final LanguageUpdateRequestDto request,
             @Parameter(description = "The CODE of the language to update", required = true,
                     schema = @Schema(type = "string")
             )
@@ -94,17 +96,17 @@ public class LanguageAdminController {
 
     @Operation(summary = "Enable Language by CODE")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successful operation"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION),
+            @ApiResponse(responseCode = "401", description = UNAUTHORIZED, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             }),
-            @ApiResponse(responseCode = "403", description = "Forbidden", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "403", description = FORBIDDEN, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             }),
-            @ApiResponse(responseCode = "404", description = "Language not found", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "404", description = LANGUAGE_NOT_FOUND, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             })
     })
@@ -120,22 +122,22 @@ public class LanguageAdminController {
     }
 
     @Operation(summary = "Disable Language by CODE", description = """
-            Language deactivation. 
-            If the language to be deactivated is specified as the default language 
+            Language deactivation.
+            If the language to be deactivated is specified as the default language
             in the site settings, we will get status 400.
             """)
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successful operation"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION),
+            @ApiResponse(responseCode = "401", description = UNAUTHORIZED, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             }),
-            @ApiResponse(responseCode = "403", description = "Forbidden", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "403", description = FORBIDDEN, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             }),
-            @ApiResponse(responseCode = "404", description = "Language not found", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "404", description = LANGUAGE_NOT_FOUND, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             })
     })

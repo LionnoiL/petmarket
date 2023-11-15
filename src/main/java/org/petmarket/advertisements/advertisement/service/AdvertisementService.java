@@ -1,19 +1,6 @@
 package org.petmarket.advertisements.advertisement.service;
 
-import static org.petmarket.utils.MessageUtils.ADVERTISEMENT_NOT_FOUND;
-import static org.petmarket.utils.MessageUtils.BREED_NOT_FOUND;
-import static org.petmarket.utils.MessageUtils.CATEGORY_NOT_FOUND;
-import static org.petmarket.utils.MessageUtils.CITY_NOT_FOUND;
-import static org.petmarket.utils.MessageUtils.LANGUAGE_IS_PRESENT_IN_LIST;
-import static org.petmarket.utils.MessageUtils.LANGUAGE_NOT_FOUND;
-import static org.petmarket.utils.MessageUtils.NO_TRANSLATION;
-import static org.petmarket.utils.MessageUtils.USER_NOT_FOUND;
-
 import jakarta.transaction.Transactional;
-import java.time.LocalDate;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.advertisements.advertisement.dto.AdvertisementRequestDto;
@@ -56,6 +43,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 
+import java.time.LocalDate;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+
+import static org.petmarket.utils.MessageUtils.*;
+
 @Slf4j
 @RequiredArgsConstructor
 @Service
@@ -82,8 +76,6 @@ public class AdvertisementService {
         BindingResult bindingResult, Authentication authentication) {
         ErrorUtils.checkItemNotCreatedException(bindingResult);
 
-        Language defaultSiteLanguage = optionsService.getDefaultSiteLanguage();
-
         Advertisement advertisement = advertisementMapper.mapDtoRequestToEntity(request);
         advertisement.setAlias(
             transliterateUtils.getAlias(
@@ -101,6 +93,8 @@ public class AdvertisementService {
         fillAttributes(advertisement, request);
         fillPayments(advertisement, request);
         fillDeliveries(advertisement, request);
+
+        Language defaultSiteLanguage = optionsService.getDefaultSiteLanguage();
         fillTranslation(advertisement, request, defaultSiteLanguage);
 
         advertisementRepository.save(advertisement);

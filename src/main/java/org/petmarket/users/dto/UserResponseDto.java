@@ -1,5 +1,7 @@
 package org.petmarket.users.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import org.petmarket.users.entity.Role;
 import org.petmarket.users.entity.UserStatus;
@@ -15,11 +17,21 @@ import java.util.List;
 public class UserResponseDto {
 
     private long id;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date created;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date updated;
+
     private UserStatus status;
+
+    @JsonProperty("first_name")
     private String firstName;
+
+    @JsonProperty("last_name")
     private String lastName;
+
     private String email;
     private String phone;
     private String site;
