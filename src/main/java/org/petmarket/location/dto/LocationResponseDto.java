@@ -13,7 +13,15 @@ public class LocationResponseDto {
 
     @Schema(example = "1", description = "City ID")
     @JsonProperty("city_id")
-    private Long cityID;
+    private Long cityId;
+
+    @Schema(example = "Подільськ", description = "City name")
+    @JsonProperty("city_name")
+    private String cityName;
+
+    @Schema(example = "Одеська", description = "State name")
+    @JsonProperty("state_name")
+    private String stateName;
 
     @Schema(example = "47.750717", description = "latitude")
     private float latitude;
