@@ -25,6 +25,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Collection;
 import java.util.List;
 
+import static org.petmarket.utils.MessageUtils.CATEGORY_NOT_FOUND;
+import static org.petmarket.utils.MessageUtils.SUCCESSFULLY_OPERATION;
+import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
+
 @Tag(name = "Advertisement Categories", description = "the site advertisement categories API")
 @Slf4j
 @RequiredArgsConstructor
@@ -36,26 +40,26 @@ public class AdvertisementCategoryController {
 
     @Operation(summary = "Get Category by ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successful operation", content = {
-                    @Content(mediaType = "application/json", schema =
-                    @Schema(implementation = AdvertisementCategoryResponseDto.class))
-            }),
-            @ApiResponse(responseCode = "404", description = "Category not found", content = {
-                    @Content(mediaType = "application/json", schema =
-                    @Schema(implementation = ErrorResponse.class))
-            })
+        @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
+            @Content(mediaType = APPLICATION_JSON_VALUE, schema =
+            @Schema(implementation = AdvertisementCategoryResponseDto.class))
+        }),
+        @ApiResponse(responseCode = "404", description = CATEGORY_NOT_FOUND, content = {
+            @Content(mediaType = APPLICATION_JSON_VALUE, schema =
+            @Schema(implementation = ErrorResponse.class))
+        })
     })
     @GetMapping("/{id}/{langCode}")
     @ResponseBody
     public AdvertisementCategoryResponseDto getCategoryById(
-            @Parameter(description = "The ID of the category to retrieve", required = true,
-                    schema = @Schema(type = "integer", format = "int64")
-            )
-            @PathVariable Long id,
-            @Parameter(description = "The Code Language of the category to retrieve", required = true,
-                    schema = @Schema(type = "string")
-            )
-            @PathVariable String langCode) {
+        @Parameter(description = "The ID of the category to retrieve", required = true,
+            schema = @Schema(type = "integer", format = "int64")
+        )
+        @PathVariable Long id,
+        @Parameter(description = "The Code Language of the category to retrieve", required = true,
+                schema = @Schema(type = "string"), example = "ua"
+        )
+        @PathVariable String langCode) {
         log.info("Received request to get the Category with id - {}.", id);
         AdvertisementCategoryResponseDto dto = categoryService.findById(id, langCode);
         log.info("the Category with id - {} was retrieved - {}.", id, dto);
@@ -64,21 +68,21 @@ public class AdvertisementCategoryController {
 
     @Operation(summary = "Get all Categories.", description = "Obtaining all site categories")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successful operation", content = {
-                    @Content(
-                            mediaType = "application/json",
-                            array = @ArraySchema(schema = @Schema(
-                                    implementation = AdvertisementCategoryResponseDto.class))
-                    )
-            })
+        @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
+            @Content(
+                mediaType = APPLICATION_JSON_VALUE,
+                array = @ArraySchema(schema = @Schema(
+                    implementation = AdvertisementCategoryResponseDto.class))
+            )
+        })
     })
     @GetMapping("/{langCode}")
     @ResponseBody
     public ResponseEntity<Collection<AdvertisementCategoryResponseDto>> getAll(
-            @Parameter(description = "The Code Language of the categories to retrieve", required = true,
-                    schema = @Schema(type = "string")
-            )
-            @PathVariable String langCode) {
+        @Parameter(description = "The Code Language of the categories to retrieve", required = true,
+                schema = @Schema(type = "string"), example = "ua"
+        )
+        @PathVariable String langCode) {
         log.info("Received request to get all Categories.");
         Collection<AdvertisementCategoryResponseDto> dtos = categoryService.getAll(langCode);
         log.info("All Categories were retrieved - {}.", dtos);
@@ -87,85 +91,88 @@ public class AdvertisementCategoryController {
 
     @Operation(summary = "Get favorite Categories.", description = "Obtaining favorite site categories")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successful operation", content = {
-                    @Content(
-                            mediaType = "application/json",
-                            array = @ArraySchema(schema = @Schema(
-                                    implementation = AdvertisementCategoryResponseDto.class))
-                    )
-            })
+        @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
+            @Content(
+                mediaType = APPLICATION_JSON_VALUE,
+                array = @ArraySchema(schema = @Schema(
+                    implementation = AdvertisementCategoryResponseDto.class))
+            )
+        })
     })
     @GetMapping("/favorite/{langCode}/{size}")
     @ResponseBody
     public ResponseEntity<Collection<AdvertisementCategoryResponseDto>> getFavorite(
-            @Parameter(description = "The Code Language of the categories to retrieve", required = true,
-                    schema = @Schema(type = "string")
-            )
-            @PathVariable String langCode,
-            @Parameter(description = "The size of the categories to be returned", required = true,
-                    schema = @Schema(type = "integer", defaultValue = "10")
-            )
-            @PathVariable Integer size) {
+        @Parameter(description = "The Code Language of the categories to retrieve", required = true,
+                schema = @Schema(type = "string"), example = "ua"
+        )
+        @PathVariable String langCode,
+        @Parameter(description = "The size of the categories to be returned", required = true,
+            schema = @Schema(type = "integer", defaultValue = "10")
+        )
+        @PathVariable Integer size) {
         log.info("Received request to get favorite Categories.");
-        Collection<AdvertisementCategoryResponseDto> dtos = categoryService.getFavorite(langCode, size);
+        Collection<AdvertisementCategoryResponseDto> dtos = categoryService.getFavorite(langCode,
+            size);
         log.info("All Categories were retrieved - {}.", dtos);
         return ResponseEntity.ok().body(dtos);
     }
 
     @Operation(summary = "Get favorite tags for Categories.", description = "Obtaining favorite tags for categories")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successful operation", content = {
-                    @Content(
-                            mediaType = "application/json",
-                            array = @ArraySchema(schema = @Schema(
-                                    implementation = AdvertisementCategoryTagResponseDto.class))
-                    )
-            })
+        @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
+            @Content(
+                mediaType = APPLICATION_JSON_VALUE,
+                array = @ArraySchema(schema = @Schema(
+                    implementation = AdvertisementCategoryTagResponseDto.class))
+            )
+        })
     })
     @GetMapping("/favorite-tags/{langCode}/{size}")
     @ResponseBody
     public ResponseEntity<Collection<AdvertisementCategoryTagResponseDto>> getFavoriteTags(
-            @Parameter(description = "The Code Language of the categories to retrieve", required = true,
-                    schema = @Schema(type = "string")
-            )
-            @PathVariable String langCode,
-            @Parameter(description = "The size of the categories to be returned", required = true,
-                    schema = @Schema(type = "integer", defaultValue = "10")
-            )
-            @PathVariable Integer size) {
+        @Parameter(description = "The Code Language of the categories to retrieve", required = true,
+                schema = @Schema(type = "string"), example = "ua"
+        )
+        @PathVariable String langCode,
+        @Parameter(description = "The size of the categories to be returned", required = true,
+            schema = @Schema(type = "integer", defaultValue = "10")
+        )
+        @PathVariable Integer size) {
         log.info("Received request to get favorite Tags Categories.");
-        Collection<AdvertisementCategoryTagResponseDto> dtos = categoryService.getFavoriteTags(langCode, size);
+        Collection<AdvertisementCategoryTagResponseDto> dtos = categoryService.getFavoriteTags(
+            langCode, size);
         log.info("All Categories were retrieved - {}.", dtos);
         return ResponseEntity.ok().body(dtos);
     }
 
     @Operation(summary = "Get Advertisements by category")
-    @ApiResponse(responseCode = "200", description = "Successful operation")
+    @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION)
     @GetMapping(path = "/{id}/{langCode}/advertisements")
     public Page<AdvertisementResponseDto> getAllAdvertisementsByCategory(
-            @Parameter(description = "Number of page (1..N)", required = true,
-                    schema = @Schema(type = "integer", defaultValue = "1")
-            ) @RequestParam(defaultValue = "1") int page,
-            @Parameter(description = "The size of the page to be returned", required = true,
-                    schema = @Schema(type = "integer", defaultValue = "30")
-            ) @RequestParam(defaultValue = "30") int size,
-            @Parameter(description = "Sort direction (ASC, DESC)",
-                    schema = @Schema(type = "string")
-            ) @RequestParam(required = false, defaultValue = "ASC") String sortDirection,
-            @Parameter(description = "Sort field",
-                    schema = @Schema(type = "string")
-            ) @RequestParam(required = false, defaultValue = "ASC") String sortField,
-            @Parameter(description = "List of attributes identifiers",
-                    schema = @Schema(type = "array[integer]")
-            ) @RequestParam(required = false) List<Long> attributes,
-            @Parameter(description = "List of locations identifiers",
-                    schema = @Schema(type = "array[integer]")
-            ) @RequestParam(required = false) List<Long> locations,
-            @Parameter(description = "Advertisement type (SIMPLE, PRODUCT, VIP)",
-                    schema = @Schema(type = "string")
-            ) @RequestParam(required = false, defaultValue = "SIMPLE") String type
+        @Parameter(description = "Number of page (1..N)", required = true,
+            schema = @Schema(type = "integer", defaultValue = "1")
+        ) @RequestParam(defaultValue = "1") int page,
+        @Parameter(description = "The size of the page to be returned", required = true,
+            schema = @Schema(type = "integer", defaultValue = "30")
+        ) @RequestParam(defaultValue = "30") int size,
+        @Parameter(description = "Sort direction (ASC, DESC)",
+            schema = @Schema(type = "string")
+        ) @RequestParam(required = false, defaultValue = "ASC") String sortDirection,
+        @Parameter(description = "Sort field",
+            schema = @Schema(type = "string")
+        ) @RequestParam(required = false, defaultValue = "ASC") String sortField,
+        @Parameter(description = "List of attributes identifiers",
+            schema = @Schema(type = "array[integer]")
+        ) @RequestParam(required = false) List<Long> attributes,
+        @Parameter(description = "List of locations identifiers",
+            schema = @Schema(type = "array[integer]")
+        ) @RequestParam(required = false) List<Long> locations,
+        @Parameter(description = "Advertisement type (SIMPLE, PRODUCT, VIP)",
+            schema = @Schema(type = "string")
+        ) @RequestParam(required = false, defaultValue = "SIMPLE") String type
     ) {
-        Pageable pageable = PageRequest.of(page - 1, size, Sort.Direction.valueOf(sortDirection), sortField);
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.Direction.valueOf(sortDirection),
+            sortField);
         //TODO finish after add AdvertisementService
         return null;
     }

@@ -26,13 +26,12 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
+import static org.petmarket.utils.MessageUtils.*;
+
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class SitePageService {
-
-    public static final String LANGUAGE_NOT_FOUND_MESSAGE = "Language not found";
-    public static final String PAGE_NOT_FOUND_MESSAGE = "Page not found";
 
     private final SitePageRepository pageRepository;
     private final LanguageRepository languageRepository;
@@ -110,15 +109,17 @@ public class SitePageService {
 
     public SitePageResponseDto findByType(SitePageType pageType, String langCode) {
         Language language = getLanguage(langCode);
-        SitePage sitePage = pageRepository.findByType(pageType);
-
+        SitePage sitePage = pageRepository.findByType(pageType)
+                .orElseThrow(
+                        () -> new ItemNotFoundException(PAGE_NOT_FOUND)
+                );
         return sitePageResponseTranslateMapper.mapEntityToDto(sitePage, language);
     }
 
     private SitePageTranslate getTranslation(SitePage page, Language language) {
         return page.getTranslations().stream()
                 .filter(t -> t.getLanguage().equals(language))
-                .findFirst().orElseThrow(() -> new TranslateException("No translation"));
+                .findFirst().orElseThrow(() -> new TranslateException(NO_TRANSLATION));
     }
 
     private boolean checkLanguage(SitePage page, Language language) {
@@ -129,7 +130,7 @@ public class SitePageService {
 
     private void addTranslation(SitePage page, SitePageTranslate translation) {
         if (checkLanguage(page, translation.getLanguage())) {
-            throw new TranslateException("Language is present in list");
+            throw new TranslateException(LANGUAGE_IS_PRESENT_IN_LIST);
         }
         translation.setSitePage(page);
         page.getTranslations().add(translation);
@@ -137,13 +138,13 @@ public class SitePageService {
 
     private Language getLanguage(String langCode) {
         return languageRepository.findByLangCodeAndEnableIsTrue(langCode).orElseThrow(() -> {
-            throw new ItemNotFoundException(LANGUAGE_NOT_FOUND_MESSAGE);
+            throw new ItemNotFoundException(LANGUAGE_NOT_FOUND);
         });
     }
 
     private SitePage getSitePage(Long id) {
         return pageRepository.findById(id).orElseThrow(() -> {
-            throw new ItemNotFoundException(PAGE_NOT_FOUND_MESSAGE);
+            throw new ItemNotFoundException(PAGE_NOT_FOUND);
         });
     }
 }

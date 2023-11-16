@@ -18,6 +18,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
 
+import static org.petmarket.utils.MessageUtils.LANGUAGE_OR_PAYMENT_NOT_FOUND;
+import static org.petmarket.utils.MessageUtils.SUCCESSFULLY_OPERATION;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+
 @Tag(name = "Payment", description = "the payments methods API")
 @Slf4j
 @RequiredArgsConstructor
@@ -29,12 +33,12 @@ public class PaymentController {
 
     @Operation(summary = "Get Payment by ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successful operation", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = PaymentResponseDto.class))
             }),
-            @ApiResponse(responseCode = "404", description = "Payment or Language not found", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "404", description = LANGUAGE_OR_PAYMENT_NOT_FOUND, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             })
     })
@@ -46,7 +50,7 @@ public class PaymentController {
             )
             @PathVariable Long id,
             @Parameter(description = "The Code Language of the payments to retrieve", required = true,
-                    schema = @Schema(type = "string")
+                    schema = @Schema(type = "string"), example = "ua"
             )
             @PathVariable String langCode) {
         log.info("Received request to get the payment with id - {}.", id);
@@ -57,9 +61,9 @@ public class PaymentController {
 
     @Operation(summary = "Get all payments.", description = "Obtaining all payments")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successful operation", content = {
+            @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
                     @Content(
-                            mediaType = "application/json",
+                            mediaType = APPLICATION_JSON_VALUE,
                             array = @ArraySchema(schema = @Schema(
                                     implementation = PaymentResponseDto.class))
                     )
@@ -69,7 +73,7 @@ public class PaymentController {
     @ResponseBody
     public ResponseEntity<Collection<PaymentResponseDto>> getAll(
             @Parameter(description = "The Code Language of the payments to retrieve", required = true,
-                    schema = @Schema(type = "string")
+                    schema = @Schema(type = "string"), example = "ua"
             )
             @PathVariable String langCode) {
         log.info("Received request to get all enabled payments.");

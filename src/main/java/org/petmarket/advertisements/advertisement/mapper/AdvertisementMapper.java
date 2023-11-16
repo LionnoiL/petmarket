@@ -10,6 +10,7 @@ import org.petmarket.advertisements.advertisement.entity.Advertisement;
 public interface AdvertisementMapper {
 
     @Mapping(target = "location", ignore = true)
+    @Mapping(target = "breed", ignore = true)
     AdvertisementResponseDto mapEntityToDto(Advertisement entity);
 
     Advertisement mapDtoRequestToEntity(AdvertisementRequestDto request);

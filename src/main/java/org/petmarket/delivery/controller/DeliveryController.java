@@ -18,6 +18,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
 
+import static org.petmarket.utils.MessageUtils.LANGUAGE_OR_DELIVERY_NOT_FOUND;
+import static org.petmarket.utils.MessageUtils.SUCCESSFULLY_OPERATION;
+import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
+
 @Tag(name = "Delivery", description = "the delivery methods API")
 @Slf4j
 @RequiredArgsConstructor
@@ -29,12 +33,12 @@ public class DeliveryController {
 
     @Operation(summary = "Get Delivery by ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successful operation", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = DeliveryResponseDto.class))
             }),
-            @ApiResponse(responseCode = "404", description = "Delivery or Language not found", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "404", description = LANGUAGE_OR_DELIVERY_NOT_FOUND, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             })
     })
@@ -46,7 +50,7 @@ public class DeliveryController {
             )
             @PathVariable Long id,
             @Parameter(description = "The Code Language of the deliveries to retrieve", required = true,
-                    schema = @Schema(type = "string")
+                    schema = @Schema(type = "string"), example = "ua"
             )
             @PathVariable String langCode) {
         log.info("Received request to get the delivery with id - {}.", id);
@@ -57,9 +61,9 @@ public class DeliveryController {
 
     @Operation(summary = "Get all deliveries.", description = "Obtaining all deliveries")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successful operation", content = {
+            @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
                     @Content(
-                            mediaType = "application/json",
+                            mediaType = APPLICATION_JSON_VALUE,
                             array = @ArraySchema(schema = @Schema(
                                     implementation = DeliveryResponseDto.class))
                     )
@@ -69,7 +73,7 @@ public class DeliveryController {
     @ResponseBody
     public ResponseEntity<Collection<DeliveryResponseDto>> getAll(
             @Parameter(description = "The Code Language of the deliveries to retrieve", required = true,
-                    schema = @Schema(type = "string")
+                    schema = @Schema(type = "string"), example = "ua"
             )
             @PathVariable String langCode) {
         log.info("Received request to get all enabled deliveries.");

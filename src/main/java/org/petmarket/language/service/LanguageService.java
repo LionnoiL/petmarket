@@ -20,6 +20,8 @@ import org.springframework.validation.BindingResult;
 import java.util.Collection;
 import java.util.List;
 
+import static org.petmarket.utils.MessageUtils.*;
+
 @Slf4j
 @RequiredArgsConstructor
 @Service
@@ -36,7 +38,7 @@ public class LanguageService {
 
     public Language getByLangCode(String langCode) {
         return languageRepository.findByLangCodeAndEnableIsTrue(langCode).orElseThrow(() -> {
-            throw new ItemNotFoundException("Language " + "-" + langCode + "-" + " not found");
+            throw new ItemNotFoundException(LANGUAGE_NOT_FOUND);
         });
     }
 
@@ -54,7 +56,7 @@ public class LanguageService {
         Language defaultSiteLanguage = optionsService.getDefaultSiteLanguage();
 
         if (language.equals(defaultSiteLanguage)) {
-            throw new ItemNotUpdatedException("Language is default in site options");
+            throw new ItemNotUpdatedException(LANGUAGE_IS_DEFAULT);
         }
 
         language.setEnable(false);
@@ -67,7 +69,7 @@ public class LanguageService {
         ErrorUtils.checkItemNotCreatedException(bindingResult);
         languageRepository.findById(dto.getLangCode())
                 .ifPresent(language -> {
-                    throw new ItemNotCreatedException("The language is already in the database");
+                    throw new ItemNotCreatedException(LANGUAGE_IS_ALREADY_IN_DATABASE);
                 });
 
         Language language = languageMapper.mapDtoRequestToEntity(dto);
@@ -91,7 +93,7 @@ public class LanguageService {
 
     private Language getLanguage(String langCode) {
         return languageRepository.findById(langCode).orElseThrow(() -> {
-            throw new ItemNotFoundException("Language not found");
+            throw new ItemNotFoundException(LANGUAGE_NOT_FOUND);
         });
     }
 }

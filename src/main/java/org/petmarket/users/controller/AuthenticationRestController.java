@@ -20,6 +20,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import static org.petmarket.utils.MessageUtils.*;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+
 @Tag(name = "Authentication", description = "the user authentication API")
 @RequiredArgsConstructor
 @RestController
@@ -30,38 +33,35 @@ public class AuthenticationRestController {
 
     @Operation(summary = "Login in and returns the authentication token")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Successfully authenticated", content = {
-            @Content(mediaType = "application/json", schema =
-            @Schema(implementation = JwtResponseDto.class))
-        }),
-        @ApiResponse(responseCode = "400", description =
-            "It indicates that the server can not or will " +
-                "not process the request due to an apparent client error",
-            content = {
-                @Content(mediaType = "application/json", schema =
-                @Schema(implementation = ErrorResponse.class))
-            })
+            @ApiResponse(responseCode = "200", description = SUCCESSFULLY_AUTHENTICATED, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
+                    @Schema(implementation = JwtResponseDto.class))
+            }),
+            @ApiResponse(responseCode = "400", description = BAD_REQUEST,
+                    content = {
+                            @Content(mediaType = APPLICATION_JSON_VALUE, schema =
+                            @Schema(implementation = ErrorResponse.class))
+                    })
     })
     @PostMapping("login")
     public ResponseEntity login(@Valid @RequestBody UserRequestDto requestDto,
-        BindingResult bindingResult) {
+                                BindingResult bindingResult) {
         return userAuthService.login(requestDto, bindingResult);
     }
 
     @Operation(summary = "User Registration",
-        description = "The user registration API creates a user account in application")
+            description = "The user registration API creates a user account in application")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Successful operation"),
-        @ApiResponse(responseCode = "400", description = "The User has already been added " +
-            "or some data is missing",
-            content = {
-                @Content(mediaType = "application/json", schema =
-                @Schema(implementation = ErrorResponse.class))
-            })
+            @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION),
+            @ApiResponse(responseCode = "400", description = BAD_REQUEST,
+                    content = {
+                            @Content(mediaType = APPLICATION_JSON_VALUE, schema =
+                            @Schema(implementation = ErrorResponse.class))
+                    })
     })
     @PostMapping("register")
     public ResponseEntity register(@Valid @RequestBody UserRequestDto requestDto,
-        BindingResult bindingResult) {
+                                   BindingResult bindingResult) {
         userAuthService.register(requestDto, bindingResult);
         return ResponseEntity.ok().build();
     }

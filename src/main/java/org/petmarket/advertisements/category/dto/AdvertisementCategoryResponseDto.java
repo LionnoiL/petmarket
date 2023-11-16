@@ -1,69 +1,45 @@
 package org.petmarket.advertisements.category.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Setter
+@Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class AdvertisementCategoryResponseDto {
 
-    private Long id;
-    private String langCode;
-    private String alias;
-    private String title;
-    private String tagTitle;
-    private String description;
-    private Long parentId;
-    private boolean availableInTags;
-    private boolean availableInFavorite;
-
     @Schema(example = "1", description = "ID Category")
-    public Long getId() {
-        return id;
-    }
+    private Long id;
 
-    @Schema(example = "Sobaki", description = "Category alias")
-    public String getAlias() {
-        return alias;
-    }
-
+    @JsonProperty("lang_code")
     @Schema(example = "ua", description = "Category language")
-    public String getLangCode() {
-        return langCode;
-    }
+    private String langCode;
+
+    @Schema(example = "sobaki", description = "Category alias")
+    private String alias;
 
     @Schema(example = "Собаки", description = "Category title")
-    public String getTitle() {
-        return title;
-    }
+    private String title;
 
+    @JsonProperty("tag_title")
     @Schema(example = "песики", description = "Title for category tag")
-    public String getTagTitle() {
-        return tagTitle;
-    }
+    private String tagTitle;
 
     @Schema(example = "Собаки..", description = "Category description")
-    public String getDescription() {
-        return description;
-    }
+    private String description;
 
+    @JsonProperty("parent_id")
     @Schema(example = "10", description = "Parent ID")
-    public Long getParentId() {
-        return parentId;
-    }
+    private Long parentId;
 
+    @JsonProperty("available_in_tags")
     @Schema(example = "true", description = "Availability category for tags")
-    public boolean isAvailableInTags() {
-        return availableInTags;
-    }
+    private boolean availableInTags;
 
+    @JsonProperty("available_in_favorite")
     @Schema(example = "true", description = "Availability category for favorites")
-    public boolean isAvailableInFavorite() {
-        return availableInFavorite;
-    }
+    private boolean availableInFavorite;
 }

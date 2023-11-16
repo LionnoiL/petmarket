@@ -1,34 +1,28 @@
 package org.petmarket.users.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Setter
+@Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ResetPasswordRequestDto {
 
     @NotBlank
+    @JsonProperty("verification_code")
+    @Schema(example = "41d994af-6611-4b31-9933-f493d0330acd", description = "Verification code from email link")
     private String verificationCode;
+
     @NotNull(message = "The 'password' cannot be null")
     @NotBlank(message = "The 'password' cannot be empty")
     @Pattern(regexp = "((?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,})")
-    private String newPassword;
-
-    @Schema(example = "41d994af-6611-4b31-9933-f493d0330acd", description = "Verification code from email link")
-    public String getVerificationCode() {
-        return verificationCode;
-    }
-
+    @JsonProperty("new_password")
     @Schema(example = "NewPassword1", description = "New user password")
-    public String getNewPassword() {
-        return newPassword;
-    }
+    private String newPassword;
 }
