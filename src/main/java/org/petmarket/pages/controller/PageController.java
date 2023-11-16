@@ -98,8 +98,7 @@ public class PageController {
     @ResponseBody
     public SitePageResponseDto getPageByType(
             @Parameter(description = "The TYPE of the page to retrieve. (HOW_TO_BUY, HOW_TO_SELL, ABOUT)",
-                    required = true,
-                    schema = @Schema(type = "string")
+                    required = true
             )
             @PathVariable SitePageType pageType,
             @Parameter(description = "The Code Language of the page to retrieve", required = true,
