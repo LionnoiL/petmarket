@@ -46,7 +46,7 @@ public class PageController {
     @ResponseBody
     public ResponseEntity<Collection<SitePageResponseDto>> getAll(
             @Parameter(description = "The Code Language of the pages to retrieve", required = true,
-                    schema = @Schema(type = "string")
+                    schema = @Schema(type = "string"), example = "ua"
             )
             @PathVariable String langCode) {
         log.info("Received request to get all Pages.");
@@ -74,7 +74,7 @@ public class PageController {
             )
             @PathVariable Long id,
             @Parameter(description = "The Code Language of the page to retrieve", required = true,
-                    schema = @Schema(type = "string")
+                    schema = @Schema(type = "string"), example = "ua"
             )
             @PathVariable String langCode) {
         log.info("Received request to get the Page with id - {}.", id);
@@ -103,7 +103,7 @@ public class PageController {
             )
             @PathVariable SitePageType pageType,
             @Parameter(description = "The Code Language of the page to retrieve", required = true,
-                    schema = @Schema(type = "string")
+                    schema = @Schema(type = "string"), example = "ua"
             )
             @PathVariable String langCode) {
         log.info("Received request to get the Page with type - {}.", pageType);

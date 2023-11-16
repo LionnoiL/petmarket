@@ -92,7 +92,7 @@ public class PageAdminController {
             )
             @PathVariable Long id,
             @Parameter(description = "The Code Language of the page to retrieve", required = true,
-                    schema = @Schema(type = "string")
+                    schema = @Schema(type = "string"), example = "ua"
             )
             @PathVariable String langCode,
             @RequestBody @Valid @NotNull(message = REQUEST_BODY_IS_MANDATORY) final SitePageUpdateRequestDto request,

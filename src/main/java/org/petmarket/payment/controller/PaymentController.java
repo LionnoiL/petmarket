@@ -50,7 +50,7 @@ public class PaymentController {
             )
             @PathVariable Long id,
             @Parameter(description = "The Code Language of the payments to retrieve", required = true,
-                    schema = @Schema(type = "string")
+                    schema = @Schema(type = "string"), example = "ua"
             )
             @PathVariable String langCode) {
         log.info("Received request to get the payment with id - {}.", id);
@@ -73,7 +73,7 @@ public class PaymentController {
     @ResponseBody
     public ResponseEntity<Collection<PaymentResponseDto>> getAll(
             @Parameter(description = "The Code Language of the payments to retrieve", required = true,
-                    schema = @Schema(type = "string")
+                    schema = @Schema(type = "string"), example = "ua"
             )
             @PathVariable String langCode) {
         log.info("Received request to get all enabled payments.");

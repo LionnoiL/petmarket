@@ -94,7 +94,7 @@ public class PaymentAdminController {
             )
             @PathVariable Long id,
             @Parameter(description = "The Code Language of the Payment to retrieve", required = true,
-                    schema = @Schema(type = "string")
+                    schema = @Schema(type = "string"), example = "ua"
             )
             @PathVariable String langCode,
             @RequestBody @Valid @NotNull(message = REQUEST_BODY_IS_MANDATORY) final PaymentRequestDto request,
@@ -151,7 +151,7 @@ public class PaymentAdminController {
             )
             @PathVariable Long id,
             @Parameter(description = "The Code Language of the payments to retrieve", required = true,
-                    schema = @Schema(type = "string")
+                    schema = @Schema(type = "string"), example = "ua"
             )
             @PathVariable String langCode) {
         log.info("Received request to get the payment with id - {}.", id);
@@ -174,7 +174,7 @@ public class PaymentAdminController {
     @ResponseBody
     public ResponseEntity<Collection<PaymentResponseDto>> getAll(
             @Parameter(description = "The Code Language of the payments to retrieve", required = true,
-                    schema = @Schema(type = "string")
+                    schema = @Schema(type = "string"), example = "ua"
             )
             @PathVariable String langCode) {
         log.info("Received request to get all payments.");

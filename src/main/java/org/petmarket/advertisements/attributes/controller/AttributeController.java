@@ -1,9 +1,5 @@
 package org.petmarket.advertisements.attributes.controller;
 
-import static org.petmarket.utils.MessageUtils.ATTRIBUTE_NOT_FOUND;
-import static org.petmarket.utils.MessageUtils.SUCCESSFULLY_OPERATION;
-import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -21,6 +17,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
+
+import static org.petmarket.utils.MessageUtils.ATTRIBUTE_NOT_FOUND;
+import static org.petmarket.utils.MessageUtils.SUCCESSFULLY_OPERATION;
+import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
 @Tag(name = "Attributes", description = "the advertisement attributes API")
 @Slf4j
@@ -50,7 +50,7 @@ public class AttributeController {
             )
             @PathVariable Long id,
             @Parameter(description = "The Code Language of the attributes to retrieve", required = true,
-                    schema = @Schema(type = "string")
+                    schema = @Schema(type = "string"), example = "ua"
             )
             @PathVariable String langCode) {
         log.info("Received request to get the attribute with id - {}.", id);
@@ -77,7 +77,7 @@ public class AttributeController {
             )
             @PathVariable Long id,
             @Parameter(description = "The Code Language of the attributes to retrieve", required = true,
-                    schema = @Schema(type = "string")
+                    schema = @Schema(type = "string"), example = "ua"
             )
             @PathVariable String langCode) {
         log.info("Received request to get Attributes by group {}", id);

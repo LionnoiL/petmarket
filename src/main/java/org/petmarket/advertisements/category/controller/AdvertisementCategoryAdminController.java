@@ -1,14 +1,5 @@
 package org.petmarket.advertisements.category.controller;
 
-import static org.petmarket.utils.MessageUtils.BAD_REQUEST;
-import static org.petmarket.utils.MessageUtils.CATEGORY_NOT_FOUND;
-import static org.petmarket.utils.MessageUtils.FORBIDDEN;
-import static org.petmarket.utils.MessageUtils.LANGUAGE_OR_CATEGORY_NOT_FOUND;
-import static org.petmarket.utils.MessageUtils.REQUEST_BODY_IS_MANDATORY;
-import static org.petmarket.utils.MessageUtils.SUCCESSFULLY_OPERATION;
-import static org.petmarket.utils.MessageUtils.UNAUTHORIZED;
-import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -36,6 +27,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
+import static org.petmarket.utils.MessageUtils.*;
+import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
 @Tag(name = "Advertisement Categories", description = "the site advertisement categories API")
 @Slf4j
@@ -105,7 +99,7 @@ public class AdvertisementCategoryAdminController {
             )
             @PathVariable Long id,
             @Parameter(description = "The Code Language of the advertisement category to retrieve", required = true,
-                    schema = @Schema(type = "string")
+                    schema = @Schema(type = "string"), example = "ua"
             )
             @PathVariable String langCode,
             @RequestBody @Valid @NotNull(message = REQUEST_BODY_IS_MANDATORY)

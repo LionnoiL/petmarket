@@ -1,14 +1,5 @@
 package org.petmarket.advertisements.attributes.controller;
 
-import static org.petmarket.utils.MessageUtils.ATTRIBUTE_GROUP_NOT_FOUND;
-import static org.petmarket.utils.MessageUtils.BAD_REQUEST;
-import static org.petmarket.utils.MessageUtils.FORBIDDEN;
-import static org.petmarket.utils.MessageUtils.LANGUAGE_OR_ATTRIBUTE_GROUP_NOT_FOUND;
-import static org.petmarket.utils.MessageUtils.REQUEST_BODY_IS_MANDATORY;
-import static org.petmarket.utils.MessageUtils.SUCCESSFULLY_OPERATION;
-import static org.petmarket.utils.MessageUtils.UNAUTHORIZED;
-import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -27,14 +18,10 @@ import org.petmarket.errorhandling.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import static org.petmarket.utils.MessageUtils.*;
+import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
 @Tag(name = "Attributes", description = "the advertisement attributes API")
 @Slf4j
@@ -106,7 +93,7 @@ public class AttributeGroupAdminController {
         )
         @PathVariable Long id,
         @Parameter(description = "The Code Language of the Attribute group to retrieve", required = true,
-            schema = @Schema(type = "string")
+                schema = @Schema(type = "string"), example = "ua"
         )
         @PathVariable String langCode,
         @RequestBody @Valid @NotNull(message = REQUEST_BODY_IS_MANDATORY) final AttributeGroupRequestDto request,

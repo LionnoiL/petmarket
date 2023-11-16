@@ -1,9 +1,5 @@
 package org.petmarket.advertisements.category.controller;
 
-import static org.petmarket.utils.MessageUtils.CATEGORY_NOT_FOUND;
-import static org.petmarket.utils.MessageUtils.SUCCESSFULLY_OPERATION;
-import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -12,8 +8,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.Collection;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.advertisements.advertisement.dto.AdvertisementResponseDto;
@@ -26,12 +20,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Collection;
+import java.util.List;
+
+import static org.petmarket.utils.MessageUtils.CATEGORY_NOT_FOUND;
+import static org.petmarket.utils.MessageUtils.SUCCESSFULLY_OPERATION;
+import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
 @Tag(name = "Advertisement Categories", description = "the site advertisement categories API")
 @Slf4j
@@ -61,7 +57,7 @@ public class AdvertisementCategoryController {
         )
         @PathVariable Long id,
         @Parameter(description = "The Code Language of the category to retrieve", required = true,
-            schema = @Schema(type = "string")
+                schema = @Schema(type = "string"), example = "ua"
         )
         @PathVariable String langCode) {
         log.info("Received request to get the Category with id - {}.", id);
@@ -84,7 +80,7 @@ public class AdvertisementCategoryController {
     @ResponseBody
     public ResponseEntity<Collection<AdvertisementCategoryResponseDto>> getAll(
         @Parameter(description = "The Code Language of the categories to retrieve", required = true,
-            schema = @Schema(type = "string")
+                schema = @Schema(type = "string"), example = "ua"
         )
         @PathVariable String langCode) {
         log.info("Received request to get all Categories.");
@@ -107,7 +103,7 @@ public class AdvertisementCategoryController {
     @ResponseBody
     public ResponseEntity<Collection<AdvertisementCategoryResponseDto>> getFavorite(
         @Parameter(description = "The Code Language of the categories to retrieve", required = true,
-            schema = @Schema(type = "string")
+                schema = @Schema(type = "string"), example = "ua"
         )
         @PathVariable String langCode,
         @Parameter(description = "The size of the categories to be returned", required = true,
@@ -135,7 +131,7 @@ public class AdvertisementCategoryController {
     @ResponseBody
     public ResponseEntity<Collection<AdvertisementCategoryTagResponseDto>> getFavoriteTags(
         @Parameter(description = "The Code Language of the categories to retrieve", required = true,
-            schema = @Schema(type = "string")
+                schema = @Schema(type = "string"), example = "ua"
         )
         @PathVariable String langCode,
         @Parameter(description = "The size of the categories to be returned", required = true,

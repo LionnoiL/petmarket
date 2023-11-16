@@ -87,7 +87,7 @@ public class LanguageAdminController {
     public LanguageResponseDto updateLanguage(
             @RequestBody @Valid @NotNull(message = REQUEST_BODY_IS_MANDATORY) final LanguageUpdateRequestDto request,
             @Parameter(description = "The CODE of the language to update", required = true,
-                    schema = @Schema(type = "string")
+                    schema = @Schema(type = "string"), example = "ua"
             )
             @PathVariable String langCode, BindingResult bindingResult) {
         log.info("Received request to update Language - {} with code {}.", request, langCode);
@@ -114,7 +114,7 @@ public class LanguageAdminController {
     @ResponseBody
     public LanguageResponseDto enableLanguage(
             @Parameter(description = "The language code to enable", required = true,
-                    schema = @Schema(type = "string")
+                    schema = @Schema(type = "string"), example = "ua"
             )
             @PathVariable String langCode) {
         log.info("Received request to enable Language with code {}.", langCode);
@@ -145,7 +145,7 @@ public class LanguageAdminController {
     @ResponseBody
     public LanguageResponseDto disableLanguage(
             @Parameter(description = "The language code to disable", required = true,
-                    schema = @Schema(type = "string")
+                    schema = @Schema(type = "string"), example = "ua"
             )
             @PathVariable String langCode) {
         log.info("Received request to disable Language with code {}.", langCode);

@@ -51,7 +51,7 @@ public class AdvertisementController {
         )
         @PathVariable Long id,
         @Parameter(description = "The Code Language of the Advertisement to retrieve", required = true,
-            schema = @Schema(type = "string")
+                schema = @Schema(type = "string"), example = "ua"
         )
         @PathVariable String langCode) {
         log.info("Received request to get Advertisement Advertisement with id - {}.", id);

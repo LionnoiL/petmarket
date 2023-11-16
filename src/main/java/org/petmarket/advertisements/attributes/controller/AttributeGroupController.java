@@ -1,9 +1,5 @@
 package org.petmarket.advertisements.attributes.controller;
 
-import static org.petmarket.utils.MessageUtils.ATTRIBUTE_GROUP_NOT_FOUND;
-import static org.petmarket.utils.MessageUtils.SUCCESSFULLY_OPERATION;
-import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -21,6 +17,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
+
+import static org.petmarket.utils.MessageUtils.ATTRIBUTE_GROUP_NOT_FOUND;
+import static org.petmarket.utils.MessageUtils.SUCCESSFULLY_OPERATION;
+import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
 @Tag(name = "Attributes", description = "the advertisement attributes API")
 @Slf4j
@@ -45,7 +45,7 @@ public class AttributeGroupController {
     @ResponseBody
     public ResponseEntity<Collection<AttributeGroupResponseDto>> getAll(
             @Parameter(description = "The Code Language of the groups to retrieve", required = true,
-                    schema = @Schema(type = "string")
+                    schema = @Schema(type = "string"), example = "ua"
             )
             @PathVariable String langCode) {
         log.info("Received request to get all Groups.");
@@ -73,7 +73,7 @@ public class AttributeGroupController {
             )
             @PathVariable Long id,
             @Parameter(description = "The Code Language of the groups to retrieve", required = true,
-                    schema = @Schema(type = "string")
+                    schema = @Schema(type = "string"), example = "ua"
             )
             @PathVariable String langCode) {
         log.info("Received request to get the group with id - {}.", id);
@@ -100,7 +100,7 @@ public class AttributeGroupController {
             )
             @PathVariable Long id,
             @Parameter(description = "The Code Language of the groups to retrieve", required = true,
-                    schema = @Schema(type = "string")
+                    schema = @Schema(type = "string"), example = "ua"
             )
             @PathVariable String langCode) {
         log.info("Received request to get Groups by category {}", id);
@@ -125,7 +125,7 @@ public class AttributeGroupController {
     @ResponseBody
     public ResponseEntity<Collection<AttributeGroupResponseDto>> getForFilter(
             @Parameter(description = "The Code Language of the groups to retrieve", required = true,
-                    schema = @Schema(type = "string")
+                    schema = @Schema(type = "string"), example = "ua"
             )
             @PathVariable String langCode) {
         log.info("Received request to get Groups for filter");
