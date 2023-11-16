@@ -19,6 +19,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+
 @Tag(name = "Users", description = "the users API")
 @Slf4j
 @RequiredArgsConstructor
@@ -33,7 +35,7 @@ public class UserController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful operation"),
             @ApiResponse(responseCode = "404", description = "User email not found", content = {
-                    @Content(mediaType = "application/json", schema =
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             })
     })
@@ -55,11 +57,11 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "Successful operation"),
             @ApiResponse(responseCode = "400", description = "Some data is missing or wrong",
                     content = {
-                            @Content(mediaType = "application/json", schema =
+                            @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                             @Schema(implementation = ErrorResponse.class))
                     }),
             @ApiResponse(responseCode = "404", description = "Verification code not found", content = {
-                    @Content(mediaType = "application/json", schema =
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             })
     })

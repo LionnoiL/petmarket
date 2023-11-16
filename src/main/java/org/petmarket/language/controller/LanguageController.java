@@ -19,6 +19,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collection;
 
+import static org.petmarket.utils.MessageUtils.SUCCESSFULLY_OPERATION;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+
 @Tag(name = "Languages", description = "the language API")
 @Slf4j
 @RequiredArgsConstructor
@@ -30,9 +33,9 @@ public class LanguageController {
 
     @Operation(summary = "Get all Languages.", description = "Obtaining all site languages, including inactive ones.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successful operation", content = {
+            @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
                     @Content(
-                            mediaType = "application/json",
+                            mediaType = APPLICATION_JSON_VALUE,
                             array = @ArraySchema(schema = @Schema(
                                     implementation = LanguageResponseDto.class))
                     )

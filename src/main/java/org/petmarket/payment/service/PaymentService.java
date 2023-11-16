@@ -24,13 +24,13 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
+import static org.petmarket.utils.MessageUtils.*;
+
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class PaymentService {
 
-    public static final String LANGUAGE_NOT_FOUND_MESSAGE = "Language not found";
-    private static final String PAYMENT_NOT_FOUND_MESSAGE = "Payment not found";
     private final PaymentRepository paymentRepository;
     private final LanguageRepository languageRepository;
     private final PaymentResponseTranslateMapper paymentResponseTranslateMapper;
@@ -123,31 +123,31 @@ public class PaymentService {
 
     private Language getLanguage(String langCode) {
         return languageRepository.findByLangCodeAndEnableIsTrue(langCode).orElseThrow(() -> {
-            throw new ItemNotFoundException(LANGUAGE_NOT_FOUND_MESSAGE);
+            throw new ItemNotFoundException(LANGUAGE_NOT_FOUND);
         });
     }
 
     private Payment getEnablePayment(Long id) {
         return paymentRepository.findByIdAndEnableIsTrue(id).orElseThrow(() -> {
-            throw new ItemNotFoundException(PAYMENT_NOT_FOUND_MESSAGE);
+            throw new ItemNotFoundException(PAYMENT_NOT_FOUND);
         });
     }
 
     private Payment getPayment(Long id) {
         return paymentRepository.findById(id).orElseThrow(() -> {
-            throw new ItemNotFoundException(PAYMENT_NOT_FOUND_MESSAGE);
+            throw new ItemNotFoundException(PAYMENT_NOT_FOUND);
         });
     }
 
     private PaymentTranslate getTranslation(Payment payment, Language language) {
         return payment.getTranslations().stream()
                 .filter(t -> t.getLanguage().equals(language))
-                .findFirst().orElseThrow(() -> new TranslateException("No translation"));
+                .findFirst().orElseThrow(() -> new TranslateException(NO_TRANSLATION));
     }
 
     private void addTranslation(Payment payment, PaymentTranslate translation) {
         if (checkLanguage(payment, translation.getLanguage())) {
-            throw new TranslateException("Language is present in list");
+            throw new TranslateException(LANGUAGE_IS_PRESENT_IN_LIST);
         }
         translation.setPayment(payment);
         payment.getTranslations().add(translation);

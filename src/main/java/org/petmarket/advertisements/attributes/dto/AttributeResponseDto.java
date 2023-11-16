@@ -1,53 +1,38 @@
 package org.petmarket.advertisements.attributes.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Setter
+@Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class AttributeResponseDto {
 
-    private String langCode;
-    private Long groupId;
-    private String groupTitle;
-    private Long attributeId;
-    private String title;
-    private int sortValue;
-
+    @JsonProperty("lang_code")
     @Schema(example = "2", description = "ID")
-    public Long getAttributeId() {
-        return attributeId;
-    }
+    private String langCode;
 
+    @JsonProperty("group_id")
     @Schema(example = "ua", description = "Attribute language")
-    public String getLangCode() {
-        return langCode;
-    }
+    private Long groupId;
 
+    @JsonProperty("group_title")
     @Schema(example = "Коротка", description = "Attribute title")
-    public String getTitle() {
-        return title;
-    }
+    private String groupTitle;
 
+    @JsonProperty("attribute_id")
     @Schema(example = "1", description = "Attribute group ID")
-    public Long getGroupId() {
-        return groupId;
-    }
+    private Long attributeId;
 
     @Schema(example = "Довжина шерсті", description = "Attribute group title")
-    public String getGroupTitle() {
-        return groupTitle;
-    }
+    private String title;
 
+    @JsonProperty("sort_value")
     @Schema(example = "120", description = "Sort order")
-    public int getSortValue() {
-        return sortValue;
-    }
+    private int sortValue;
 
     @Override
     public String toString() {

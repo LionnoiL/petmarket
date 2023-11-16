@@ -15,6 +15,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import static org.petmarket.utils.MessageUtils.*;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+
 @Tag(name = "Review", description = "the reviews API")
 @Slf4j
 @RequiredArgsConstructor
@@ -26,17 +29,17 @@ public class ReviewAdminController {
 
     @Operation(summary = "Delete Review by ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Successful operation"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "204", description = SUCCESSFULLY_OPERATION),
+            @ApiResponse(responseCode = "401", description = UNAUTHORIZED, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             }),
-            @ApiResponse(responseCode = "403", description = "Forbidden", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "403", description = FORBIDDEN, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             }),
-            @ApiResponse(responseCode = "404", description = "Review not found", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "404", description = REVIEW_NOT_FOUND, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             })
     })
@@ -55,17 +58,17 @@ public class ReviewAdminController {
 
     @Operation(summary = "Delete all Review by advertisement ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Successful operation"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "204", description = SUCCESSFULLY_OPERATION),
+            @ApiResponse(responseCode = "401", description = UNAUTHORIZED, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             }),
-            @ApiResponse(responseCode = "403", description = "Forbidden", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "403", description = FORBIDDEN, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             }),
-            @ApiResponse(responseCode = "404", description = "Advertisement not found", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "404", description = ADVERTISEMENT_NOT_FOUND, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             })
     })
@@ -84,17 +87,17 @@ public class ReviewAdminController {
 
     @Operation(summary = "Delete all Review by user ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Successful operation"),
+            @ApiResponse(responseCode = "204", description = SUCCESSFULLY_OPERATION),
             @ApiResponse(responseCode = "401", description = "Unauthorized", content = {
-                    @Content(mediaType = "application/json", schema =
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             }),
             @ApiResponse(responseCode = "403", description = "Forbidden", content = {
-                    @Content(mediaType = "application/json", schema =
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             }),
             @ApiResponse(responseCode = "404", description = "User not found", content = {
-                    @Content(mediaType = "application/json", schema =
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             })
     })

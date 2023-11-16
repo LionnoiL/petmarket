@@ -7,14 +7,17 @@ import org.petmarket.advertisements.advertisement.entity.Advertisement;
 import org.petmarket.advertisements.advertisement.entity.AdvertisementTranslate;
 import org.petmarket.advertisements.attributes.mapper.AttributeTranslateMapper;
 import org.petmarket.advertisements.category.mapper.AdvertisementCategoryResponseTranslateMapper;
+import org.petmarket.breeds.mapper.BreedMapper;
 import org.petmarket.delivery.mapper.DeliveryResponseTranslateMapper;
 import org.petmarket.language.entity.Language;
+import org.petmarket.location.mapper.LocationMapper;
 import org.petmarket.options.service.OptionsService;
 import org.petmarket.payment.mapper.PaymentResponseTranslateMapper;
 import org.petmarket.translate.LanguageHolder;
 import org.petmarket.translate.TranslationService;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,6 +33,8 @@ public class AdvertisementResponseTranslateMapper {
     private final PaymentResponseTranslateMapper paymentMapper;
     private final DeliveryResponseTranslateMapper deliveryMapper;
     private final AttributeTranslateMapper attributeMapper;
+    private final LocationMapper locationMapper;
+    private final BreedMapper breedMapper;
 
     public AdvertisementResponseDto mapEntityToDto(Advertisement entity, Language language) {
         AdvertisementTranslate translation = (AdvertisementTranslate) translationService.getTranslate(
@@ -42,16 +47,22 @@ public class AdvertisementResponseTranslateMapper {
         dto.setDescription(translation.getDescription());
         dto.setLangCode(language.getLangCode());
         dto.setCategory(categoryMapper.mapEntityToDto(entity.getCategory(), language));
+        dto.setLocation(locationMapper.mapEntityToDto(entity.getLocation()));
         dto.setPayments(paymentMapper.mapEntityToDto(entity.getPayments(), language));
         dto.setDeliveries(deliveryMapper.mapEntityToDto(entity.getDeliveries(), language));
         dto.setAttributes(attributeMapper.mapEntityToDto(entity.getAttributes(), language));
+        //TODO after complete breed mapper
+        //dto.setBreed(breedMapper.toDto(entity.getBreed()));
 
         return dto;
     }
 
-    public List<AdvertisementResponseDto> mapEntityToDto(List<Advertisement> categories,
+    public List<AdvertisementResponseDto> mapEntityToDto(List<Advertisement> advertisements,
                                                          Language language) {
-        return categories.stream()
+        if (advertisements == null) {
+            return Collections.emptyList();
+        }
+        return advertisements.stream()
                 .map(p -> mapEntityToDto(p, language))
                 .toList();
     }

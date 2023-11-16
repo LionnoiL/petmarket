@@ -23,6 +23,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
 
+import static org.petmarket.utils.MessageUtils.*;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+
 @Tag(name = "Review", description = "the reviews API")
 @Slf4j
 @RequiredArgsConstructor
@@ -34,9 +37,9 @@ public class AdvertisementReviewController {
 
     @Operation(summary = "Get review by advertisement ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successful operation", content = {
+            @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
                     @Content(
-                            mediaType = "application/json",
+                            mediaType = APPLICATION_JSON_VALUE,
                             array = @ArraySchema(schema = @Schema(
                                     implementation = AdvertisementReviewResponseDto.class))
                     )
@@ -57,24 +60,24 @@ public class AdvertisementReviewController {
 
     @Operation(summary = "Add review to advertisement")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Successful operation", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "201", description = SUCCESSFULLY_OPERATION, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = AdvertisementReviewResponseDto.class))
             }),
-            @ApiResponse(responseCode = "400", description = "Some data is missing", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "400", description = BAD_REQUEST, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             }),
-            @ApiResponse(responseCode = "401", description = "Unauthorized", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "401", description = UNAUTHORIZED, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             }),
-            @ApiResponse(responseCode = "403", description = "Forbidden", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "403", description = FORBIDDEN, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             }),
-            @ApiResponse(responseCode = "404", description = "Advertisement not found", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "404", description = ADVERTISEMENT_NOT_FOUND, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             })
     })
@@ -88,7 +91,7 @@ public class AdvertisementReviewController {
             @PathVariable Long id,
             @RequestBody
             @Valid
-            @NotNull(message = "Request body is mandatory") final AdvertisementReviewRequestDto request,
+            @NotNull(message = REQUEST_BODY_IS_MANDATORY) final AdvertisementReviewRequestDto request,
             BindingResult bindingResult, Authentication authentication) {
         log.info("Received request to add review - {} to advertisement with id {}.", request, id);
         return advertisementService.addReview(id, request, bindingResult, authentication);

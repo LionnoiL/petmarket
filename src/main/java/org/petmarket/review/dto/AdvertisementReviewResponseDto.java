@@ -1,64 +1,50 @@
 package org.petmarket.review.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.*;
 import org.petmarket.review.entity.ReviewType;
 
 import java.time.LocalDate;
 
 @Setter
+@Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class AdvertisementReviewResponseDto {
 
     private Long id;
+
+    @Schema(example = "2023-10-17", description = "The date the advertisement review was created")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate created;
+
+    @Schema(example = "BUYER_TO_ADVERTISEMENT")
     private ReviewType type;
+
+    @Schema(example = "2")
     private int value;
+
+    @Schema(example = "Товар поганої якості")
     private String description;
+
+    @JsonProperty("advertisement_id")
+    @Schema(example = "1")
     private Long advertisementId;
+
+    @JsonProperty("author_first_name")
+    @Schema(example = "Andrii")
     private String authorFirstName;
+
+    @JsonProperty("author_last_name")
+    @Schema(example = "Haponov")
     private String authorLastName;
+
+    @JsonProperty("author_id")
+    @Schema(example = "120")
     private long authorId;
-
-    public String getAuthorFirstName() {
-        return authorFirstName;
-    }
-
-    public String getAuthorLastName() {
-        return authorLastName;
-    }
-
-    public long getAuthorId() {
-        return authorId;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public LocalDate getCreated() {
-        return created;
-    }
-
-    public ReviewType getType() {
-        return type;
-    }
-
-    public int getValue() {
-        return value;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public Long getAdvertisementId() {
-        return advertisementId;
-    }
 
     @Override
     public String toString() {

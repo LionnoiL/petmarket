@@ -11,6 +11,7 @@ import org.petmarket.translate.LanguageHolder;
 import org.petmarket.translate.TranslationService;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,9 +39,12 @@ public class AttributeGroupTranslateMapper {
         return dto;
     }
 
-    public List<AttributeGroupResponseDto> mapEntityToDto(List<AttributeGroup> categories,
+    public List<AttributeGroupResponseDto> mapEntityToDto(List<AttributeGroup> groups,
                                                           Language language) {
-        return categories.stream()
+        if (groups == null) {
+            return Collections.emptyList();
+        }
+        return groups.stream()
                 .map(p -> mapEntityToDto(p, language))
                 .toList();
     }

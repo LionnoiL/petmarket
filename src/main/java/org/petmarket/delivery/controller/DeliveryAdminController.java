@@ -23,6 +23,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
 
+import static org.petmarket.utils.MessageUtils.*;
+import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
+
 @Tag(name = "Delivery", description = "the delivery methods API")
 @Slf4j
 @RequiredArgsConstructor
@@ -34,29 +37,27 @@ public class DeliveryAdminController {
 
     @Operation(summary = "Create a new Delivery")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successful operation", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = DeliveryResponseDto.class))
             }),
-            @ApiResponse(responseCode = "400", description =
-                    "The Delivery has already been added " +
-                            "or some data is missing", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "400", description = BAD_REQUEST, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             }),
-            @ApiResponse(responseCode = "401", description = "Unauthorized", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "401", description = UNAUTHORIZED, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             }),
-            @ApiResponse(responseCode = "403", description = "Forbidden", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "403", description = FORBIDDEN, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             })
     })
     @PostMapping
     @ResponseBody
     public DeliveryResponseDto addDelivery(
-            @RequestBody @Valid @NotNull(message = "Request body is mandatory") final DeliveryRequestDto request,
+            @RequestBody @Valid @NotNull(message = REQUEST_BODY_IS_MANDATORY) final DeliveryRequestDto request,
             BindingResult bindingResult) {
         log.info("Received request to create Delivery - {}.", request);
         return deliveryService.addDelivery(request, bindingResult);
@@ -64,24 +65,24 @@ public class DeliveryAdminController {
 
     @Operation(summary = "Update Delivery by ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Successful operation", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "201", description = SUCCESSFULLY_OPERATION, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = DeliveryResponseDto.class))
             }),
-            @ApiResponse(responseCode = "400", description = "Some data is missing", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "400", description = BAD_REQUEST, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             }),
-            @ApiResponse(responseCode = "401", description = "Unauthorized", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "401", description = UNAUTHORIZED, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             }),
-            @ApiResponse(responseCode = "403", description = "Forbidden", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "403", description = FORBIDDEN, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             }),
-            @ApiResponse(responseCode = "404", description = "Language or Delivery not found", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "404", description = LANGUAGE_OR_DELIVERY_NOT_FOUND, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             })
     })
@@ -93,10 +94,10 @@ public class DeliveryAdminController {
             )
             @PathVariable Long id,
             @Parameter(description = "The Code Language of the Delivery to retrieve", required = true,
-                    schema = @Schema(type = "string")
+                    schema = @Schema(type = "string"), example = "ua"
             )
             @PathVariable String langCode,
-            @RequestBody @Valid @NotNull(message = "Request body is mandatory") final DeliveryRequestDto request,
+            @RequestBody @Valid @NotNull(message = REQUEST_BODY_IS_MANDATORY) final DeliveryRequestDto request,
             BindingResult bindingResult) {
         log.info("Received request to update delivery - {} with id {}.", request, id);
         return deliveryService.updateDelivery(id, langCode, request, bindingResult);
@@ -104,17 +105,17 @@ public class DeliveryAdminController {
 
     @Operation(summary = "Delete Delivery by ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Successful operation"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "204", description = SUCCESSFULLY_OPERATION),
+            @ApiResponse(responseCode = "401", description = UNAUTHORIZED, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             }),
-            @ApiResponse(responseCode = "403", description = "Forbidden", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "403", description = FORBIDDEN, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             }),
-            @ApiResponse(responseCode = "404", description = "Delivery not found", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "404", description = DELIVERY_NOT_FOUND, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             })
     })
@@ -133,12 +134,12 @@ public class DeliveryAdminController {
 
     @Operation(summary = "Get Delivery by ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successful operation", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = DeliveryResponseDto.class))
             }),
-            @ApiResponse(responseCode = "404", description = "Delivery or Language not found", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "404", description = LANGUAGE_OR_DELIVERY_NOT_FOUND, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             })
     })
@@ -150,7 +151,7 @@ public class DeliveryAdminController {
             )
             @PathVariable Long id,
             @Parameter(description = "The Code Language of the deliveries to retrieve", required = true,
-                    schema = @Schema(type = "string")
+                    schema = @Schema(type = "string"), example = "ua"
             )
             @PathVariable String langCode) {
         log.info("Received request to get the delivery with id - {}.", id);
@@ -161,9 +162,9 @@ public class DeliveryAdminController {
 
     @Operation(summary = "Get all deliveries.", description = "Obtaining all deliveries")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successful operation", content = {
+            @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
                     @Content(
-                            mediaType = "application/json",
+                            mediaType = APPLICATION_JSON_VALUE,
                             array = @ArraySchema(schema = @Schema(
                                     implementation = DeliveryResponseDto.class))
                     )
@@ -173,7 +174,7 @@ public class DeliveryAdminController {
     @ResponseBody
     public ResponseEntity<Collection<DeliveryResponseDto>> getAll(
             @Parameter(description = "The Code Language of the deliveries to retrieve", required = true,
-                    schema = @Schema(type = "string")
+                    schema = @Schema(type = "string"), example = "ua"
             )
             @PathVariable String langCode) {
         log.info("Received request to get all deliveries.");

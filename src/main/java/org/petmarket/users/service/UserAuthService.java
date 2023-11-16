@@ -38,6 +38,8 @@ import org.springframework.validation.BindingResult;
 
 import java.util.*;
 
+import static org.petmarket.utils.MessageUtils.*;
+
 @Slf4j
 @RequiredArgsConstructor
 @Service
@@ -65,7 +67,7 @@ public class UserAuthService {
 
         User user = userMapper.mapDtoRequestToDto(userRequestDto);
         Role roleUser = roleRepository.findByName("ROLE_USER").orElseThrow(() -> {
-            throw new ItemNotFoundException("Role not found");
+            throw new ItemNotFoundException(ROLE_NOT_FOUND);
         });
         List<Role> userRoles = new ArrayList<>();
         userRoles.add(roleUser);
@@ -93,7 +95,7 @@ public class UserAuthService {
             User user = userService.findByUsername(username);
 
             if (user == null) {
-                throw new UsernameNotFoundException("User with email: " + username + " not found");
+                throw new UsernameNotFoundException(ROLE_NOT_FOUND);
             }
 
             String accessToken = jwtTokenProvider.createToken(username, user.getRoles());
@@ -106,7 +108,7 @@ public class UserAuthService {
 
             return ResponseEntity.ok(response);
         } catch (AuthenticationException e) {
-            throw new BadCredentialsException("Invalid email or password");
+            throw new BadCredentialsException(INVALID_EMAIL_OR_PASSWORD);
         }
     }
 
@@ -115,7 +117,10 @@ public class UserAuthService {
         if (token != null && jwtTokenProvider.validateToken(token, false)) {
             Authentication auth = jwtTokenProvider.getAuthentication(token);
             JwtUser jwtUser = (JwtUser) auth.getPrincipal();
-            User user = userRepository.findByEmail(jwtUser.getEmail()).get();
+
+            User user = userRepository.findByEmail(jwtUser.getEmail()).orElseThrow(
+                    () -> new BadCredentialsException(USER_NOT_FOUND)
+            );
             String accessToken = jwtTokenProvider.createToken(user.getEmail(), user.getRoles());
             String refreshToken = jwtTokenProvider.createRefreshToken(user.getEmail(),
                     user.getRoles());
@@ -126,15 +131,15 @@ public class UserAuthService {
             return ResponseEntity.ok(jwtResponseDto);
         }
 
-        throw new BadCredentialsException("Invalid email or password");
+        throw new BadCredentialsException(INVALID_EMAIL_OR_PASSWORD);
     }
 
     public void sendResetPassword(String email) {
         if (email == null || email.isEmpty()) {
-            throw new ItemNotFoundException("User email not found");
+            throw new ItemNotFoundException(USER_NOT_FOUND);
         }
         User user = userRepository.findByEmail(email).orElseThrow(
-                () -> new ItemNotFoundException("User email not found")
+                () -> new ItemNotFoundException(USER_NOT_FOUND)
         );
         user.setEmailConfirmCode(UUID.randomUUID().toString());
         userRepository.save(user);
@@ -157,7 +162,7 @@ public class UserAuthService {
 
         User user = userRepository.findByEmailConfirmCode(
                 resetPasswordRequestDto.getVerificationCode()).orElseThrow(
-                () -> new ItemNotFoundException("Verification code not found")
+                () -> new ItemNotFoundException(VERIFICATION_CODE_NOT_FOUND)
         );
 
         user.setPassword(passwordEncoder.encode(resetPasswordRequestDto.getNewPassword()));

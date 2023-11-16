@@ -18,6 +18,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
 
+import static org.petmarket.utils.MessageUtils.ATTRIBUTE_NOT_FOUND;
+import static org.petmarket.utils.MessageUtils.SUCCESSFULLY_OPERATION;
+import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
+
 @Tag(name = "Attributes", description = "the advertisement attributes API")
 @Slf4j
 @RequiredArgsConstructor
@@ -29,12 +33,12 @@ public class AttributeController {
 
     @Operation(summary = "Get Attribute by ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successful operation", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = AttributeResponseDto.class))
             }),
-            @ApiResponse(responseCode = "404", description = "Attribute not found", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "404", description = ATTRIBUTE_NOT_FOUND, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             })
     })
@@ -46,7 +50,7 @@ public class AttributeController {
             )
             @PathVariable Long id,
             @Parameter(description = "The Code Language of the attributes to retrieve", required = true,
-                    schema = @Schema(type = "string")
+                    schema = @Schema(type = "string"), example = "ua"
             )
             @PathVariable String langCode) {
         log.info("Received request to get the attribute with id - {}.", id);
@@ -57,9 +61,9 @@ public class AttributeController {
 
     @Operation(summary = "Get Attributes by Attribute Group", description = "Obtaining attributes")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successful operation", content = {
+            @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
                     @Content(
-                            mediaType = "application/json",
+                            mediaType = APPLICATION_JSON_VALUE,
                             array = @ArraySchema(schema = @Schema(
                                     implementation = AttributeResponseDto.class))
                     )
@@ -73,7 +77,7 @@ public class AttributeController {
             )
             @PathVariable Long id,
             @Parameter(description = "The Code Language of the attributes to retrieve", required = true,
-                    schema = @Schema(type = "string")
+                    schema = @Schema(type = "string"), example = "ua"
             )
             @PathVariable String langCode) {
         log.info("Received request to get Attributes by group {}", id);

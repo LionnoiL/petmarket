@@ -11,6 +11,7 @@ import org.petmarket.translate.LanguageHolder;
 import org.petmarket.translate.TranslationService;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,6 +40,9 @@ public class PaymentResponseTranslateMapper {
 
     public List<PaymentResponseDto> mapEntityToDto(List<Payment> payments,
                                                    Language language) {
+        if (payments == null) {
+            return Collections.emptyList();
+        }
         return payments.stream()
                 .map(p -> mapEntityToDto(p, language))
                 .toList();

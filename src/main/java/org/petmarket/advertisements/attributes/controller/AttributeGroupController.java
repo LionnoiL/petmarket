@@ -18,6 +18,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
 
+import static org.petmarket.utils.MessageUtils.ATTRIBUTE_GROUP_NOT_FOUND;
+import static org.petmarket.utils.MessageUtils.SUCCESSFULLY_OPERATION;
+import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
+
 @Tag(name = "Attributes", description = "the advertisement attributes API")
 @Slf4j
 @RequiredArgsConstructor
@@ -29,9 +33,9 @@ public class AttributeGroupController {
 
     @Operation(summary = "Get all Attribute Groups.", description = "Obtaining all attribute groups")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successful operation", content = {
+            @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
                     @Content(
-                            mediaType = "application/json",
+                            mediaType = APPLICATION_JSON_VALUE,
                             array = @ArraySchema(schema = @Schema(
                                     implementation = AttributeGroupResponseDto.class))
                     )
@@ -41,7 +45,7 @@ public class AttributeGroupController {
     @ResponseBody
     public ResponseEntity<Collection<AttributeGroupResponseDto>> getAll(
             @Parameter(description = "The Code Language of the groups to retrieve", required = true,
-                    schema = @Schema(type = "string")
+                    schema = @Schema(type = "string"), example = "ua"
             )
             @PathVariable String langCode) {
         log.info("Received request to get all Groups.");
@@ -52,12 +56,12 @@ public class AttributeGroupController {
 
     @Operation(summary = "Get Attribute Group by ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successful operation", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = AttributeGroupResponseDto.class))
             }),
-            @ApiResponse(responseCode = "404", description = "Group not found", content = {
-                    @Content(mediaType = "application/json", schema =
+            @ApiResponse(responseCode = "404", description = ATTRIBUTE_GROUP_NOT_FOUND, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
                     @Schema(implementation = ErrorResponse.class))
             })
     })
@@ -69,7 +73,7 @@ public class AttributeGroupController {
             )
             @PathVariable Long id,
             @Parameter(description = "The Code Language of the groups to retrieve", required = true,
-                    schema = @Schema(type = "string")
+                    schema = @Schema(type = "string"), example = "ua"
             )
             @PathVariable String langCode) {
         log.info("Received request to get the group with id - {}.", id);
@@ -80,9 +84,9 @@ public class AttributeGroupController {
 
     @Operation(summary = "Get Attribute Groups by Category", description = "Obtaining attribute groups")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successful operation", content = {
+            @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
                     @Content(
-                            mediaType = "application/json",
+                            mediaType = APPLICATION_JSON_VALUE,
                             array = @ArraySchema(schema = @Schema(
                                     implementation = AttributeGroupResponseDto.class))
                     )
@@ -96,7 +100,7 @@ public class AttributeGroupController {
             )
             @PathVariable Long id,
             @Parameter(description = "The Code Language of the groups to retrieve", required = true,
-                    schema = @Schema(type = "string")
+                    schema = @Schema(type = "string"), example = "ua"
             )
             @PathVariable String langCode) {
         log.info("Received request to get Groups by category {}", id);
@@ -109,9 +113,9 @@ public class AttributeGroupController {
     @Operation(summary = "Get Attribute Groups for filter",
             description = "Obtaining a list of attribute groups used in filter construction")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successful operation", content = {
+            @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
                     @Content(
-                            mediaType = "application/json",
+                            mediaType = APPLICATION_JSON_VALUE,
                             array = @ArraySchema(schema = @Schema(
                                     implementation = AttributeGroupResponseDto.class))
                     )
@@ -121,7 +125,7 @@ public class AttributeGroupController {
     @ResponseBody
     public ResponseEntity<Collection<AttributeGroupResponseDto>> getForFilter(
             @Parameter(description = "The Code Language of the groups to retrieve", required = true,
-                    schema = @Schema(type = "string")
+                    schema = @Schema(type = "string"), example = "ua"
             )
             @PathVariable String langCode) {
         log.info("Received request to get Groups for filter");

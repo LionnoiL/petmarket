@@ -1,60 +1,41 @@
 package org.petmarket.pages.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.petmarket.pages.entity.SitePageType;
 
 import java.time.LocalDate;
 
 @Setter
+@Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class SitePageResponseDto {
 
-    private Long id;
-    private LocalDate created;
-    private LocalDate updated;
-    private SitePageType type;
-    private String langCode;
-    private String title;
-    private String description;
-
     @Schema(example = "1", description = "ID Page")
-    public Long getId() {
-        return id;
-    }
+    private Long id;
 
     @Schema(example = "2023-10-17", description = "The date the page was created")
-    public LocalDate getCreated() {
-        return created;
-    }
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    private LocalDate created;
 
     @Schema(example = "2023-10-17", description = "Page update date")
-    public LocalDate getUpdated() {
-        return updated;
-    }
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    private LocalDate updated;
 
     @Schema(example = "HOW_TO_SELL", description = "Page type")
-    public SitePageType getType() {
-        return type;
-    }
+    private SitePageType type;
 
     @Schema(example = "ua", description = "Page language")
-    public String getLangCode() {
-        return langCode;
-    }
+    @JsonProperty("lang_code")
+    private String langCode;
 
     @Schema(example = "Як безпечно купувати", description = "Page title")
-    public String getTitle() {
-        return title;
-    }
+    private String title;
 
     @Schema(example = "Стаття як безпечно купувати..", description = "Page description")
-    public String getDescription() {
-        return description;
-    }
+    private String description;
 }

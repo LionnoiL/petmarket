@@ -15,12 +15,13 @@ import org.springframework.stereotype.Service;
 import java.util.Comparator;
 import java.util.List;
 
+import static org.petmarket.utils.MessageUtils.COUNTRY_NOT_FOUND;
+
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class CountryService {
 
-    public static final String COUNTRY_NOT_FOUND_MESSAGE = "Country not found";
     private final CountryRepository countryRepository;
     private final CountryMapper countryMapper;
     private final StateMapper stateMapper;
@@ -46,6 +47,6 @@ public class CountryService {
 
     private Country getCountry(Long id) {
         return countryRepository.findById(id)
-                .orElseThrow(() -> new ItemNotFoundException(COUNTRY_NOT_FOUND_MESSAGE));
+                .orElseThrow(() -> new ItemNotFoundException(COUNTRY_NOT_FOUND));
     }
 }
