@@ -79,8 +79,8 @@ public class CategoryServiceImpl implements CategoryService {
                     .toList();
 
             for (CategoryTranslation translation : translations) {
-                translation.setCategoryName(requestDto.getTitle());
-                translation.setCategoryDescription(requestDto.getDescription());
+                translation.setTitle(requestDto.getTitle());
+                translation.setDescription(requestDto.getDescription());
             }
 
             categoryRepository.save(category);
@@ -122,8 +122,8 @@ public class CategoryServiceImpl implements CategoryService {
     private CategoryTranslation createTranslation(BlogPostCategoryRequestDto requestDto,
                                                   String langCode, BlogCategory category) {
         return CategoryTranslation.builder()
-                .categoryName(requestDto.getTitle())
-                .categoryDescription(requestDto.getDescription())
+                .title(requestDto.getTitle())
+                .description(requestDto.getDescription())
                 .blogCategory(category)
                 .language(languageService.getByLangCode(langCode)).build();
     }

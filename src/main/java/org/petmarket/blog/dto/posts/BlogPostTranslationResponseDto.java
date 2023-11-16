@@ -10,5 +10,5 @@ public class BlogPostTranslationResponseDto {
     @Schema(example = "Догляд за вівчаркою", description = "Назва блог посту")
     private String title;
     @Schema(example = "Вівчарок треба мити і вичісувати", description = "Текст блог посту")
-    private String text;
+    private String description;
 }

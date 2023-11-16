@@ -13,6 +13,12 @@ import java.util.List;
 public class BlogPostResponseDto {
     @Schema(example = "1", description = "Post Id")
     private Long id;
+    @Schema(example = "ua", description = "Код перекладу")
+    private String langCode;
+    @Schema(example = "Догляд за вівчаркою", description = "Назва блог посту")
+    private String title;
+    @Schema(example = "Вівчарок треба мити і вичісувати", description = "Текст блог посту")
+    private String description;
     @Schema(example = "admin@admin.com", description = "User email")
     private String userName;
     @Schema(example = "Bob", description = "User Name")
@@ -28,6 +34,5 @@ public class BlogPostResponseDto {
     private String alias;
     private List<BlogPostCategoryResponseDto> categories;
     private List<BlogPostCommentResponse> comments;
-    private List<BlogPostTranslationResponseDto> translations;
 
 }

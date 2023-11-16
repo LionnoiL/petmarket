@@ -68,7 +68,6 @@ public class BreedServiceImpl implements BreedService {
     public BreedResponseDto get(Long breedId, String langCode) {
         Breed breed = findBreedById(breedId);
         breed.setTranslations(getTranslation(breed, langCode));
-
         return breedMapper.toDto(breed);
     }
 

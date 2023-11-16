@@ -69,7 +69,7 @@ public class PostServiceImpl implements PostService {
         for (PostTranslations translation : post.getTranslations()) {
             if (translation.getLanguage().getLangCode().equals(checkedLang(langCode))) {
                 translation.setTitle(requestDto.getTitle());
-                translation.setText(requestDto.getText());
+                translation.setDescription(requestDto.getText());
                 translation.setShortText(truncateStringTo500Characters(requestDto.getText()));
             }
         }
@@ -108,7 +108,7 @@ public class PostServiceImpl implements PostService {
             PostTranslations translation = PostTranslations.builder()
                     .post(post)
                     .title(requestDto.getTitle())
-                    .text(requestDto.getText())
+                    .description(requestDto.getText())
                     .language(languageService.getByLangCode(langCode))
                     .shortText(truncateStringTo500Characters(requestDto.getText()))
                     .build();
@@ -170,7 +170,7 @@ public class PostServiceImpl implements PostService {
         return PostTranslations.builder()
                 .post(post)
                 .title(requestDto.getTitle())
-                .text(requestDto.getText())
+                .description(requestDto.getText())
                 .language(language)
                 .shortText(truncateStringTo500Characters(requestDto.getText()))
                 .build();
