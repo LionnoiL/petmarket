@@ -1,15 +1,6 @@
 package org.petmarket.advertisements.category.service;
 
-import static org.petmarket.utils.MessageUtils.CATEGORY_NOT_FOUND;
-import static org.petmarket.utils.MessageUtils.LANGUAGE_IS_PRESENT_IN_LIST;
-import static org.petmarket.utils.MessageUtils.LANGUAGE_NOT_FOUND;
-import static org.petmarket.utils.MessageUtils.NO_TRANSLATION;
-import static org.petmarket.utils.MessageUtils.PARENT_CATEGORY_CANNOT_IN_LIST;
-
 import jakarta.transaction.Transactional;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.advertisements.advertisement.repository.AdvertisementRepository;
@@ -22,6 +13,7 @@ import org.petmarket.advertisements.category.entity.AdvertisementCategoryTransla
 import org.petmarket.advertisements.category.mapper.AdvertisementCategoryMapper;
 import org.petmarket.advertisements.category.mapper.AdvertisementCategoryResponseTranslateMapper;
 import org.petmarket.advertisements.category.repository.AdvertisementCategoryRepository;
+import org.petmarket.advertisements.category.repository.AdvertisementCategoryTranslateRepository;
 import org.petmarket.errorhandling.ItemNotFoundException;
 import org.petmarket.errorhandling.ItemNotUpdatedException;
 import org.petmarket.language.entity.Language;
@@ -33,12 +25,19 @@ import org.petmarket.utils.TransliterateUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+
+import static org.petmarket.utils.MessageUtils.*;
+
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class AdvertisementCategoryService {
 
     private final AdvertisementCategoryRepository categoryRepository;
+    private final AdvertisementCategoryTranslateRepository categoryTranslateRepository;
     private final LanguageRepository languageRepository;
     private final AdvertisementRepository advertisementRepository;
     private final AdvertisementCategoryMapper categoryMapper;
@@ -209,5 +208,10 @@ public class AdvertisementCategoryService {
         return categoryRepository.findById(id).orElseThrow(() -> {
             throw new ItemNotFoundException(CATEGORY_NOT_FOUND);
         });
+    }
+
+    public Collection<AdvertisementCategoryResponseDto> getAllByJdbc(String langCode) {
+        getLanguage(langCode);
+        return categoryTranslateRepository.findAllByLanguage(langCode);
     }
 }
