@@ -14,6 +14,9 @@ public class BlogPostCommentResponse {
     private Long id;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime created;
+    @Schema(example = "Це дуже корисна інформація дякую ВАМ!", description = "Комментар до блог посту")
+    private String comment;
+    private CommentStatus status;
     @Schema(example = "1", description = "ID посту")
     @JsonProperty("post_id")
     private Long postId;
@@ -29,7 +32,4 @@ public class BlogPostCommentResponse {
     @Schema(example = "Alison", description = "Прізвище користувача")
     @JsonProperty("last_name")
     private String lastName;
-    @Schema(example = "Це дуже корисна інформація дякую ВАМ!", description = "Комментар до блог посту")
-    private String comment;
-    private CommentStatus status;
 }

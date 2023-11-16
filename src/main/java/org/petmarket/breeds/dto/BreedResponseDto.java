@@ -10,17 +10,17 @@ import java.time.LocalDateTime;
 public class BreedResponseDto {
     @Schema(description = "Breed Id", example = "1")
     private Long id;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime created;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime updated;
+    @Schema(description = "Translation lang-code", example = "ua")
+    @JsonProperty("lang_code")
+    private String langCode;
     @Schema(description = "Breed Title", example = "Вівчарка")
     private String title;
     @Schema(description = "Breed Description", example = "Гарна порода собак")
     private String description;
-    @Schema(description = "Translation lang-code", example = "ua")
-    @JsonProperty("lang_code")
-    private String langCode;
     @Schema (description = "Category Id", example = "1")
     private Long category;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime created;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime updated;
 }
