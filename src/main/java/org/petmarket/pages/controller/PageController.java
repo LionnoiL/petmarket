@@ -97,7 +97,7 @@ public class PageController {
     @GetMapping("/{langCode}/type/{pageType}")
     @ResponseBody
     public SitePageResponseDto getPageByType(
-            @Parameter(description = "The TYPE of the page to retrieve. (HOW_TO_BUY, HOW_TO_SELL, ABOUT)",
+            @Parameter(description = "The TYPE of the page to retrieve.",
                     required = true
             )
             @PathVariable SitePageType pageType,
