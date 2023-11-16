@@ -109,8 +109,10 @@ public class SitePageService {
 
     public SitePageResponseDto findByType(SitePageType pageType, String langCode) {
         Language language = getLanguage(langCode);
-        SitePage sitePage = pageRepository.findByType(pageType);
-
+        SitePage sitePage = pageRepository.findByType(pageType)
+                .orElseThrow(
+                        () -> new ItemNotFoundException(PAGE_NOT_FOUND)
+                );
         return sitePageResponseTranslateMapper.mapEntityToDto(sitePage, language);
     }
 
