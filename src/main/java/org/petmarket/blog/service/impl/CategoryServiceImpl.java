@@ -11,6 +11,7 @@ import org.petmarket.blog.repository.CategoryRepository;
 import org.petmarket.blog.service.CategoryService;
 import org.petmarket.errorhandling.ItemNotFoundException;
 import org.petmarket.errorhandling.ItemNotUpdatedException;
+import org.petmarket.language.entity.Language;
 import org.petmarket.language.service.LanguageService;
 import org.petmarket.options.service.OptionsService;
 import org.springframework.data.domain.Pageable;
@@ -37,24 +38,19 @@ public class CategoryServiceImpl implements CategoryService {
                 blogCategory));
         blogCategory.setTranslations(translations);
         categoryRepository.save(blogCategory);
-        return mapper.categoryToDto(blogCategory);
+        return mapper.toDto(blogCategory, optionsService.getDefaultSiteLanguage());
     }
 
     @Override
     public BlogPostCategoryResponseDto get(Long categoryId, String langCode) {
         BlogCategory category = getBlogCategory(categoryId);
-        category.setTranslations(getTranslation(categoryId, langCode));
-        return mapper.categoryToDto(category);
+        return mapper.toDto(category, checkedLang(langCode));
     }
 
     @Override
     public List<BlogPostCategoryResponseDto> getAll(Pageable pageable, String langCode) {
         return categoryRepository.findAll(pageable).stream()
-                .map(category -> {
-                    category.setTranslations(getTranslation(category.getId(), langCode));
-                    return category;
-                })
-                .map(mapper::categoryToDto)
+                .map(c -> mapper.toDto(c, checkedLang(langCode)))
                 .toList();
     }
 
@@ -69,18 +65,20 @@ public class CategoryServiceImpl implements CategoryService {
     public BlogPostCategoryResponseDto updateById(Long categoryId,
                                                   String langCode,
                                                   BlogPostCategoryRequestDto requestDto) {
+
         BlogCategory category = getBlogCategory(categoryId);
 
-        boolean langCodeExist = category.getTranslations().stream()
-                .anyMatch(translation -> translation.getLanguage().getLangCode().equals(checkedLang(langCode)));
-        if (langCodeExist) {
+        boolean isLangCodeExist = category.getTranslations().stream()
+                .anyMatch(t -> t.getLanguage().getLangCode().equals(checkedLang(langCode).getLangCode()));
+
+        if (isLangCodeExist) {
             List<CategoryTranslation> translations = category.getTranslations().stream()
-                    .filter(translation -> translation.getLanguage().getLangCode().equals(checkedLang(langCode)))
+                    .filter(t -> t.getLanguage().getLangCode().equals(checkedLang(langCode).getLangCode()))
                     .toList();
 
             for (CategoryTranslation translation : translations) {
-                translation.setCategoryName(requestDto.getTitle());
-                translation.setCategoryDescription(requestDto.getDescription());
+                translation.setTitle(requestDto.getTitle());
+                translation.setDescription(requestDto.getDescription());
             }
 
             categoryRepository.save(category);
@@ -90,7 +88,7 @@ public class CategoryServiceImpl implements CategoryService {
                     + ". Create translation first");
         }
 
-        return mapper.categoryToDto(category);
+        return mapper.toDto(category, checkedLang(langCode));
     }
 
     @Override
@@ -109,40 +107,27 @@ public class CategoryServiceImpl implements CategoryService {
         List<CategoryTranslation> translations = category.getTranslations();
         if (translations.stream()
                 .anyMatch(t -> t.getLanguage().getLangCode()
-                        .equals(checkedLang(langCode)))) {
+                        .equals(checkedLang(langCode).getLangCode()))) {
             throw new ItemNotUpdatedException(langCode + " translation is already exist");
         } else {
             translations.add(createTranslation(requestDto, langCode, category));
             category.setTranslations(translations);
             categoryRepository.save(category);
         }
-        return mapper.categoryToDto(category);
+        return mapper.toDto(category, checkedLang(langCode));
     }
 
     private CategoryTranslation createTranslation(BlogPostCategoryRequestDto requestDto,
                                                   String langCode, BlogCategory category) {
         return CategoryTranslation.builder()
-                .categoryName(requestDto.getTitle())
-                .categoryDescription(requestDto.getDescription())
+                .title(requestDto.getTitle())
+                .description(requestDto.getDescription())
                 .blogCategory(category)
                 .language(languageService.getByLangCode(langCode)).build();
     }
 
-    private String checkedLang(String langCode) {
-        return languageService.getByLangCode(langCode).getLangCode();
+    private Language checkedLang(String langCode) {
+        return languageService.getByLangCode(langCode);
     }
 
-    private List<CategoryTranslation> getTranslation(Long categoryId, String langCode) {
-        List<CategoryTranslation> translations = getBlogCategory(categoryId).getTranslations().stream()
-                .filter(t -> t.getLanguage().getLangCode().equals(checkedLang(langCode)))
-                .toList();
-
-        if (translations.isEmpty()) {
-            translations = getBlogCategory(categoryId).getTranslations().stream()
-                    .filter(postTranslations -> postTranslations.getLanguage().getLangCode().equals(
-                            optionsService.getDefaultSiteLanguage().getLangCode()))
-                    .toList();
-        }
-        return translations;
-    }
 }

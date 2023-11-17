@@ -28,7 +28,7 @@ public class PostTranslations {
     private String shortText;
     @NotNull
     @Column(name = "text")
-    private String text;
+    private String description;
     @ManyToOne
     @JoinColumn(name = "owner_id", nullable = false)
     private Post post;

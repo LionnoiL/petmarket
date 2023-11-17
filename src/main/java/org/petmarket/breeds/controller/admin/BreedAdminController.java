@@ -13,6 +13,8 @@ import org.petmarket.breeds.service.BreedService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import static org.petmarket.utils.MessageUtils.*;
+
 @RestController
 @RequestMapping("/v1/admin/breeds")
 @RequiredArgsConstructor
@@ -24,9 +26,9 @@ public class BreedAdminController {
             summary = "Save Breed",
             description = "Save a new breed.",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Successfully saved"),
-                    @ApiResponse(responseCode = "400", description = "Bad request"),
-                    @ApiResponse(responseCode = "500", description = "Internal server error")
+                    @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION),
+                    @ApiResponse(responseCode = "400", description = BAD_REQUEST),
+                    @ApiResponse(responseCode = "500", description = SERVER_ERROR)
             }
     )
     @PostMapping
@@ -43,10 +45,10 @@ public class BreedAdminController {
             summary = "Add Translation",
             description = "Add a translation for a breed.",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Translation added successfully"),
-                    @ApiResponse(responseCode = "400", description = "Bad request"),
-                    @ApiResponse(responseCode = "404", description = "Breed not found"),
-                    @ApiResponse(responseCode = "500", description = "Internal server error")
+                    @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION),
+                    @ApiResponse(responseCode = "400", description = BAD_REQUEST),
+                    @ApiResponse(responseCode = "404", description = NOT_FOUND),
+                    @ApiResponse(responseCode = "500", description = SERVER_ERROR)
             },
             parameters = {
                     @Parameter(name = "breedId", description = "Breed Id", example = "1"),
@@ -69,11 +71,10 @@ public class BreedAdminController {
             summary = "Update a breed by ID and language code",
             description = "Updates a breed with the specified ID and language code",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Breed successfully updated"),
-                    @ApiResponse(responseCode = "400",
-                            description = "Bad request, e.g., invalid breed ID or language code"),
-                    @ApiResponse(responseCode = "404", description = "Breed not found"),
-                    @ApiResponse(responseCode = "500", description = "Internal server error")
+                    @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION),
+                    @ApiResponse(responseCode = "400", description = BAD_REQUEST),
+                    @ApiResponse(responseCode = "404", description = NOT_FOUND),
+                    @ApiResponse(responseCode = "500", description = SERVER_ERROR)
             },
             parameters = {
                     @Parameter(name = "breedId", example = "1", required = true),
@@ -96,9 +97,9 @@ public class BreedAdminController {
             summary = "Delete a breed",
             description = "Delete a breed by ID",
             responses = {
-                    @ApiResponse(responseCode = "204", description = "Breed deleted successfully"),
-                    @ApiResponse(responseCode = "404", description = "Breed not found"),
-                    @ApiResponse(responseCode = "500", description = "Internal server error")
+                    @ApiResponse(responseCode = "204", description = SUCCESSFULLY_DELETED),
+                    @ApiResponse(responseCode = "404", description = NOT_FOUND),
+                    @ApiResponse(responseCode = "500", description = SERVER_ERROR)
             },
             parameters = {
                     @Parameter(name = "breedId", description = "Breed Id", example = "1", required = true)

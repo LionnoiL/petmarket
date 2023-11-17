@@ -3,7 +3,6 @@ package org.petmarket.breeds.service.impl;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.petmarket.advertisements.category.service.AdvertisementCategoryService;
-import org.petmarket.blog.entity.CommentStatus;
 import org.petmarket.breeds.dto.BreedRequestDto;
 import org.petmarket.breeds.dto.BreedResponseDto;
 import org.petmarket.breeds.entity.Breed;
@@ -42,7 +41,7 @@ public class BreedServiceImpl implements BreedService {
         breed.setTranslations(translatioinsList);
         breed.setCategory(categoryService.findCategory(requestDto.getCategoryId()));
         breedRepository.save(breed);
-        return breedMapper.toDto(breed);
+        return breedMapper.toDto(breed, optionsService.getDefaultSiteLanguage());
     }
 
     @Override
@@ -51,7 +50,7 @@ public class BreedServiceImpl implements BreedService {
         Breed breed = findBreedById(breedId);
         List<BreedTranslation> breedTranslations = breed.getTranslations();
         if (breedTranslations.stream()
-                .anyMatch(t -> t.getLanguage().getLangCode().equals(checkedLang(langCode)))) {
+                .anyMatch(t -> t.getLanguage().getLangCode().equals(checkedLang(langCode).getLangCode()))) {
             throw new ItemNotUpdatedException(langCode + " translation is already exist");
         } else {
             BreedTranslation newTranslation = createTranslation(
@@ -62,18 +61,13 @@ public class BreedServiceImpl implements BreedService {
             breed.setTranslations(breedTranslations);
             breedRepository.save(breed);
         }
-        return breedMapper.toDto(breed);
+        return breedMapper.toDto(breed, checkedLang(langCode));
     }
 
     @Override
     public BreedResponseDto get(Long breedId, String langCode) {
         Breed breed = findBreedById(breedId);
-        breed.setTranslations(getTranslation(breed, langCode));
-        breed.setComments(breed.getComments().stream()
-                .filter(comment -> comment.getStatus().equals(CommentStatus.APPROVED))
-                .toList());
-
-        return breedMapper.toDto(breed);
+        return breedMapper.toDto(breed, checkedLang(langCode));
     }
 
     @Override
@@ -91,7 +85,7 @@ public class BreedServiceImpl implements BreedService {
             addTranslation(breedId, langCode, requestDto);
         } else {
             List<BreedTranslation> updatedTranslations = breed.getTranslations().stream()
-                    .filter(t -> t.getLanguage().getLangCode().equals(checkedLang(langCode)))
+                    .filter(t -> t.getLanguage().getLangCode().equals(checkedLang(langCode).getLangCode()))
                     .map(translation -> {
                         translation.setTitle(requestDto.getTitle());
                         translation.setDescription(requestDto.getDescription());
@@ -103,25 +97,7 @@ public class BreedServiceImpl implements BreedService {
             breedRepository.save(breed);
 
         }
-        return breedMapper.toDto(breed);
-    }
-
-    private String checkedLang(String langCode) {
-        return languageService.getByLangCode(langCode).getLangCode();
-    }
-
-    private List<BreedTranslation> getTranslation(Breed breed, String langCode) {
-        List<BreedTranslation> translations = breed.getTranslations().stream()
-                .filter(t -> t.getLanguage().getLangCode().equals(checkedLang(langCode)))
-                .toList();
-
-        if (translations.isEmpty()) {
-            translations = breed.getTranslations().stream()
-                    .filter(postTranslations -> postTranslations.getLanguage().getLangCode().equals(
-                            optionsService.getDefaultSiteLanguage().getLangCode()))
-                    .toList();
-        }
-        return translations;
+        return breedMapper.toDto(breed, checkedLang(langCode));
     }
 
     public Breed findBreedById(Long breedId) {
@@ -141,13 +117,9 @@ public class BreedServiceImpl implements BreedService {
         return allBreeds.stream()
                 .map(breed -> {
                     breed.setCategory(breed.getCategory());
-                    breed.setComments(breed.getComments().stream()
-                            .filter(breedComment -> breedComment.getStatus().equals(CommentStatus.APPROVED))
-                            .toList());
-                    breed.setTranslations(getTranslation(breed, langCode));
                     return breed;
                 })
-                .map(breedMapper::toDto)
+                .map(b -> breedMapper.toDto(b, checkedLang(langCode)))
                 .toList();
     }
 
@@ -162,5 +134,9 @@ public class BreedServiceImpl implements BreedService {
 
     private List<Breed> findAllByBreedCategoryId(Long categoryId) {
         return breedRepository.findBreedByCategoryId(categoryId);
+    }
+
+    private Language checkedLang(String langCode) {
+        return languageService.getByLangCode(langCode);
     }
 }

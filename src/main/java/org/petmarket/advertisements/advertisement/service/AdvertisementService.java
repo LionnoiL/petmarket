@@ -85,7 +85,7 @@ public class AdvertisementService {
         );
         advertisement.setAuthor(getUserByEmail(authentication.getName()));
         advertisement.setStatus(AdvertisementStatus.NO_ACTIVE);
-
+        //setter
         fillDateEnding(advertisement);
         fillCategory(advertisement, request);
         fillBreed(advertisement, request);

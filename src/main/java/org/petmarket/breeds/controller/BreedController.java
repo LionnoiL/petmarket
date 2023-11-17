@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static org.petmarket.utils.MessageUtils.*;
+
 @RestController
 @RequestMapping("/v1/breeds")
 @RequiredArgsConstructor
@@ -22,8 +24,8 @@ public class BreedController {
             summary = "Get Breed",
             description = "Get information about a breed.",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Successfully retrieved breed"),
-                    @ApiResponse(responseCode = "404", description = "Breed not found")
+                    @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION),
+                    @ApiResponse(responseCode = "404", description = NOT_FOUND)
             },
             parameters = {
                     @Parameter(name = "breedId", description = "breed id", example = "1"),
@@ -39,10 +41,10 @@ public class BreedController {
             summary = "Get All Breeds",
             description = "Get a list of all breeds.",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Successfully retrieved breeds"),
-                    @ApiResponse(responseCode = "400", description = "Bad Request"),
-                    @ApiResponse(responseCode = "404", description = "Not Found"),
-                    @ApiResponse(responseCode = "500", description = "Internal Server Error")
+                    @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION),
+                    @ApiResponse(responseCode = "400", description = BAD_REQUEST),
+                    @ApiResponse(responseCode = "404", description = NOT_FOUND),
+                    @ApiResponse(responseCode = "500", description = SERVER_ERROR)
             },
             parameters = {
                     @Parameter(name = "langCode", description = "Code of language", example = "ua"),

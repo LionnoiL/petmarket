@@ -13,6 +13,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import static org.petmarket.utils.MessageUtils.*;
+import static org.petmarket.utils.MessageUtils.SERVER_ERROR;
+
 @RestController
 @RequestMapping("/v1/blog/comments")
 @RequiredArgsConstructor
@@ -24,11 +27,11 @@ public class CommentController {
             summary = "Create a new comment for a blog post",
             description = "Create a new comment for a specific blog post",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Comment created successfully"),
-                    @ApiResponse(responseCode = "400", description = "Invalid input data"),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
-                    @ApiResponse(responseCode = "404", description = "Post not found"),
-                    @ApiResponse(responseCode = "500", description = "Internal server error")
+                    @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION),
+                    @ApiResponse(responseCode = "400", description = BAD_REQUEST),
+                    @ApiResponse(responseCode = "401", description = UNAUTHORIZED),
+                    @ApiResponse(responseCode = "404", description = NOT_FOUND),
+                    @ApiResponse(responseCode = "500", description = SERVER_ERROR)
             },
             parameters = {
                     @Parameter(

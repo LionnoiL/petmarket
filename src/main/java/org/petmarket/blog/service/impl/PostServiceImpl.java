@@ -40,19 +40,17 @@ public class PostServiceImpl implements PostService {
     @Override
     public BlogPostResponseDto get(Long id, String langCode) {
         Post post = findById(id);
-        post.setCategories(getFilteredCategories(post, langCode));
-        post.setTranslations(getTranslation(id, langCode));
         post.setComments(post.getComments().stream()
                 .filter(comment -> comment.getStatus().equals(CommentStatus.APPROVED))
                 .toList());
-        return postMapper.toDto(post);
+        return postMapper.toDto(post, checkedLang(langCode));
     }
 
     @Override
     public List<BlogPostResponseDto> getAll(Pageable pageable, String langCode) {
 
         return postRepository.findAll(pageable).stream()
-                .map(postMapper::toDto)
+                .map(post -> postMapper.toDto(post, checkedLang(langCode)))
                 .toList();
     }
 
@@ -67,14 +65,14 @@ public class PostServiceImpl implements PostService {
     public BlogPostResponseDto updateById(Long id, String langCode, BlogPostRequestDto requestDto) {
         Post post = findById(id);
         for (PostTranslations translation : post.getTranslations()) {
-            if (translation.getLanguage().getLangCode().equals(checkedLang(langCode))) {
+            if (translation.getLanguage().getLangCode().equals(checkedLang(langCode).getLangCode())) {
                 translation.setTitle(requestDto.getTitle());
-                translation.setText(requestDto.getText());
+                translation.setDescription(requestDto.getText());
                 translation.setShortText(truncateStringTo500Characters(requestDto.getText()));
             }
         }
         postRepository.save(post);
-        return postMapper.toDto(post);
+        return postMapper.toDto(post, checkedLang(langCode));
     }
 
     @Override
@@ -90,7 +88,7 @@ public class PostServiceImpl implements PostService {
                                         Authentication authentication) {
         Post post = createPost(requestDto, authentication);
         postRepository.save(post);
-        return postMapper.toDto(post);
+        return postMapper.toDto(post, optionsService.getDefaultSiteLanguage());
     }
 
     @Transactional
@@ -102,13 +100,13 @@ public class PostServiceImpl implements PostService {
         List<PostTranslations> translations = post.getTranslations();
         if (translations.stream()
                 .anyMatch(t -> t.getLanguage().getLangCode()
-                        .equals(checkedLang(langCode)))) {
+                        .equals(checkedLang(langCode).getLangCode()))) {
             throw new ItemNotUpdatedException(langCode + " translation already exist");
         } else {
             PostTranslations translation = PostTranslations.builder()
                     .post(post)
                     .title(requestDto.getTitle())
-                    .text(requestDto.getText())
+                    .description(requestDto.getText())
                     .language(languageService.getByLangCode(langCode))
                     .shortText(truncateStringTo500Characters(requestDto.getText()))
                     .build();
@@ -116,7 +114,7 @@ public class PostServiceImpl implements PostService {
             post.setTranslations(translations);
             postRepository.save(post);
         }
-        return postMapper.toDto(post);
+        return postMapper.toDto(post, checkedLang(langCode));
     }
 
     @Override
@@ -132,14 +130,12 @@ public class PostServiceImpl implements PostService {
         return allPosts.stream()
                 .filter(post -> post.getStatus().equals(Post.Status.PUBLISHED))
                 .map(post -> {
-                    post.setCategories(getFilteredCategories(post, langCode));
                     post.setComments(post.getComments().stream()
                             .filter(blogComment -> blogComment.getStatus().equals(CommentStatus.APPROVED))
                             .toList());
-                    post.setTranslations(getTranslation(post.getId(), langCode));
                     return post;
                 })
-                .map(postMapper::toDto)
+                .map(post -> postMapper.toDto(post, checkedLang(langCode)))
                 .toList();
     }
 
@@ -149,7 +145,7 @@ public class PostServiceImpl implements PostService {
         Post post = findById(postId);
         post.setStatus(status);
         postRepository.save(post);
-        return postMapper.toDto(post);
+        return postMapper.toDto(post, optionsService.getDefaultSiteLanguage());
     }
 
     @Transactional
@@ -170,7 +166,7 @@ public class PostServiceImpl implements PostService {
         return PostTranslations.builder()
                 .post(post)
                 .title(requestDto.getTitle())
-                .text(requestDto.getText())
+                .description(requestDto.getText())
                 .language(language)
                 .shortText(truncateStringTo500Characters(requestDto.getText()))
                 .build();
@@ -206,38 +202,11 @@ public class PostServiceImpl implements PostService {
         return post;
     }
 
-    private String checkedLang(String langCode) {
-        return languageService.getByLangCode(langCode).getLangCode();
+    private Language checkedLang(String langCode) {
+        return languageService.getByLangCode(langCode);
     }
 
     private List<Post> findAllByBlogCategoryId(Long categoryId, Pageable pageable) {
         return postRepository.findPostsByCategoryId(categoryId, pageable);
-    }
-
-    private List<BlogCategory> getFilteredCategories(Post post, String langCode) {
-        return post.getCategories().stream()
-                .map(category -> {
-                    List<CategoryTranslation> translations = category.getTranslations().stream()
-                            .filter(c -> c.getLanguage().getLangCode().equals(checkedLang(langCode)))
-                            .toList();
-                    category.setTranslations(translations);
-                    return category;
-                })
-                .filter(category -> !category.getTranslations().isEmpty())
-                .toList();
-    }
-
-    private List<PostTranslations> getTranslation(Long postId, String langCode) {
-        List<PostTranslations> translations = findById(postId).getTranslations().stream()
-                .filter(t -> t.getLanguage().getLangCode().equals(checkedLang(langCode)))
-                .toList();
-
-        if (translations.isEmpty()) {
-            translations = findById(postId).getTranslations().stream()
-                    .filter(postTranslations -> postTranslations.getLanguage().getLangCode().equals(
-                            optionsService.getDefaultSiteLanguage().getLangCode()))
-                    .toList();
-        }
-        return translations;
     }
 }
