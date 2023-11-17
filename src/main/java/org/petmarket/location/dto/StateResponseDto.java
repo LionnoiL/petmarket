@@ -27,4 +27,8 @@ public class StateResponseDto {
     @Schema(example = "Україна", description = "Country name")
     @JsonProperty("country_name")
     private String countryName;
+
+    @Schema(example = "5100000000")
+    @JsonProperty("koatuu_code")
+    private String koatuuCode;
 }

@@ -25,4 +25,8 @@ public class CityRequestDto {
             = "Name must be between 1 and 250 characters")
     @Schema(example = "Подільськ", description = "City name")
     private String name;
+
+    @Schema(example = "5111200000")
+    @JsonProperty("koatuu_code")
+    private String koatuuCode;
 }
