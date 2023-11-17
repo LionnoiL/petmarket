@@ -51,8 +51,7 @@ public class AdvertisementResponseTranslateMapper {
         dto.setPayments(paymentMapper.mapEntityToDto(entity.getPayments(), language));
         dto.setDeliveries(deliveryMapper.mapEntityToDto(entity.getDeliveries(), language));
         dto.setAttributes(attributeMapper.mapEntityToDto(entity.getAttributes(), language));
-        //TODO after complete breed mapper
-        //dto.setBreed(breedMapper.toDto(entity.getBreed()));
+        dto.setBreed(breedMapper.toDto(entity.getBreed(), language));
 
         return dto;
     }
