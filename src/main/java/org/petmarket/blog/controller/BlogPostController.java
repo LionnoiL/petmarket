@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static org.petmarket.utils.MessageUtils.*;
+
 @RestController
 @RequestMapping("/v1/blog")
 @RequiredArgsConstructor
@@ -24,9 +26,9 @@ public class BlogPostController {
     @Operation(
             summary = "Get a specific blog post by ID and language code",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "OK - Blog post found and returned"),
-                    @ApiResponse(responseCode = "404", description = "Not Found - Blog post not found"),
-                    @ApiResponse(responseCode = "500", description = "Internal Server Error")
+                    @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION),
+                    @ApiResponse(responseCode = "404", description = NOT_FOUND),
+                    @ApiResponse(responseCode = "500", description = SERVER_ERROR)
             },
             parameters = {
                     @Parameter(
@@ -53,8 +55,8 @@ public class BlogPostController {
     @Operation(
             summary = "Get all blog posts by language code and category (if specified)",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "OK - Blog posts found and returned"),
-                    @ApiResponse(responseCode = "500", description = "Internal Server Error")
+                    @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION),
+                    @ApiResponse(responseCode = "500", description = SERVER_ERROR)
             },
             parameters = {
                     @Parameter(

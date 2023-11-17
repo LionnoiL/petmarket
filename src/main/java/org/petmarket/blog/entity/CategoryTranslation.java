@@ -23,10 +23,10 @@ public class CategoryTranslation {
     private Language language;
     @NotNull
     @Column(name = "category_name")
-    private String categoryName;
+    private String title;
     @NotNull
     @Column(name = "category_description")
-    private String categoryDescription;
+    private String description;
     @ManyToOne
     @JoinColumn(name = "owner_id", nullable = false)
     private BlogCategory blogCategory;
