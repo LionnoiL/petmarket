@@ -18,7 +18,8 @@ public class BreedResponseDto {
     @Schema(description = "Breed Description", example = "Гарна порода собак")
     private String description;
     @Schema (description = "Category Id", example = "1")
-    private Long category;
+    @JsonProperty("category_id")
+    private Long categoryId;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime created;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")

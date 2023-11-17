@@ -41,7 +41,7 @@ public class BreedServiceImpl implements BreedService {
         breed.setTranslations(translatioinsList);
         breed.setCategory(categoryService.findCategory(requestDto.getCategoryId()));
         breedRepository.save(breed);
-        return breedMapper.toDto(breed, optionsService.getDefaultSiteLanguage().getLangCode());
+        return breedMapper.toDto(breed, optionsService.getDefaultSiteLanguage());
     }
 
     @Override
@@ -50,7 +50,7 @@ public class BreedServiceImpl implements BreedService {
         Breed breed = findBreedById(breedId);
         List<BreedTranslation> breedTranslations = breed.getTranslations();
         if (breedTranslations.stream()
-                .anyMatch(t -> t.getLanguage().getLangCode().equals(checkedLang(langCode)))) {
+                .anyMatch(t -> t.getLanguage().getLangCode().equals(checkedLang(langCode).getLangCode()))) {
             throw new ItemNotUpdatedException(langCode + " translation is already exist");
         } else {
             BreedTranslation newTranslation = createTranslation(
@@ -85,7 +85,7 @@ public class BreedServiceImpl implements BreedService {
             addTranslation(breedId, langCode, requestDto);
         } else {
             List<BreedTranslation> updatedTranslations = breed.getTranslations().stream()
-                    .filter(t -> t.getLanguage().getLangCode().equals(checkedLang(langCode)))
+                    .filter(t -> t.getLanguage().getLangCode().equals(checkedLang(langCode).getLangCode()))
                     .map(translation -> {
                         translation.setTitle(requestDto.getTitle());
                         translation.setDescription(requestDto.getDescription());
@@ -119,7 +119,7 @@ public class BreedServiceImpl implements BreedService {
                     breed.setCategory(breed.getCategory());
                     return breed;
                 })
-                .map(b -> breedMapper.toDto(b, langCode))
+                .map(b -> breedMapper.toDto(b, checkedLang(langCode)))
                 .toList();
     }
 
@@ -136,7 +136,7 @@ public class BreedServiceImpl implements BreedService {
         return breedRepository.findBreedByCategoryId(categoryId);
     }
 
-    private String checkedLang(String langCode) {
-        return languageService.getByLangCode(langCode).getLangCode();
+    private Language checkedLang(String langCode) {
+        return languageService.getByLangCode(langCode);
     }
 }

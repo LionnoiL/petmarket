@@ -22,6 +22,9 @@ public class BlogPostResponseDto {
     private String title;
     @Schema(example = "Вівчарок треба мити і вичісувати", description = "Текст блог посту")
     private String description;
+    @Schema(example = "Вівчарок треба мити і вичісувати...", description = "Текст блог посту до 500 символів")
+    @JsonProperty("short_text")
+    private String shortText;
     @Schema(example = "3", description = "Time to read")
     @JsonProperty("reading_minutes")
     private int readingMinutes;
