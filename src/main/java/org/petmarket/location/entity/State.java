@@ -1,9 +1,10 @@
 package org.petmarket.location.entity;
 
 import jakarta.persistence.*;
+import lombok.*;
+
 import java.util.HashSet;
 import java.util.Set;
-import lombok.*;
 
 @Entity
 @Table(name = "states")
@@ -23,6 +24,9 @@ public class State {
 
     @Column(name = "alias", nullable = false)
     private String alias;
+
+    @Column(name = "koatuu_code", nullable = false)
+    private String koatuuCode;
 
     @ManyToOne
     @JoinColumn(name = "country_id")

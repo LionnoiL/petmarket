@@ -22,6 +22,9 @@ public class City {
     @Column(name = "alias", nullable = false)
     private String alias;
 
+    @Column(name = "koatuu_code", nullable = false)
+    private String koatuuCode;
+
     @ManyToOne
     @JoinColumn(name = "state_id")
     private State state;

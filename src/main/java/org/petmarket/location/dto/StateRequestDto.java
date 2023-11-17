@@ -28,4 +28,8 @@ public class StateRequestDto {
             = "Name must be between 1 and 250 characters")
     @Schema(example = "Одеська область", description = "State name")
     private String name;
+
+    @Schema(example = "5100000000")
+    @JsonProperty("koatuu_code")
+    private String koatuuCode;
 }
