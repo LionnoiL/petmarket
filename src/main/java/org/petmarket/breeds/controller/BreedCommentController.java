@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static org.petmarket.utils.MessageUtils.*;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v1/breeds/comments")
@@ -31,8 +33,8 @@ public class BreedCommentController {
             summary = "Add Comment (any user)",
             description = "Add a comment to a breed.",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Comment added successfully"),
-                    @ApiResponse(responseCode = "400", description = "Bad request")
+                    @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION),
+                    @ApiResponse(responseCode = "400", description = BAD_REQUEST)
             },
             parameters = {
                     @Parameter(name = "breedId", description = "Breed Id", example = "1")
@@ -54,10 +56,8 @@ public class BreedCommentController {
     @Operation(summary = "Get all breed comments",
             description = "Get a list of all comments for a specific breed",
             responses = {
-                    @ApiResponse(responseCode = "200",
-                            description = "Successful operation"),
-                    @ApiResponse(responseCode = "500",
-                            description = "Internal server error")
+                    @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION),
+                    @ApiResponse(responseCode = "500", description = SERVER_ERROR)
             },
             parameters = {
                     @Parameter(
@@ -93,12 +93,11 @@ public class BreedCommentController {
             summary = "Delete a comment by ID for User",
             description = "Deletes a comment with the specified ID",
             responses = {
-                    @ApiResponse(responseCode = "204", description = "Comment successfully deleted"),
-                    @ApiResponse(responseCode = "400", description = "Bad request, e.g., invalid comment ID"),
-                    @ApiResponse(responseCode = "404", description = "Comment not found"),
-                    @ApiResponse(responseCode = "403",
-                            description = "Forbidden, e.g., user does not have permission to delete the comment"),
-                    @ApiResponse(responseCode = "500", description = "Internal server error")
+                    @ApiResponse(responseCode = "204", description = SUCCESSFULLY_DELETED),
+                    @ApiResponse(responseCode = "400", description = BAD_REQUEST),
+                    @ApiResponse(responseCode = "403", description = FORBIDDEN),
+                    @ApiResponse(responseCode = "404", description = NOT_FOUND),
+                    @ApiResponse(responseCode = "500", description = SERVER_ERROR)
             },
             parameters = {
                     @Parameter(name = "commentId", description = "Comment Id", example = "1")

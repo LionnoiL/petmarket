@@ -13,6 +13,9 @@ public final class MessageUtils {
     public static final String FORBIDDEN = "Forbidden";
     public static final String REQUEST_BODY_IS_MANDATORY = "Request body is mandatory";
     public static final String ADVERTISEMENT_NOT_FOUND = "Advertisement not found";
+    public static final String NOT_FOUND = "Requested entity not found";
+    public static final String SERVER_ERROR = "Internal server error";
+    public static final String SUCCESSFULLY_DELETED = "Entity deleted successfully";
     public static final String LANGUAGE_NOT_FOUND = "Language not found";
     public static final String LANGUAGE_IS_DEFAULT = "Language is default in site options";
     public static final String LANGUAGE_IS_ALREADY_IN_DATABASE = "The language is already in the database";

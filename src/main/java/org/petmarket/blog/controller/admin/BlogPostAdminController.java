@@ -17,6 +17,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import static org.petmarket.utils.MessageUtils.*;
+
 @RestController
 @RequestMapping("/v1/admin/blog")
 @RequiredArgsConstructor
@@ -28,10 +30,10 @@ public class BlogPostAdminController {
             summary = "Create a new blog post",
             description = "Create a new blog post with the default language code",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Blog post created successfully"),
-                    @ApiResponse(responseCode = "400", description = "Invalid input data"),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
-                    @ApiResponse(responseCode = "500", description = "Internal server error")
+                    @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION),
+                    @ApiResponse(responseCode = "400", description = BAD_REQUEST),
+                    @ApiResponse(responseCode = "401", description = UNAUTHORIZED),
+                    @ApiResponse(responseCode = "500", description = SERVER_ERROR)
             }
     )
     @PostMapping
@@ -47,10 +49,10 @@ public class BlogPostAdminController {
             summary = "Add a translation",
             description = "Add a new translation for a blog post.",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Translation added successfully",
+                    @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION,
                             content = @Content(schema = @Schema(implementation = BlogPostResponseDto.class))),
-                    @ApiResponse(responseCode = "400", description = "Bad request"),
-                    @ApiResponse(responseCode = "404", description = "Blog post not found")
+                    @ApiResponse(responseCode = "400", description = BAD_REQUEST),
+                    @ApiResponse(responseCode = "404", description = NOT_FOUND)
             },
             parameters = {
                     @Parameter(name = "postId", description = "Post ID", example = "1", required = true),
@@ -72,10 +74,10 @@ public class BlogPostAdminController {
             summary = "Update post status",
             description = "Update the status of a blog post.",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Post status updated successfully",
+                    @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION,
                             content = @Content(schema = @Schema(implementation = BlogPostResponseDto.class))),
-                    @ApiResponse(responseCode = "400", description = "Bad request"),
-                    @ApiResponse(responseCode = "404", description = "Blog post not found")
+                    @ApiResponse(responseCode = "400", description = BAD_REQUEST),
+                    @ApiResponse(responseCode = "404", description = NOT_FOUND)
             },
             parameters = {
                     @Parameter(name = "postId", description = "Post ID", example = "1", required = true)
@@ -92,10 +94,10 @@ public class BlogPostAdminController {
             summary = "Update a post",
             description = "Update the content of a blog post.",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Post updated successfully",
+                    @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION,
                             content = @Content(schema = @Schema(implementation = BlogPostResponseDto.class))),
-                    @ApiResponse(responseCode = "400", description = "Bad request"),
-                    @ApiResponse(responseCode = "404", description = "Blog post not found")
+                    @ApiResponse(responseCode = "400", description = BAD_REQUEST),
+                    @ApiResponse(responseCode = "404", description = NOT_FOUND)
             },
             parameters = {
                     @Parameter(name = "postId", description = "Post ID", example = "1", required = true),
@@ -116,9 +118,9 @@ public class BlogPostAdminController {
             summary = "Delete a blog post",
             description = "Delete a blog post by ID",
             responses = {
-                    @ApiResponse(responseCode = "204", description = "Blog post deleted successfully"),
-                    @ApiResponse(responseCode = "404", description = "Blog post not found"),
-                    @ApiResponse(responseCode = "500", description = "Internal server error")
+                    @ApiResponse(responseCode = "204", description = SUCCESSFULLY_DELETED),
+                    @ApiResponse(responseCode = "404", description = NOT_FOUND),
+                    @ApiResponse(responseCode = "500", description = SERVER_ERROR)
             },
             parameters = {
                     @Parameter(name = "postId", description = "Post ID", example = "1", required = true)

@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Stack;
 
+import static org.petmarket.utils.MessageUtils.*;
+
 @RestController
 @RequestMapping("/v1/admin/blog/comments")
 @AllArgsConstructor
@@ -24,8 +26,8 @@ public class CommentAdminController {
             summary = "Get all comments",
             description = "Get all comments with pagination for admin",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "List of comments retrieved successfully"),
-                    @ApiResponse(responseCode = "500", description = "Internal server error")
+                    @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION),
+                    @ApiResponse(responseCode = "500", description = SERVER_ERROR)
             }
     )
     @GetMapping
@@ -37,10 +39,10 @@ public class CommentAdminController {
             summary = "Change comment status",
             description = "Change the status of a comment by ID",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Comment status changed successfully"),
-                    @ApiResponse(responseCode = "400", description = "Invalid input data"),
-                    @ApiResponse(responseCode = "404", description = "Comment not found"),
-                    @ApiResponse(responseCode = "500", description = "Internal server error")
+                    @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION),
+                    @ApiResponse(responseCode = "400", description = BAD_REQUEST),
+                    @ApiResponse(responseCode = "404", description = NOT_FOUND),
+                    @ApiResponse(responseCode = "500", description = SERVER_ERROR)
             },
             parameters = {
                     @Parameter(
@@ -62,9 +64,9 @@ public class CommentAdminController {
             summary = "Delete a comment",
             description = "Delete a comment by ID",
             responses = {
-                    @ApiResponse(responseCode = "204", description = "Comment deleted successfully"),
-                    @ApiResponse(responseCode = "404", description = "Comment not found"),
-                    @ApiResponse(responseCode = "500", description = "Internal server error")
+                    @ApiResponse(responseCode = "204", description = SUCCESSFULLY_DELETED),
+                    @ApiResponse(responseCode = "404", description = NOT_FOUND),
+                    @ApiResponse(responseCode = "500", description = SERVER_ERROR)
             },
             parameters = {
                     @Parameter(

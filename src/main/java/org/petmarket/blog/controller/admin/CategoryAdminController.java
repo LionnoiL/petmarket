@@ -12,6 +12,8 @@ import org.petmarket.blog.service.CategoryService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import static org.petmarket.utils.MessageUtils.*;
+
 @RestController
 @RequestMapping("/v1/admin/blog/categories")
 @RequiredArgsConstructor
@@ -23,9 +25,9 @@ public class CategoryAdminController {
             summary = "Save a new blog category",
             description = "Create a new blog category with the default language code",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Blog category created successfully"),
-                    @ApiResponse(responseCode = "400", description = "Invalid input data"),
-                    @ApiResponse(responseCode = "500", description = "Internal server error")
+                    @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION),
+                    @ApiResponse(responseCode = "400", description = BAD_REQUEST),
+                    @ApiResponse(responseCode = "500", description = SERVER_ERROR)
             }
     )
     @PostMapping
@@ -41,9 +43,9 @@ public class CategoryAdminController {
             summary = "Add translation to a blog category",
             description = "Add translation to an existing blog category with the specified language code",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Blog category translation added successfully"),
-                    @ApiResponse(responseCode = "400", description = "Invalid input data"),
-                    @ApiResponse(responseCode = "500", description = "Internal server error")
+                    @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION),
+                    @ApiResponse(responseCode = "400", description = BAD_REQUEST),
+                    @ApiResponse(responseCode = "500", description = SERVER_ERROR)
             },
             parameters = {
                     @Parameter(name = "categoryId", description = "Category ID", example = "1", required = true),
@@ -65,9 +67,9 @@ public class CategoryAdminController {
             summary = "Edit blog category",
             description = "Edit translation to an existing blog category with the specified language code",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Blog category translation added successfully"),
-                    @ApiResponse(responseCode = "400", description = "Invalid input data"),
-                    @ApiResponse(responseCode = "500", description = "Internal server error")
+                    @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION),
+                    @ApiResponse(responseCode = "400", description = BAD_REQUEST),
+                    @ApiResponse(responseCode = "500", description = SERVER_ERROR)
             },
             parameters = {
                     @Parameter(name = "categoryId", description = "Category ID", example = "1", required = true),
@@ -89,9 +91,9 @@ public class CategoryAdminController {
             summary = "Delete a blog category",
             description = "Delete a blog category by ID",
             responses = {
-                    @ApiResponse(responseCode = "204", description = "Blog category deleted successfully"),
-                    @ApiResponse(responseCode = "404", description = "Category not found"),
-                    @ApiResponse(responseCode = "500", description = "Internal server error")
+                    @ApiResponse(responseCode = "204", description = SUCCESSFULLY_DELETED),
+                    @ApiResponse(responseCode = "404", description = NOT_FOUND),
+                    @ApiResponse(responseCode = "500", description = SERVER_ERROR)
             },
             parameters = {
                     @Parameter(name = "categoryId", description = "Category ID", example = "1", required = true)

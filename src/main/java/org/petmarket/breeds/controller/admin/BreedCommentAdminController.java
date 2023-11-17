@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Stack;
 
+import static org.petmarket.utils.MessageUtils.*;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v1/admin/breeds/comments")
@@ -27,7 +29,7 @@ public class BreedCommentAdminController {
             summary = "Get All Comments for Admin",
             description = "Get a list of all breed comments.",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Successfully retrieved comments")
+                    @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION)
             },
             parameters = {
                     @Parameter(name = "page", description = "Page number", example = "1"),
@@ -50,8 +52,8 @@ public class BreedCommentAdminController {
             summary = "Change Comment Status for admin",
             description = "Change the status of multiple comments.",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Status updated successfully"),
-                    @ApiResponse(responseCode = "400", description = "Bad request")
+                    @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION),
+                    @ApiResponse(responseCode = "400", description = BAD_REQUEST),
             },
             parameters = {
                     @Parameter(name = "commentsIds",
@@ -69,8 +71,9 @@ public class BreedCommentAdminController {
             summary = "Delete Comment by Admin only",
             description = "Delete a breed comment.",
             responses = {
-                    @ApiResponse(responseCode = "204", description = "Comment deleted successfully"),
-                    @ApiResponse(responseCode = "404", description = "Comment not found")
+                    @ApiResponse(responseCode = "204", description = SUCCESSFULLY_DELETED),
+                    @ApiResponse(responseCode = "404", description = NOT_FOUND),
+                    @ApiResponse(responseCode = "500", description = SERVER_ERROR)
             },
             parameters = {
                     @Parameter(name = "commentId", description = "Id of comment", example = "1")
