@@ -5,6 +5,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.files.FileStorageName;
 import org.petmarket.files.StorageService;
@@ -14,9 +15,9 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.UUID;
 
 @Slf4j
+@Setter
 @RequiredArgsConstructor
 @Service
 public class S3Service implements StorageService {
@@ -27,8 +28,8 @@ public class S3Service implements StorageService {
     private String bucketName;
 
     @Override
-    public FileStorageName sendFile(File file, String s3Catalog) {
-        String fileName = UUID.randomUUID().toString();
+    public FileStorageName sendFile(File file, String s3Catalog, String fileName) {
+        String fileUrl = "";
         try {
             s3client.putObject(
                     bucketName,
@@ -36,7 +37,10 @@ public class S3Service implements StorageService {
                     file
             );
             URL url = s3client.getUrl(bucketName, s3Catalog + fileName);
-            return new FileStorageName(fileName, url.toString());
+            if (url != null) {
+                fileUrl = url.toString();
+            }
+            return new FileStorageName(fileName, fileUrl);
         } catch (SdkClientException e) {
             log.error(e.toString());
             throw new S3Exception("Error send file to S3");
