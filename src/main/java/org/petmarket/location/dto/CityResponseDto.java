@@ -20,6 +20,22 @@ public class CityResponseDto {
     @Schema(example = "podilsk", description = "City alias")
     private String alias;
 
+    @Schema(example = "місто")
+    @JsonProperty("city_type_title")
+    private String cityTypeTitle;
+
+    @Schema(example = "м.")
+    @JsonProperty("city_type_short_title")
+    private String cityTypeShortTitle;
+
+    @Schema(example = "1", description = "District ID")
+    @JsonProperty("district_id")
+    private Long districtId;
+
+    @Schema(example = "Подільський район", description = "District name")
+    @JsonProperty("district_name")
+    private String districtName;
+
     @Schema(example = "14", description = "State ID")
     @JsonProperty("state_id")
     private Long stateId;

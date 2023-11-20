@@ -28,4 +28,8 @@ public class City {
     @ManyToOne
     @JoinColumn(name = "state_id")
     private State state;
+
+    @ManyToOne
+    @JoinColumn(name = "city_type_id")
+    private CityType type;
 }
