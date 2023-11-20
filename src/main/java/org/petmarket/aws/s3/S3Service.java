@@ -50,6 +50,7 @@ public class S3Service implements StorageService {
             S3ObjectInputStream inputStream = s3object.getObjectContent();
             return inputStream.readAllBytes();
         } catch (IOException | SdkClientException e) {
+            log.error(e.toString());
             throw new S3Exception("Error get file from S3");
         }
     }
@@ -59,6 +60,7 @@ public class S3Service implements StorageService {
         try {
             s3client.deleteObject(bucketName, awsCatalog + fileName);
         } catch (SdkClientException e) {
+            log.error(e.toString());
             throw new S3Exception("Error delete file from S3");
         }
     }
