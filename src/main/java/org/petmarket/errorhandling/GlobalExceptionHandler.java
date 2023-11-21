@@ -1,6 +1,7 @@
 package org.petmarket.errorhandling;
 
 import lombok.RequiredArgsConstructor;
+import org.petmarket.aws.s3.S3Exception;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -18,6 +19,15 @@ import java.sql.SQLIntegrityConstraintViolationException;
 @RequiredArgsConstructor
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+
+    @ExceptionHandler(S3Exception.class)
+    private ResponseEntity<ErrorResponse> handleException(S3Exception exception) {
+        ErrorResponse response = new ErrorResponse(
+                exception.getMessage(),
+                System.currentTimeMillis()
+        );
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
 
     @ExceptionHandler(LoginException.class)
     private ResponseEntity<ErrorResponse> handleException(LoginException exception) {
