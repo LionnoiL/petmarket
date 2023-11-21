@@ -13,6 +13,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.petmarket.language.entity.Language;
+import org.petmarket.translate.LanguageHolder;
 
 @Entity
 @Data
@@ -20,7 +21,7 @@ import org.petmarket.language.entity.Language;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class BreedTranslation {
+public class BreedTranslation implements LanguageHolder {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

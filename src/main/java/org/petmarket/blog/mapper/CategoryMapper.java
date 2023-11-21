@@ -8,41 +8,37 @@ import org.petmarket.blog.dto.category.BlogPostCategoryResponseDto;
 import org.petmarket.blog.entity.BlogCategory;
 import org.petmarket.blog.entity.CategoryTranslation;
 import org.petmarket.config.MapperConfig;
-import org.petmarket.errorhandling.ItemNotUpdatedException;
 import org.petmarket.language.entity.Language;
 import org.petmarket.options.service.OptionsService;
+import org.petmarket.translate.LanguageHolder;
+import org.petmarket.translate.TranslationService;
 import org.springframework.beans.factory.annotation.Autowired;
-import java.util.Optional;
-import static org.petmarket.utils.MessageUtils.NOT_FOUND;
+import java.util.stream.Collectors;
 
-@Mapper(config = MapperConfig.class, uses = OptionsService.class)
+@Mapper(config = MapperConfig.class, uses = {TranslationService.class, OptionsService.class})
 public abstract class CategoryMapper {
+    private CategoryTranslation translated;
+    @Autowired
+    private TranslationService translationService;
     @Autowired
     private OptionsService optionsService;
 
     public abstract BlogPostCategoryResponseDto toDto(BlogCategory entity, @Context Language language);
 
     @AfterMapping
-    public void getTranslations(@MappingTarget BlogPostCategoryResponseDto responseDto,
-                                BlogCategory entity,
-                                @Context Language language) {
-        Optional<CategoryTranslation> translation = entity.getTranslations().stream()
-                .filter(t -> t.getLanguage().getLangCode().equals(language.getLangCode()))
-                .findFirst();
+    public void getTranslations(BlogCategory entity, @Context Language language) {
+        translated = (CategoryTranslation) translationService.getTranslate(
+                entity.getTranslations().stream().map(LanguageHolder.class::cast).collect(Collectors.toSet()),
+                language,
+                optionsService.getDefaultSiteLanguage()
+        );
+    }
 
-        if (!translation.isPresent()) {
-            translation = entity.getTranslations().stream()
-                    .filter(postTranslations -> postTranslations.getLanguage().getLangCode().equals(
-                            optionsService.getDefaultSiteLanguage().getLangCode()))
-                    .findFirst();
-        }
-
-        if (translation.isPresent()) {
-            responseDto.setTitle(translation.get().getTitle());
-            responseDto.setDescription(translation.get().getDescription());
-            responseDto.setLangCode(translation.get().getLanguage().getLangCode());
-        } else {
-            throw new ItemNotUpdatedException(NOT_FOUND);
-        }
+    @AfterMapping
+    public void setTranslations(
+            @MappingTarget BlogPostCategoryResponseDto responseDto) {
+        responseDto.setTitle(translated.getTitle());
+        responseDto.setDescription(translated.getDescription());
+        responseDto.setLangCode(translated.getLanguage().getLangCode());
     }
 }
