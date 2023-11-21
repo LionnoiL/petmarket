@@ -25,11 +25,13 @@ public class City {
     @Column(name = "koatuu_code", nullable = false)
     private String koatuuCode;
 
+    @Column(name = "city_type_name", nullable = false)
+    private String cityTypeName;
+
+    @Column(name = "city_type_short_name", nullable = false)
+    private String cityTypeShortName;
+
     @ManyToOne
     @JoinColumn(name = "state_id")
     private State state;
-
-    @ManyToOne
-    @JoinColumn(name = "city_type_id")
-    private CityType type;
 }

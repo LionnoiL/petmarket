@@ -22,11 +22,11 @@ public class CityResponseDto {
 
     @Schema(example = "місто")
     @JsonProperty("city_type_title")
-    private String cityTypeTitle;
+    private String cityTypeName;
 
     @Schema(example = "м.")
     @JsonProperty("city_type_short_title")
-    private String cityTypeShortTitle;
+    private String cityTypeShortName;
 
     @Schema(example = "1", description = "District ID")
     @JsonProperty("district_id")

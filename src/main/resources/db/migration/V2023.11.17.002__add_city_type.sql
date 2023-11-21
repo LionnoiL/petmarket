@@ -14,6 +14,6 @@ CREATE TABLE cities_types_translations (
 	CONSTRAINT cities_types_translations_fk_language FOREIGN KEY (lang_code) REFERENCES languages (lang_code)
 );
 
-ALTER TABLE cities
-	ADD COLUMN city_type_id BIGINT NULL DEFAULT NULL,
-	ADD CONSTRAINT FK_cities_cities_types FOREIGN KEY (city_type_id) REFERENCES cities_types (id);
+ALTER TABLE cities ADD COLUMN city_type_name VARCHAR(255) NULL DEFAULT NULL;
+
+ALTER TABLE cities ADD COLUMN city_type_short_name VARCHAR(10) NULL DEFAULT NULL;
