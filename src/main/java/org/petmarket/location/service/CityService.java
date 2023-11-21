@@ -66,6 +66,7 @@ public class CityService {
                 .name(request.getName())
                 .alias(transliterateUtils.getAlias(City.class.getSimpleName(), request.getName()))
                 .build();
+        city.setKoatuuCode(request.getKoatuuCode());
         cityRepository.save(city);
 
         return cityMapper.mapEntityToDto(city);
