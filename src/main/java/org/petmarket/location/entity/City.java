@@ -34,4 +34,8 @@ public class City {
     @ManyToOne
     @JoinColumn(name = "state_id")
     private State state;
+
+    @ManyToOne
+    @JoinColumn(name = "district_id")
+    private District district;
 }
