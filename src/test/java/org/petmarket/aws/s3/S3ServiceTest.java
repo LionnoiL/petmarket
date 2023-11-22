@@ -16,10 +16,10 @@ import static org.mockito.Mockito.*;
 
 class S3ServiceTest {
 
-    final String BUCKET_NAME = "test-bucket";
-    final String S3_CATALOG = "test-catalog/";
-    final String TEST_FILE_NAME = "test-file.txt";
-    final File TEST_FILE = new File(TEST_FILE_NAME);
+    private static final String BUCKET_NAME = "test-bucket";
+    private static final String S3_CATALOG = "test-catalog/";
+    private static final String TEST_FILE_NAME = "test-file.txt";
+    private static final File TEST_FILE = new File(TEST_FILE_NAME);
 
     @Test
     void sendFile() {
@@ -50,7 +50,8 @@ class S3ServiceTest {
 
         S3Object mockS3Object = mock(S3Object.class);
         when(mockS3Client.getObject(eq(BUCKET_NAME), eq(S3_CATALOG + TEST_FILE_NAME))).thenReturn(mockS3Object);
-        when(mockS3Object.getObjectContent()).thenReturn(new S3ObjectInputStream(new ByteArrayInputStream(contentBytes), null));
+        when(mockS3Object.getObjectContent())
+                .thenReturn(new S3ObjectInputStream(new ByteArrayInputStream(contentBytes), null));
 
         // Act
         byte[] result = s3Service.getFile(S3_CATALOG, TEST_FILE_NAME);

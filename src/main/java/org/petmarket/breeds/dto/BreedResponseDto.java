@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import org.petmarket.advertisements.category.dto.AdvertisementCategoryShortResponseDto;
+
 import java.time.LocalDateTime;
 
 @Data
@@ -17,9 +19,8 @@ public class BreedResponseDto {
     private String title;
     @Schema(description = "Breed Description", example = "Гарна порода собак")
     private String description;
-    @Schema (description = "Category Id", example = "1")
-    @JsonProperty("category_id")
-    private Long categoryId;
+    @Schema (description = "Category")
+    private AdvertisementCategoryShortResponseDto category;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime created;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
