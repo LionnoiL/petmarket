@@ -108,7 +108,7 @@ public class PostServiceImpl implements PostService {
                     .title(requestDto.getTitle())
                     .description(requestDto.getText())
                     .language(languageService.getByLangCode(langCode))
-                    .shortText(truncateStringTo500Characters(requestDto.getText()))
+                    .shortText(truncateStringTo500Characters(requestDto.getText()) + " ...")
                     .build();
             translations.add(translation);
             post.setTranslations(translations);
@@ -155,10 +155,10 @@ public class PostServiceImpl implements PostService {
     }
 
     private String truncateStringTo500Characters(String input) {
-        if (input.length() <= 500) {
+        if (input.length() <= 495) {
             return input;
         } else {
-            return input.substring(0, 500);
+            return input.substring(0, 495);
         }
     }
 
@@ -168,7 +168,7 @@ public class PostServiceImpl implements PostService {
                 .title(requestDto.getTitle())
                 .description(requestDto.getText())
                 .language(language)
-                .shortText(truncateStringTo500Characters(requestDto.getText()))
+                .shortText(truncateStringTo500Characters(requestDto.getText()) + " ...")
                 .build();
     }
 
