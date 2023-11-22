@@ -4,16 +4,22 @@ import org.mapstruct.*;
 import org.petmarket.blog.dto.posts.BlogPostResponseDto;
 import org.petmarket.blog.entity.*;
 import org.petmarket.config.MapperConfig;
-import org.petmarket.errorhandling.ItemNotUpdatedException;
 import org.petmarket.language.entity.Language;
 import org.petmarket.options.service.OptionsService;
+import org.petmarket.translate.LanguageHolder;
+import org.petmarket.translate.TranslationService;
 import org.springframework.beans.factory.annotation.Autowired;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
-import static org.petmarket.utils.MessageUtils.NOT_FOUND;
-
-@Mapper(config = MapperConfig.class, uses = {CategoryMapper.class, BlogCommentMapper.class, OptionsService.class})
+@Mapper(config = MapperConfig.class, uses = {
+        TranslationService.class,
+        CategoryMapper.class,
+        BlogCommentMapper.class,
+        OptionsService.class})
 public abstract class BlogPostMapper {
+    private PostTranslations translated;
+    @Autowired
+    private TranslationService translationService;
     @Autowired
     private OptionsService optionsService;
 
@@ -24,27 +30,20 @@ public abstract class BlogPostMapper {
     public abstract BlogPostResponseDto toDto(Post post, @Context Language language);
 
     @AfterMapping
-    public void getTranslations(@MappingTarget BlogPostResponseDto responseDto,
-                                Post entity,
-                                @Context Language language) {
-        Optional<PostTranslations> translation = entity.getTranslations().stream()
-                .filter(t -> t.getLanguage().getLangCode().equals(language.getLangCode()))
-                .findFirst();
+    public void getTranslations(Post entity, @Context Language language) {
+        translated = (PostTranslations) translationService.getTranslate(
+                entity.getTranslations().stream().map(LanguageHolder.class::cast).collect(Collectors.toSet()),
+                language,
+                optionsService.getDefaultSiteLanguage()
+        );
+    }
 
-        if (!translation.isPresent()) {
-            translation = entity.getTranslations().stream()
-                    .filter(postTranslations -> postTranslations.getLanguage().getLangCode().equals(
-                            optionsService.getDefaultSiteLanguage().getLangCode()))
-                    .findFirst();
-        }
-
-        if (translation.isPresent()) {
-            responseDto.setTitle(translation.get().getTitle());
-            responseDto.setDescription(translation.get().getDescription());
-            responseDto.setLangCode(translation.get().getLanguage().getLangCode());
-            responseDto.setShortText(translation.get().getShortText());
-        } else {
-            throw new ItemNotUpdatedException(NOT_FOUND);
-        }
+    @AfterMapping
+    public void setTranslations(
+            @MappingTarget BlogPostResponseDto responseDto) {
+        responseDto.setTitle(translated.getTitle());
+        responseDto.setDescription(translated.getDescription());
+        responseDto.setLangCode(translated.getLanguage().getLangCode());
+        responseDto.setShortText(translated.getShortText());
     }
 }
