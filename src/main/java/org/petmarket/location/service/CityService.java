@@ -107,7 +107,6 @@ public class CityService {
         fillDistrict(request, city);
         cityRepository.save(city);
 
-
         return cityMapper.mapEntityToDto(city);
     }
 
