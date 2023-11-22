@@ -7,9 +7,11 @@ import org.petmarket.errorhandling.ItemNotFoundException;
 import org.petmarket.location.dto.CityRequestDto;
 import org.petmarket.location.dto.CityResponseDto;
 import org.petmarket.location.entity.City;
+import org.petmarket.location.entity.District;
 import org.petmarket.location.entity.State;
 import org.petmarket.location.mapper.CityMapper;
 import org.petmarket.location.repository.CityRepository;
+import org.petmarket.location.repository.DistrictRepository;
 import org.petmarket.location.repository.StateRepository;
 import org.petmarket.utils.ErrorUtils;
 import org.petmarket.utils.TransliterateUtils;
@@ -19,20 +21,28 @@ import org.springframework.validation.BindingResult;
 
 import java.util.List;
 
+import static org.petmarket.utils.MessageUtils.*;
+
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class CityService {
 
-    public static final String CITY_NOT_FOUND_MESSAGE = "City not found";
-    public static final String STATE_NOT_FOUND_MESSAGE = "State not found";
     private final CityRepository cityRepository;
     private final StateRepository stateRepository;
+    private final DistrictRepository districtRepository;
     private final CityMapper cityMapper;
     private final TransliterateUtils transliterateUtils;
 
     public CityResponseDto findById(Long id) {
         return cityMapper.mapEntityToDto(getCity(id));
+    }
+
+    public CityResponseDto findByKoatuu(String koatuu) {
+        City city = cityRepository.findByKoatuuCode(koatuu).orElseThrow(() -> {
+            throw new ItemNotFoundException(CITY_NOT_FOUND);
+        });
+        return cityMapper.mapEntityToDto(city);
     }
 
     public List<CityResponseDto> findByName(String name, int size) {
@@ -67,6 +77,9 @@ public class CityService {
                 .alias(transliterateUtils.getAlias(City.class.getSimpleName(), request.getName()))
                 .build();
         city.setKoatuuCode(request.getKoatuuCode());
+        city.setCityTypeName(request.getCityTypeName());
+        city.setCityTypeShortName(request.getCityTypeShortName());
+        fillDistrict(request, city);
         cityRepository.save(city);
 
         return cityMapper.mapEntityToDto(city);
@@ -87,20 +100,37 @@ public class CityService {
         }
         city.setName(request.getName());
         city.setState(state);
+        city.setKoatuuCode(request.getKoatuuCode());
+        city.setCityTypeName(request.getCityTypeName());
+        city.setCityTypeShortName(request.getCityTypeShortName());
+
+        fillDistrict(request, city);
         cityRepository.save(city);
+
 
         return cityMapper.mapEntityToDto(city);
     }
 
+    private void fillDistrict(CityRequestDto request, City city) {
+        if (request.getDistrictId() != null) {
+            District district = districtRepository.findById(request.getDistrictId()).orElseThrow(
+                    () -> {
+                        throw new ItemNotFoundException(DISTRICT_NOT_FOUND);
+                    }
+            );
+            city.setDistrict(district);
+        }
+    }
+
     private City getCity(Long id) {
         return cityRepository.findById(id).orElseThrow(() -> {
-            throw new ItemNotFoundException(CITY_NOT_FOUND_MESSAGE);
+            throw new ItemNotFoundException(CITY_NOT_FOUND);
         });
     }
 
     private State getState(Long stateId) {
         return stateRepository.findById(stateId).orElseThrow(() -> {
-            throw new ItemNotFoundException(STATE_NOT_FOUND_MESSAGE);
+            throw new ItemNotFoundException(STATE_NOT_FOUND);
         });
     }
 }

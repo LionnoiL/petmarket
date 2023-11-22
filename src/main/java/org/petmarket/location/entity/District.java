@@ -1,19 +1,10 @@
 package org.petmarket.location.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
-@Table(name = "disctricts")
+@Table(name = "districts")
 @Getter
 @Setter
 @Builder
@@ -27,4 +18,11 @@ public class District {
 
     @Column(name = "name", nullable = false)
     private String name;
+
+    @Column(name = "koatuu_code", nullable = false)
+    private String koatuuCode;
+
+    @ManyToOne
+    @JoinColumn(name = "state_id")
+    private State state;
 }

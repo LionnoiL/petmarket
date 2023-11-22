@@ -43,13 +43,37 @@ public class CityController {
     @GetMapping("/{id}")
     @ResponseBody
     public CityResponseDto getCityById(
-        @Parameter(description = "The ID of the city to retrieve", required = true,
-            schema = @Schema(type = "integer", format = "int64")
-        )
-        @PathVariable Long id) {
+            @Parameter(description = "The ID of the city to retrieve", required = true,
+                    schema = @Schema(type = "integer", format = "int64")
+            )
+            @PathVariable Long id) {
         log.info("Received request to get the City with id - {}.", id);
         CityResponseDto dto = cityService.findById(id);
         log.info("the City with id - {} was retrieved - {}.", id, dto);
+        return dto;
+    }
+
+    @Operation(summary = "Get City by KOATUU code")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
+                    @Schema(implementation = CityResponseDto.class))
+            }),
+            @ApiResponse(responseCode = "404", description = CITY_NOT_FOUND, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
+                    @Schema(implementation = ErrorResponse.class))
+            })
+    })
+    @GetMapping("/byKoatuu/{koatuu}")
+    @ResponseBody
+    public CityResponseDto getCityByKoatuuCode(
+            @Parameter(description = "The KOATUU code of the city to retrieve", required = true,
+                    schema = @Schema(type = "string")
+            )
+            @PathVariable String koatuu) {
+        log.info("Received request to get the City with koatuu - {}.", koatuu);
+        CityResponseDto dto = cityService.findByKoatuu(koatuu);
+        log.info("the City with koatuu - {} was retrieved - {}.", koatuu, dto);
         return dto;
     }
 

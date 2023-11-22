@@ -28,6 +28,7 @@ public final class MessageUtils {
     public static final String CITY_NOT_FOUND = "City not found";
     public static final String STATE_NOT_FOUND = "State not found";
     public static final String COUNTRY_NOT_FOUND = "Country not found";
+    public static final String DISTRICT_NOT_FOUND = "District not found";
     public static final String PAGE_NOT_FOUND = "Page not found";
     public static final String ATTRIBUTE_NOT_FOUND = "Attribute not found";
     public static final String ATTRIBUTE_GROUP_NOT_FOUND = "Attribute group not found";

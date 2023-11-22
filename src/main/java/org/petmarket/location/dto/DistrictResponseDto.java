@@ -9,32 +9,13 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CityResponseDto {
-
-    @Schema(example = "1", description = "City ID")
-    private Long id;
-
-    @Schema(example = "Подільськ", description = "City name")
-    private String name;
-
-    @Schema(example = "podilsk", description = "City alias")
-    private String alias;
-
-    @Schema(example = "місто")
-    @JsonProperty("city_type_title")
-    private String cityTypeName;
-
-    @Schema(example = "м.")
-    @JsonProperty("city_type_short_title")
-    private String cityTypeShortName;
+public class DistrictResponseDto {
 
     @Schema(example = "1", description = "District ID")
-    @JsonProperty("district_id")
-    private Long districtId;
+    private Long id;
 
     @Schema(example = "Подільський район", description = "District name")
-    @JsonProperty("district_name")
-    private String districtName;
+    private String name;
 
     @Schema(example = "14", description = "State ID")
     @JsonProperty("state_id")
