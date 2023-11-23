@@ -33,6 +33,13 @@ public class StateService {
         return stateMapper.mapEntityToDto(getState(id));
     }
 
+    public StateResponseDto findByKoatuu(String koatuu) {
+        State state = stateRepository.findByKoatuuCode(koatuu).orElseThrow(() -> {
+            throw new ItemNotFoundException(STATE_NOT_FOUND_MESSAGE);
+        });
+        return stateMapper.mapEntityToDto(state);
+    }
+
     public List<StateResponseDto> findByName(String name) {
         return stateRepository.findByNameContainingOrderByName(name)
                 .stream()

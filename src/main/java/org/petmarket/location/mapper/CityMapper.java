@@ -13,6 +13,8 @@ public interface CityMapper {
     @Mapping(target = "stateName", source = "state.name")
     @Mapping(target = "countryId", source = "state.country.id")
     @Mapping(target = "countryName", source = "state.country.name")
+    @Mapping(target = "districtName", source = "district.name")
+    @Mapping(target = "districtId", source = "district.id")
     CityResponseDto mapEntityToDto(City entity);
 
     City mapDtoRequestToEntity(CityRequestDto request);

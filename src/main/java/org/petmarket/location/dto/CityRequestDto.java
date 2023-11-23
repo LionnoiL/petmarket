@@ -29,4 +29,18 @@ public class CityRequestDto {
     @Schema(example = "5111200000")
     @JsonProperty("koatuu_code")
     private String koatuuCode;
+
+    @Size(max = 255, message = "city_type_name must be no more than 255 characters long.")
+    @Schema(example = "місто")
+    @JsonProperty("city_type_name")
+    private String cityTypeName;
+
+    @Size(max = 10, message = "city_type_short_name must be no more than 10 characters long.")
+    @Schema(example = "м.")
+    @JsonProperty("city_type_short_name")
+    private String cityTypeShortName;
+
+    @Schema(example = "250", description = "District ID")
+    @JsonProperty("district_id")
+    private Long districtId;
 }
