@@ -54,6 +54,30 @@ public class StateController {
         return dto;
     }
 
+    @Operation(summary = "Get State by KOATUU code")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
+                    @Schema(implementation = StateResponseDto.class))
+            }),
+            @ApiResponse(responseCode = "404", description = STATE_NOT_FOUND, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
+                    @Schema(implementation = ErrorResponse.class))
+            })
+    })
+    @GetMapping("/byKoatuu/{koatuu}")
+    @ResponseBody
+    public StateResponseDto getStateByKoatuuCode(
+            @Parameter(description = "The KOATUU code of the state to retrieve", required = true,
+                    schema = @Schema(type = "string")
+            )
+            @PathVariable String koatuu) {
+        log.info("Received request to get the State with koatuu - {}.", koatuu);
+        StateResponseDto dto = stateService.findByKoatuu(koatuu);
+        log.info("the State with koatuu - {} was retrieved - {}.", koatuu, dto);
+        return dto;
+    }
+
     @Operation(summary = "Get State by Name")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
