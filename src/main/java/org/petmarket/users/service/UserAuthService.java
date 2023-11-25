@@ -35,7 +35,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
-
 import java.util.*;
 
 import static org.petmarket.utils.MessageUtils.*;
@@ -105,7 +104,7 @@ public class UserAuthService {
             }
 
             JwtResponseDto response = new JwtResponseDto(username, accessToken, refreshToken);
-
+            userService.setLastActivity(user.getUsername());
             return ResponseEntity.ok(response);
         } catch (AuthenticationException e) {
             throw new BadCredentialsException(INVALID_EMAIL_OR_PASSWORD);

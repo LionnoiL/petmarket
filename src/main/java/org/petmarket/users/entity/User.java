@@ -9,6 +9,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -86,6 +87,8 @@ public class User {
             joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "id")})
     private List<Role> roles;
+    @Column(name = "last_activity")
+    private LocalDateTime lastActivity;
 
     @Override
     public boolean equals(Object o) {
@@ -111,6 +114,7 @@ public class User {
                 "id=" + id +
                 ", created=" + created +
                 ", updated=" + updated +
+                ", last activity=" + lastActivity +
                 ", status=" + status +
                 ", username='" + username + '\'' +
                 ", email='" + email + '\'' +
