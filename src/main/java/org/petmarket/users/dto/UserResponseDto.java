@@ -41,7 +41,7 @@ public class UserResponseDto {
     //TODO location, language
 
     private List<Role> roles;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss yyyy-MM-dd")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonProperty("last_activity")
     private LocalDateTime lastActivity;
 }
