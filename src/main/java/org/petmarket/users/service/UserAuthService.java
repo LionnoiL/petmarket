@@ -77,7 +77,7 @@ public class UserAuthService {
         user.setStatus(UserStatus.ACTIVE);
         user.setId(null);
         user.setLoginProvider(LoginProvider.LOCAL);
-
+        user.setUsername(userRequestDto.getEmail());
         User registeredUser = userRepository.save(user);
 
         return userMapper.mapEntityToDto(registeredUser);

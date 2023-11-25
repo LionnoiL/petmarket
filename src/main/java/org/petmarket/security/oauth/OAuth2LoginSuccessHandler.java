@@ -71,6 +71,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
             user.setRoles(userRoles);
             user.setStatus(UserStatus.ACTIVE);
             user.setId(null);
+            user.setUsername(email);
 
             if ("google".equals(oAuth2AuthenticationToken.getAuthorizedClientRegistrationId())) {
                 user.setFirstName(attributes.getOrDefault("given_name", "").toString());
