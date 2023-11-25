@@ -6,8 +6,6 @@ import static org.petmarket.utils.MessageUtils.LANGUAGE_IS_PRESENT_IN_LIST;
 import static org.petmarket.utils.MessageUtils.LANGUAGE_NOT_FOUND;
 import static org.petmarket.utils.MessageUtils.NO_TRANSLATION;
 
-import jakarta.persistence.criteria.Expression;
-import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
 import java.util.Collection;
 import java.util.Collections;

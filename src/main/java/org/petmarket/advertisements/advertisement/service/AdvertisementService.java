@@ -90,17 +90,25 @@ public class AdvertisementService {
         Specification<Object> where = Specification.where((root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
-            predicates.add(criteriaBuilder.equal(root.get("status"), status));
-            predicates.add(criteriaBuilder.equal(root.get("category"), category));
-            predicates.add(criteriaBuilder.equal(root.get("type"), type));
+            if (category != null) {
+                predicates.add(criteriaBuilder.equal(root.get("category"), category));
+            }
+            if (status != null) {
+                predicates.add(criteriaBuilder.equal(root.get("status"), status));
+            }
+            if (type != null) {
+                predicates.add(criteriaBuilder.equal(root.get("type"), type));
+            }
             if (!cities.isEmpty()) {
                 predicates.add(root.join("location").get("city").in(cities));
             }
-
-            for (Attribute attribute : attributes) {
-                predicates.add(criteriaBuilder.isMember(attribute, root.get("attributes")));
+            if (!attributes.isEmpty()) {
+                List<Predicate> orPredicates = new ArrayList<>();
+                for (Attribute attribute : attributes) {
+                    orPredicates.add(criteriaBuilder.isMember(attribute, root.get("attributes")));
+                }
+                predicates.add(criteriaBuilder.or(orPredicates.toArray(new Predicate[0])));
             }
-
             return criteriaBuilder.and(predicates.toArray(new Predicate[]{}));
         });
 

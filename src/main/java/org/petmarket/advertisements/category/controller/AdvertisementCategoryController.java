@@ -196,8 +196,8 @@ public class AdvertisementCategoryController {
         @Parameter(description = "List of cities identifiers",
             schema = @Schema(type = "array[integer]")
         ) @RequestParam(required = false) List<Long> citiesIds,
-        @Parameter(description = "Advertisement type (SIMPLE, PRODUCT, VIP)")
-        @RequestParam(required = false, defaultValue = "SIMPLE") AdvertisementType type
+        @Parameter(description = "Advertisement type")
+        @RequestParam(required = false) AdvertisementType type
     ) {
         Pageable pageable = PageRequest.of(page - 1, size, Sort.Direction.valueOf(sortDirection),
             sortField);
