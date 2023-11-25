@@ -6,8 +6,11 @@ import static org.petmarket.utils.MessageUtils.LANGUAGE_IS_PRESENT_IN_LIST;
 import static org.petmarket.utils.MessageUtils.LANGUAGE_NOT_FOUND;
 import static org.petmarket.utils.MessageUtils.NO_TRANSLATION;
 
+import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -56,6 +59,13 @@ public class AttributeService {
             .sorted(Comparator.comparing(a -> a.getSortValue()))
             .toList();
         return attributeTranslateMapper.mapEntityToDto(attributes, language);
+    }
+
+    public List<Attribute> getByIds(List<Long> attributesIds) {
+        if (attributesIds == null) {
+            return Collections.emptyList();
+        }
+        return attributeRepository.findAllById(attributesIds);
     }
 
     @Transactional

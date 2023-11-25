@@ -1,6 +1,8 @@
 package org.petmarket.advertisements.advertisement.service;
 
+import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
+import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.advertisements.advertisement.dto.AdvertisementRequestDto;
@@ -8,6 +10,7 @@ import org.petmarket.advertisements.advertisement.dto.AdvertisementResponseDto;
 import org.petmarket.advertisements.advertisement.entity.Advertisement;
 import org.petmarket.advertisements.advertisement.entity.AdvertisementStatus;
 import org.petmarket.advertisements.advertisement.entity.AdvertisementTranslate;
+import org.petmarket.advertisements.advertisement.entity.AdvertisementType;
 import org.petmarket.advertisements.advertisement.mapper.AdvertisementMapper;
 import org.petmarket.advertisements.advertisement.mapper.AdvertisementResponseTranslateMapper;
 import org.petmarket.advertisements.advertisement.repository.AdvertisementRepository;
@@ -39,6 +42,9 @@ import org.petmarket.users.entity.User;
 import org.petmarket.users.repository.UserRepository;
 import org.petmarket.utils.ErrorUtils;
 import org.petmarket.utils.TransliterateUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
@@ -70,6 +76,29 @@ public class AdvertisementService {
     private final ReviewMapper reviewMapper;
     private final OptionsService optionsService;
     private final TransliterateUtils transliterateUtils;
+
+    public Page<Advertisement> getByCategoryTypeCitiesAttributes(AdvertisementCategory category,
+        List<Attribute> attributes, List<City> cities, AdvertisementType type, Pageable pageable) {
+
+        Specification<Object> where = Specification.where((root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            predicates.add(criteriaBuilder.equal(root.get("status"), AdvertisementStatus.ACTIVE));
+            predicates.add(criteriaBuilder.equal(root.get("category"), category));
+            predicates.add(criteriaBuilder.equal(root.get("type"), type));
+            if (!cities.isEmpty()){
+                predicates.add(root.join("location").get("city").in(cities));
+            }
+
+            for (Attribute attribute : attributes) {
+                predicates.add(criteriaBuilder.isMember(attribute, root.get("attributes")));
+            }
+
+            return criteriaBuilder.and(predicates.toArray(new Predicate[]{}));
+        });
+
+        return advertisementRepository.findAll(where, pageable);
+    }
 
     @Transactional
     public AdvertisementResponseDto addAdvertisement(AdvertisementRequestDto request,

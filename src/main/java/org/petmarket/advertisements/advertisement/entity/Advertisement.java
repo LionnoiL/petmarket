@@ -23,6 +23,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "advertisements")
+@EqualsAndHashCode(of = {"id"})
 @Getter
 @Setter
 @Builder
