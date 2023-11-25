@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.advertisements.advertisement.dto.AdvertisementResponseDto;
 import org.petmarket.advertisements.advertisement.entity.Advertisement;
+import org.petmarket.advertisements.advertisement.entity.AdvertisementStatus;
 import org.petmarket.advertisements.advertisement.entity.AdvertisementType;
 import org.petmarket.advertisements.advertisement.mapper.AdvertisementResponseTranslateMapper;
 import org.petmarket.advertisements.advertisement.service.AdvertisementService;
@@ -204,8 +205,9 @@ public class AdvertisementCategoryController {
         List<Attribute> attributes = attributeService.getByIds(attributesIds);
         List<City> cities = cityService.getByIds(citiesIds);
         AdvertisementCategory category = categoryService.findCategory(id);
-        Page<Advertisement> advertisements = advertisementService.getByCategoryTypeCitiesAttributes(category,
-            attributes, cities, type, pageable);
+        Page<Advertisement> advertisements = advertisementService.getByCategoryTypeCitiesAttributes(
+            category,
+            attributes, cities, type, AdvertisementStatus.ACTIVE, pageable);
 
         return advertisements.map(adv -> advertisementMapper.mapEntityToDto(adv, language));
     }
