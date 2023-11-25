@@ -6,8 +6,10 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.petmarket.users.service.UserService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.filter.GenericFilterBean;
 
 import java.io.IOException;
@@ -16,6 +18,7 @@ import java.io.IOException;
 public class JwtTokenFilter extends GenericFilterBean {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final UserService userService;
 
     @Override
     public void doFilter(ServletRequest servletRequest,
@@ -27,9 +30,17 @@ public class JwtTokenFilter extends GenericFilterBean {
             Authentication auth = jwtTokenProvider.getAuthentication(token);
 
             if (auth != null) {
+                updateUserLastActivity(auth);
                 SecurityContextHolder.getContext().setAuthentication(auth);
             }
         }
         filterChain.doFilter(servletRequest, servletResponse);
+    }
+
+    private void updateUserLastActivity(Authentication auth) {
+        if (auth.getPrincipal() instanceof UserDetails) {
+            UserDetails userDetails = (UserDetails) auth.getPrincipal();
+            userService.setLastActivity(userDetails.getUsername());
+        }
     }
 }

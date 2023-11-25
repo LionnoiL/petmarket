@@ -1,14 +1,18 @@
 package org.petmarket.users.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.errorhandling.ItemNotFoundException;
 import org.petmarket.security.jwt.JwtUser;
+import org.petmarket.users.dto.UserResponseDto;
 import org.petmarket.users.entity.User;
+import org.petmarket.users.mapper.UserMapper;
 import org.petmarket.users.repository.UserRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import java.time.LocalDateTime;
 
 /**
  * @author Andriy Gaponov
@@ -19,6 +23,7 @@ import org.springframework.stereotype.Service;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
     public User findByUsername(String username) throws ItemNotFoundException {
         User user = userRepository.findByEmail(username)
@@ -39,4 +44,21 @@ public class UserService {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
     }
+
+    public UserResponseDto findById(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> {
+            throw new ItemNotFoundException("User not found by id: " + userId);
+        });
+        return userMapper.mapEntityToDto(user);
+    }
+
+    @Transactional
+    public void setLastActivity(String username) {
+        User user = findByUsername(username);
+        if (user != null) {
+            user.setLastActivity(LocalDateTime.now());
+            userRepository.save(user);
+        }
+    }
 }
+

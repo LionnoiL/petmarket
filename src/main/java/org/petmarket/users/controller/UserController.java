@@ -12,13 +12,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.errorhandling.ErrorResponse;
 import org.petmarket.users.dto.ResetPasswordRequestDto;
+import org.petmarket.users.dto.UserResponseDto;
 import org.petmarket.users.service.UserAuthService;
 import org.petmarket.users.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-
+import static org.petmarket.utils.MessageUtils.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Tag(name = "Users", description = "the users API")
@@ -73,5 +74,28 @@ public class UserController {
         userAuthService.resetPassword(requestDto, bindingResult);
         log.info("Password reset");
         return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @Operation(
+            summary = "Get user by ID",
+            description = "Get user details by user ID",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION),
+                    @ApiResponse(responseCode = "401", description = UNAUTHORIZED),
+                    @ApiResponse(responseCode = "404", description = NOT_FOUND),
+                    @ApiResponse(responseCode = "500", description = SERVER_ERROR)
+            },
+            parameters = {
+                    @Parameter(
+                            name = "userId",
+                            description = "User ID",
+                            example = "1",
+                            required = true
+                    )
+            }
+    )
+    @GetMapping("/{userId}")
+    public UserResponseDto getUser(@PathVariable Long userId) {
+        return userService.findById(userId);
     }
 }

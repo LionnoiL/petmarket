@@ -6,6 +6,7 @@ import lombok.*;
 import org.petmarket.users.entity.Role;
 import org.petmarket.users.entity.UserStatus;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -40,4 +41,7 @@ public class UserResponseDto {
     //TODO location, language
 
     private List<Role> roles;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss yyyy-MM-dd")
+    @JsonProperty("last_activity")
+    private LocalDateTime lastActivity;
 }

@@ -6,6 +6,7 @@ import org.petmarket.security.jwt.AuthenticationEntryPointJwt;
 import org.petmarket.security.jwt.JwtConfigure;
 import org.petmarket.security.jwt.JwtTokenProvider;
 import org.petmarket.security.oauth.OAuth2LoginSuccessHandler;
+import org.petmarket.users.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -51,6 +52,8 @@ public class SecurityConfig {
     private AccessDeniedHandlerJwt accessDeniedHandlerJwt;
     @Autowired
     private OAuth2LoginSuccessHandler loginSuccessHandler;
+    @Autowired
+    private UserService userService;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -70,7 +73,7 @@ public class SecurityConfig {
                 .exceptionHandling().authenticationEntryPoint(authenticationEntryPointJwt)
                 .and().exceptionHandling().accessDeniedHandler(accessDeniedHandlerJwt)
                 .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and().apply(new JwtConfigure(jwtTokenProvider))
+                .and().apply(new JwtConfigure(jwtTokenProvider, userService))
         ;
 
         return http.build();
