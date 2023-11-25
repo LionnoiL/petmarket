@@ -81,7 +81,6 @@ public class UserController {
             description = "Get user details by user ID",
             responses = {
                     @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION),
-                    @ApiResponse(responseCode = "401", description = UNAUTHORIZED),
                     @ApiResponse(responseCode = "404", description = NOT_FOUND),
                     @ApiResponse(responseCode = "500", description = SERVER_ERROR)
             },
