@@ -1,6 +1,21 @@
 package org.petmarket.advertisements.advertisement.service;
 
+import static org.petmarket.utils.MessageUtils.ADVERTISEMENT_NOT_FOUND;
+import static org.petmarket.utils.MessageUtils.BREED_NOT_FOUND;
+import static org.petmarket.utils.MessageUtils.CATEGORY_NOT_FOUND;
+import static org.petmarket.utils.MessageUtils.CITY_NOT_FOUND;
+import static org.petmarket.utils.MessageUtils.LANGUAGE_IS_PRESENT_IN_LIST;
+import static org.petmarket.utils.MessageUtils.LANGUAGE_NOT_FOUND;
+import static org.petmarket.utils.MessageUtils.NO_TRANSLATION;
+import static org.petmarket.utils.MessageUtils.USER_NOT_FOUND;
+
+import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.advertisements.advertisement.dto.AdvertisementRequestDto;
@@ -8,6 +23,7 @@ import org.petmarket.advertisements.advertisement.dto.AdvertisementResponseDto;
 import org.petmarket.advertisements.advertisement.entity.Advertisement;
 import org.petmarket.advertisements.advertisement.entity.AdvertisementStatus;
 import org.petmarket.advertisements.advertisement.entity.AdvertisementTranslate;
+import org.petmarket.advertisements.advertisement.entity.AdvertisementType;
 import org.petmarket.advertisements.advertisement.mapper.AdvertisementMapper;
 import org.petmarket.advertisements.advertisement.mapper.AdvertisementResponseTranslateMapper;
 import org.petmarket.advertisements.advertisement.repository.AdvertisementRepository;
@@ -39,16 +55,12 @@ import org.petmarket.users.entity.User;
 import org.petmarket.users.repository.UserRepository;
 import org.petmarket.utils.ErrorUtils;
 import org.petmarket.utils.TransliterateUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
-
-import java.time.LocalDate;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-
-import static org.petmarket.utils.MessageUtils.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -70,6 +82,38 @@ public class AdvertisementService {
     private final ReviewMapper reviewMapper;
     private final OptionsService optionsService;
     private final TransliterateUtils transliterateUtils;
+
+    public Page<Advertisement> getByCategoryTypeCitiesAttributes(AdvertisementCategory category,
+        List<Attribute> attributes, List<City> cities, AdvertisementType type,
+        AdvertisementStatus status, Pageable pageable) {
+
+        Specification<Object> where = Specification.where((root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            if (category != null) {
+                predicates.add(criteriaBuilder.equal(root.get("category"), category));
+            }
+            if (status != null) {
+                predicates.add(criteriaBuilder.equal(root.get("status"), status));
+            }
+            if (type != null) {
+                predicates.add(criteriaBuilder.equal(root.get("type"), type));
+            }
+            if (!cities.isEmpty()) {
+                predicates.add(root.join("location").get("city").in(cities));
+            }
+            if (!attributes.isEmpty()) {
+                List<Predicate> orPredicates = new ArrayList<>();
+                for (Attribute attribute : attributes) {
+                    orPredicates.add(criteriaBuilder.isMember(attribute, root.get("attributes")));
+                }
+                predicates.add(criteriaBuilder.or(orPredicates.toArray(new Predicate[0])));
+            }
+            return criteriaBuilder.and(predicates.toArray(new Predicate[]{}));
+        });
+
+        return advertisementRepository.findAll(where, pageable);
+    }
 
     @Transactional
     public AdvertisementResponseDto addAdvertisement(AdvertisementRequestDto request,

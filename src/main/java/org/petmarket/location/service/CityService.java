@@ -1,6 +1,7 @@
 package org.petmarket.location.service;
 
 import jakarta.transaction.Transactional;
+import java.util.Collections;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.errorhandling.ItemNotFoundException;
@@ -58,6 +59,13 @@ public class CityService {
                 .stream()
                 .map(cityMapper::mapEntityToDto)
                 .toList();
+    }
+
+    public List<City> getByIds(List<Long> citiesIds) {
+        if (citiesIds == null) {
+            return Collections.emptyList();
+        }
+        return cityRepository.findAllById(citiesIds);
     }
 
     @Transactional

@@ -1,5 +1,9 @@
 package org.petmarket.advertisements.category.controller;
 
+import static org.petmarket.utils.MessageUtils.CATEGORY_NOT_FOUND;
+import static org.petmarket.utils.MessageUtils.SUCCESSFULLY_OPERATION;
+import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -8,26 +12,38 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.Collection;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.advertisements.advertisement.dto.AdvertisementResponseDto;
+import org.petmarket.advertisements.advertisement.entity.Advertisement;
+import org.petmarket.advertisements.advertisement.entity.AdvertisementStatus;
+import org.petmarket.advertisements.advertisement.entity.AdvertisementType;
+import org.petmarket.advertisements.advertisement.mapper.AdvertisementResponseTranslateMapper;
+import org.petmarket.advertisements.advertisement.service.AdvertisementService;
+import org.petmarket.advertisements.attributes.entity.Attribute;
+import org.petmarket.advertisements.attributes.service.AttributeService;
 import org.petmarket.advertisements.category.dto.AdvertisementCategoryResponseDto;
 import org.petmarket.advertisements.category.dto.AdvertisementCategoryTagResponseDto;
+import org.petmarket.advertisements.category.entity.AdvertisementCategory;
 import org.petmarket.advertisements.category.service.AdvertisementCategoryService;
 import org.petmarket.errorhandling.ErrorResponse;
+import org.petmarket.language.entity.Language;
+import org.petmarket.language.service.LanguageService;
+import org.petmarket.location.entity.City;
+import org.petmarket.location.service.CityService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.Collection;
-import java.util.List;
-
-import static org.petmarket.utils.MessageUtils.CATEGORY_NOT_FOUND;
-import static org.petmarket.utils.MessageUtils.SUCCESSFULLY_OPERATION;
-import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "Advertisement Categories", description = "the site advertisement categories API")
 @Slf4j
@@ -37,6 +53,11 @@ import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 public class AdvertisementCategoryController {
 
     private final AdvertisementCategoryService categoryService;
+    private final AdvertisementService advertisementService;
+    private final LanguageService languageService;
+    private final AttributeService attributeService;
+    private final CityService cityService;
+    private final AdvertisementResponseTranslateMapper advertisementMapper;
 
     @Operation(summary = "Get Category by ID")
     @ApiResponses(value = {
@@ -57,7 +78,7 @@ public class AdvertisementCategoryController {
         )
         @PathVariable Long id,
         @Parameter(description = "The Code Language of the category to retrieve", required = true,
-                schema = @Schema(type = "string"), example = "ua"
+            schema = @Schema(type = "string"), example = "ua"
         )
         @PathVariable String langCode) {
         log.info("Received request to get the Category with id - {}.", id);
@@ -80,7 +101,7 @@ public class AdvertisementCategoryController {
     @ResponseBody
     public ResponseEntity<Collection<AdvertisementCategoryResponseDto>> getAll(
         @Parameter(description = "The Code Language of the categories to retrieve", required = true,
-                schema = @Schema(type = "string"), example = "ua"
+            schema = @Schema(type = "string"), example = "ua"
         )
         @PathVariable String langCode) {
         log.info("Received request to get all Categories.");
@@ -103,7 +124,7 @@ public class AdvertisementCategoryController {
     @ResponseBody
     public ResponseEntity<Collection<AdvertisementCategoryResponseDto>> getFavorite(
         @Parameter(description = "The Code Language of the categories to retrieve", required = true,
-                schema = @Schema(type = "string"), example = "ua"
+            schema = @Schema(type = "string"), example = "ua"
         )
         @PathVariable String langCode,
         @Parameter(description = "The size of the categories to be returned", required = true,
@@ -131,7 +152,7 @@ public class AdvertisementCategoryController {
     @ResponseBody
     public ResponseEntity<Collection<AdvertisementCategoryTagResponseDto>> getFavoriteTags(
         @Parameter(description = "The Code Language of the categories to retrieve", required = true,
-                schema = @Schema(type = "string"), example = "ua"
+            schema = @Schema(type = "string"), example = "ua"
         )
         @PathVariable String langCode,
         @Parameter(description = "The size of the categories to be returned", required = true,
@@ -149,6 +170,14 @@ public class AdvertisementCategoryController {
     @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION)
     @GetMapping(path = "/{id}/{langCode}/advertisements")
     public Page<AdvertisementResponseDto> getAllAdvertisementsByCategory(
+        @Parameter(description = "The Code Language of the categories to retrieve", required = true,
+            schema = @Schema(type = "string"), example = "ua"
+        )
+        @PathVariable String langCode,
+        @Parameter(description = "The ID of the category to retrieve", required = true,
+            schema = @Schema(type = "integer", format = "int64")
+        )
+        @PathVariable Long id,
         @Parameter(description = "Number of page (1..N)", required = true,
             schema = @Schema(type = "integer", defaultValue = "1")
         ) @RequestParam(defaultValue = "1") int page,
@@ -160,20 +189,26 @@ public class AdvertisementCategoryController {
         ) @RequestParam(required = false, defaultValue = "ASC") String sortDirection,
         @Parameter(description = "Sort field",
             schema = @Schema(type = "string")
-        ) @RequestParam(required = false, defaultValue = "ASC") String sortField,
+        ) @RequestParam(required = false, defaultValue = "created") String sortField,
         @Parameter(description = "List of attributes identifiers",
             schema = @Schema(type = "array[integer]")
-        ) @RequestParam(required = false) List<Long> attributes,
-        @Parameter(description = "List of locations identifiers",
+        ) @RequestParam(required = false) List<Long> attributesIds,
+        @Parameter(description = "List of cities identifiers",
             schema = @Schema(type = "array[integer]")
-        ) @RequestParam(required = false) List<Long> locations,
-        @Parameter(description = "Advertisement type (SIMPLE, PRODUCT, VIP)",
-            schema = @Schema(type = "string")
-        ) @RequestParam(required = false, defaultValue = "SIMPLE") String type
+        ) @RequestParam(required = false) List<Long> citiesIds,
+        @Parameter(description = "Advertisement type")
+        @RequestParam(required = false) AdvertisementType type
     ) {
         Pageable pageable = PageRequest.of(page - 1, size, Sort.Direction.valueOf(sortDirection),
             sortField);
-        //TODO finish after add AdvertisementService
-        return null;
+        Language language = languageService.getByLangCode(langCode);
+        List<Attribute> attributes = attributeService.getByIds(attributesIds);
+        List<City> cities = cityService.getByIds(citiesIds);
+        AdvertisementCategory category = categoryService.findCategory(id);
+        Page<Advertisement> advertisements = advertisementService.getByCategoryTypeCitiesAttributes(
+            category,
+            attributes, cities, type, AdvertisementStatus.ACTIVE, pageable);
+
+        return advertisements.map(adv -> advertisementMapper.mapEntityToDto(adv, language));
     }
 }

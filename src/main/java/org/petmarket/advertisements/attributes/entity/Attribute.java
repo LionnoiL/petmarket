@@ -8,6 +8,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "attribute")
+@EqualsAndHashCode(of = {"id"})
 @Getter
 @Setter
 @Builder
