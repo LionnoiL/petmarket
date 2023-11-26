@@ -5,5 +5,5 @@ RUN mvn clean package -DskipTests
 # run buided .jar
 FROM openjdk:17-oracle
 COPY --from=build /target/petmarket.jar petmarket.jar
-EXPOSE 8080
+EXPOSE 5555
 ENTRYPOINT ["java", "-jar", "petmarket.jar"]
