@@ -116,7 +116,7 @@ public class AdvertisementController {
 
     @Operation(summary = "Get Favorite Advertisements")
     @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION)
-    @GetMapping(path = "/{langCode}/favorite")
+    @GetMapping(path = "/favorite/{langCode}")
     public Page<AdvertisementResponseDto> getFavoriteAds(
         @Parameter(description = "The Code Language of the advertisements to retrieve", required = true,
             schema = @Schema(type = "string"), example = "ua"
