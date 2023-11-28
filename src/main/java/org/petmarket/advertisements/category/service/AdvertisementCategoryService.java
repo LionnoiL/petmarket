@@ -8,6 +8,7 @@ import static org.petmarket.utils.MessageUtils.PARENT_CATEGORY_CANNOT_IN_LIST;
 
 import jakarta.transaction.Transactional;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -49,6 +50,13 @@ public class AdvertisementCategoryService {
     public AdvertisementCategoryResponseDto findById(Long id, String langCode) {
         Language language = getLanguage(langCode);
         return categoryResponseTranslateMapper.mapEntityToDto(getCategory(id), language);
+    }
+
+    public List<AdvertisementCategory> getByIds(List<Long> categoriesIds) {
+        if (categoriesIds == null) {
+            return Collections.emptyList();
+        }
+        return categoryRepository.findAllById(categoriesIds);
     }
 
     public Collection<AdvertisementCategoryResponseDto> getAll(String langCode) {

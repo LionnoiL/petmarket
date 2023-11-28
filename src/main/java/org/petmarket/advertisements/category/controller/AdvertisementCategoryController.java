@@ -170,7 +170,7 @@ public class AdvertisementCategoryController {
     @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION)
     @GetMapping(path = "/{id}/{langCode}/advertisements")
     public Page<AdvertisementResponseDto> getAllAdvertisementsByCategory(
-        @Parameter(description = "The Code Language of the categories to retrieve", required = true,
+        @Parameter(description = "The Code Language of the advertisements to retrieve", required = true,
             schema = @Schema(type = "string"), example = "ua"
         )
         @PathVariable String langCode,

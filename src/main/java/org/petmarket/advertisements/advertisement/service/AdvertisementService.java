@@ -115,6 +115,16 @@ public class AdvertisementService {
         return advertisementRepository.findAll(where, pageable);
     }
 
+    public Page<Advertisement> getFavoriteAds(List<AdvertisementCategory> categories,
+        Pageable pageable) {
+        if (categories.isEmpty()) {
+            return advertisementRepository.findTop1000ByOrderByCreatedDesc(pageable);
+        } else {
+            return advertisementRepository.findTop1000ByCategoryInOrderByCreatedDesc(categories,
+                pageable);
+        }
+    }
+
     @Transactional
     public AdvertisementResponseDto addAdvertisement(AdvertisementRequestDto request,
         BindingResult bindingResult, Authentication authentication) {
