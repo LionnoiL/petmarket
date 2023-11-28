@@ -12,6 +12,7 @@ import org.petmarket.users.repository.UserRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDateTime;
 
 /**
@@ -25,6 +26,12 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
+    public static Long getCurrentUserId() {
+        JwtUser principal = (JwtUser) SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal();
+        return principal.getId();
+    }
+
     public User findByUsername(String username) throws ItemNotFoundException {
         User user = userRepository.findByEmail(username)
                 .orElseThrow(() -> {
@@ -34,10 +41,12 @@ public class UserService {
         return user;
     }
 
-    public Long getCurrentUserId() {
+    public User getCurrentUser() {
         JwtUser principal = (JwtUser) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
-        return principal.getId();
+        return userRepository.findById(principal.getId()).orElseThrow(() -> {
+            throw new ItemNotFoundException("User not found by id: " + principal.getId());
+        });
     }
 
     public boolean isCurrentUserAdmin() {

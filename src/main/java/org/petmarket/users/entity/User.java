@@ -15,6 +15,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "users")
+@EqualsAndHashCode(of = {"id"})
 @Getter
 @Setter
 @Builder
@@ -89,24 +90,6 @@ public class User {
     private List<Role> roles;
     @Column(name = "last_activity")
     private LocalDateTime lastActivity;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        User user = (User) o;
-
-        return id.equals(user.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return id.hashCode();
-    }
 
     @Override
     public String toString() {
