@@ -74,9 +74,10 @@ public class AdvertisementController {
             )
             @PathVariable String langCode) {
         log.info("Received request to get Advertisement Advertisement with id - {}.", id);
-        AdvertisementResponseDto dto = advertisementService.findById(id, langCode);
-        log.info("the Advertisement with id - {} was retrieved - {}.", id, dto);
-        return dto;
+        Language language = languageService.getByLangCode(langCode);
+        Advertisement advertisement = advertisementService.getAdvertisement(id);
+        accessCheckerService.checkViewAccess(advertisement);
+        return advertisementMapper.mapEntityToDto(advertisement, language);
     }
 
     @Operation(summary = "Create a new Advertisement")
@@ -158,7 +159,7 @@ public class AdvertisementController {
             ) @RequestParam(required = false) List<Long> ids
     ) {
         List<Advertisement> advertisements = advertisementService.getAdvertisements(ids);
-        accessCheckerService.checkAccess(advertisements);
+        accessCheckerService.checkUpdateAccess(advertisements);
         advertisementService.setStatus(advertisements, AdvertisementStatus.DRAFT);
         Language defaultSiteLanguage = optionsService.getDefaultSiteLanguage();
         return advertisements.stream()
@@ -190,7 +191,7 @@ public class AdvertisementController {
             ) @RequestParam(required = false) List<Long> ids
     ) {
         List<Advertisement> advertisements = advertisementService.getAdvertisements(ids);
-        accessCheckerService.checkAccess(advertisements);
+        accessCheckerService.checkUpdateAccess(advertisements);
         advertisementService.setStatus(advertisements, AdvertisementStatus.PENDING);
         Language defaultSiteLanguage = optionsService.getDefaultSiteLanguage();
         return advertisements.stream()

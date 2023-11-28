@@ -221,11 +221,6 @@ public class AdvertisementService {
         advertisement.setAttributes(attributes);
     }
 
-    public AdvertisementResponseDto findById(Long id, String langCode) {
-        Language language = getLanguage(langCode);
-        return translateMapper.mapEntityToDto(getAdvertisement(id), language);
-    }
-
     public Collection<AdvertisementReviewResponseDto> getReviewsByAdvertisementId(Long id) {
         getAdvertisement(id);
         return reviewMapper.mapEntityToAdvertisementDto(

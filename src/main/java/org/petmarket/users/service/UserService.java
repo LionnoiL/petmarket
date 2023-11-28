@@ -42,11 +42,15 @@ public class UserService {
     }
 
     public User getCurrentUser() {
-        JwtUser principal = (JwtUser) SecurityContextHolder.getContext().getAuthentication()
-                .getPrincipal();
-        return userRepository.findById(principal.getId()).orElseThrow(() -> {
-            throw new ItemNotFoundException("User not found by id: " + principal.getId());
-        });
+        try {
+            JwtUser principal = (JwtUser) SecurityContextHolder.getContext().getAuthentication()
+                    .getPrincipal();
+            return userRepository.findById(principal.getId()).orElseThrow(() -> {
+                throw new ItemNotFoundException("User not found by id: " + principal.getId());
+            });
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public boolean isCurrentUserAdmin() {
