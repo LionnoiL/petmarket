@@ -161,8 +161,7 @@ public class AdvertisementService {
     }
 
     private void fillDeliveries(Advertisement advertisement, AdvertisementRequestDto request) {
-        List<Delivery> deliveries = deliveryRepository.getDeliveriesFromIds(
-                request.getDeliveriesIds());
+        List<Delivery> deliveries = deliveryRepository.getDeliveriesFromIds(request.getDeliveriesIds());
         advertisement.setDeliveries(deliveries);
     }
 
@@ -180,12 +179,15 @@ public class AdvertisementService {
     }
 
     private void fillCategory(Advertisement advertisement, AdvertisementRequestDto request) {
-        AdvertisementCategory category = categoryRepository.findById(request.getCategoryId())
-                .orElseThrow(
-                        () -> {
-                            throw new ItemNotFoundException(CATEGORY_NOT_FOUND);
-                        }
-                );
+        AdvertisementCategory category = null;
+        if (request.getCategoryId() != null) {
+            category = categoryRepository.findById(request.getCategoryId())
+                    .orElseThrow(
+                            () -> {
+                                throw new ItemNotFoundException(CATEGORY_NOT_FOUND);
+                            }
+                    );
+        }
         advertisement.setCategory(category);
     }
 
@@ -202,16 +204,19 @@ public class AdvertisementService {
     }
 
     private void fillLocation(Advertisement advertisement, AdvertisementRequestDto request) {
-        City city = cityRepository.findById(request.getCityId()).orElseThrow(
-                () -> {
-                    throw new ItemNotFoundException(CITY_NOT_FOUND);
-                }
-        );
-        Location location = Location.builder()
-                .city(city)
-                .latitude(request.getLatitude())
-                .longitude(request.getLongitude())
-                .build();
+        Location location = null;
+        if (request.getCityId() != null) {
+            City city = cityRepository.findById(request.getCityId()).orElseThrow(
+                    () -> {
+                        throw new ItemNotFoundException(CITY_NOT_FOUND);
+                    }
+            );
+            location = Location.builder()
+                    .city(city)
+                    .latitude(request.getLatitude())
+                    .longitude(request.getLongitude())
+                    .build();
+        }
         advertisement.setLocation(location);
     }
 
@@ -267,6 +272,9 @@ public class AdvertisementService {
             throw new BadRequestException("advertisements is null");
         }
         for (Advertisement advertisement : advertisements) {
+            if (advertisement.getCategory() == null || advertisement.getLocation() == null) {
+                status = AdvertisementStatus.DRAFT;
+            }
             advertisement.setStatus(status);
             advertisementRepository.save(advertisement);
         }

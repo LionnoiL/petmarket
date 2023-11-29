@@ -25,6 +25,9 @@ public class AttributeGroupTranslateMapper {
     private final AttributeGroupMapper mapper;
 
     public AttributeGroupResponseDto mapEntityToDto(AttributeGroup entity, Language language) {
+        if (entity == null) {
+            return null;
+        }
         AttributeGroupTranslate translation = (AttributeGroupTranslate) translationService.getTranslate(
                 entity.getTranslations().stream().map(LanguageHolder.class::cast).collect(Collectors.toSet()),
                 language,

@@ -37,6 +37,9 @@ public class AdvertisementResponseTranslateMapper {
     private final BreedMapper breedMapper;
 
     public AdvertisementResponseDto mapEntityToDto(Advertisement entity, Language language) {
+        if (entity == null) {
+            return null;
+        }
         AdvertisementTranslate translation = (AdvertisementTranslate) translationService.getTranslate(
                 entity.getTranslations().stream().map(LanguageHolder.class::cast).collect(Collectors.toSet()),
                 language,
