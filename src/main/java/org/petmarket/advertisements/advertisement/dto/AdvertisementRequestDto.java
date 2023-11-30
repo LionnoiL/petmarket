@@ -35,7 +35,6 @@ public class AdvertisementRequestDto {
     @Schema(example = "1000")
     private BigDecimal price;
 
-    @NotNull
     @Schema(example = "1")
     @JsonProperty("city_id")
     private Long cityId;
@@ -46,7 +45,6 @@ public class AdvertisementRequestDto {
     @Schema(example = "29.529612")
     private Float longitude;
 
-    @NotNull
     @Schema(example = "1")
     @JsonProperty("category_id")
     private Long categoryId;

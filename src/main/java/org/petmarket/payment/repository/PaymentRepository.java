@@ -3,6 +3,7 @@ package org.petmarket.payment.repository;
 import org.petmarket.errorhandling.ItemNotFoundException;
 import org.petmarket.payment.entity.Payment;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,6 +16,9 @@ public interface PaymentRepository extends PaymentRepositoryBasic {
     List<Payment> findAllByEnableIsTrue();
 
     default List<Payment> getPaymentsFromIds(List<Long> ids) {
+        if (ids == null) {
+            return Collections.emptyList();
+        }
         return ids.stream()
                 .map(id -> findById(id).orElseThrow(
                         () -> {

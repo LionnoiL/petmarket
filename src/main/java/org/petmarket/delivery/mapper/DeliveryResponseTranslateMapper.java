@@ -25,6 +25,9 @@ public class DeliveryResponseTranslateMapper {
     private final DeliveryMapper deliveryMapper;
 
     public DeliveryResponseDto mapEntityToDto(Delivery entity, Language language) {
+        if (entity == null) {
+            return null;
+        }
         DeliveryTranslate translation = (DeliveryTranslate) translationService.getTranslate(
                 entity.getTranslations().stream().map(LanguageHolder.class::cast).collect(Collectors.toSet()),
                 language,

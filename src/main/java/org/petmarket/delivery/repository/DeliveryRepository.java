@@ -3,6 +3,7 @@ package org.petmarket.delivery.repository;
 import org.petmarket.delivery.entity.Delivery;
 import org.petmarket.errorhandling.ItemNotFoundException;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,6 +16,9 @@ public interface DeliveryRepository extends DeliveryRepositoryBasic {
     List<Delivery> findAllByEnableIsTrue();
 
     default List<Delivery> getDeliveriesFromIds(List<Long> ids) {
+        if (ids == null) {
+            return Collections.emptyList();
+        }
         return ids.stream()
                 .map(id -> findById(id).orElseThrow(
                         () -> {

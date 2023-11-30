@@ -26,6 +26,9 @@ public class AttributeTranslateMapper {
     private final AttributeMapper mapper;
 
     public AttributeResponseDto mapEntityToDto(Attribute entity, Language language) {
+        if (entity == null) {
+            return null;
+        }
         AttributeTranslate translation = (AttributeTranslate) translationService.getTranslate(
                 entity.getTranslations().stream().map(LanguageHolder.class::cast).collect(Collectors.toSet()),
                 language,

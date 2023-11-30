@@ -25,6 +25,9 @@ public class AdvertisementCategoryResponseTranslateMapper {
     private final AdvertisementCategoryMapper mapper;
 
     public AdvertisementCategoryResponseDto mapEntityToDto(AdvertisementCategory entity, Language language) {
+        if (entity == null) {
+            return null;
+        }
         AdvertisementCategoryTranslate translation = (AdvertisementCategoryTranslate) translationService.getTranslate(
                 entity.getTranslations().stream().map(LanguageHolder.class::cast).collect(Collectors.toSet()),
                 language,

@@ -25,6 +25,9 @@ public class PaymentResponseTranslateMapper {
     private final PaymentMapper paymentMapper;
 
     public PaymentResponseDto mapEntityToDto(Payment entity, Language language) {
+        if (entity == null) {
+            return null;
+        }
         PaymentTranslate translation = (PaymentTranslate) translationService.getTranslate(
                 entity.getTranslations().stream().map(LanguageHolder.class::cast).collect(Collectors.toSet()),
                 language,
