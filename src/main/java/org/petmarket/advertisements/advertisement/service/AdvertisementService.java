@@ -111,6 +111,29 @@ public class AdvertisementService {
         return advertisementRepository.findAll(where, pageable);
     }
 
+    public Page<Advertisement> getAdvertisements(List<AdvertisementCategory> categories, List<City> cities,
+                                                 AdvertisementStatus status,
+                                                 AdvertisementType type, Pageable pageable) {
+        Specification<Object> where = Specification.where((root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            if (!categories.isEmpty()) {
+                predicates.add(root.join("category").in(categories));
+            }
+            if (!cities.isEmpty()) {
+                predicates.add(root.join("location").get("city").in(cities));
+            }
+            if (status != null) {
+                predicates.add(criteriaBuilder.equal(root.get("status"), status));
+            }
+            if (type != null) {
+                predicates.add(criteriaBuilder.equal(root.get("type"), type));
+            }
+            return criteriaBuilder.and(predicates.toArray(new Predicate[]{}));
+        });
+
+        return advertisementRepository.findAll(where, pageable);
+    }
+
     public Page<Advertisement> getFavoriteAds(List<AdvertisementCategory> categories,
                                               Pageable pageable) {
         if (categories.isEmpty()) {
