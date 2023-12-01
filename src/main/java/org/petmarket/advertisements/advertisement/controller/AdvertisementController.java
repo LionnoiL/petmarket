@@ -23,7 +23,7 @@ import org.petmarket.advertisements.category.service.AdvertisementCategoryServic
 import org.petmarket.advertisements.images.dto.AdvertisementImageResponseDto;
 import org.petmarket.advertisements.images.entity.AdvertisementImage;
 import org.petmarket.advertisements.images.mapper.AdvertisementImageMapper;
-import org.petmarket.advertisements.images.service.ImageService;
+import org.petmarket.advertisements.images.service.AdvertisementImageService;
 import org.petmarket.errorhandling.ErrorResponse;
 import org.petmarket.language.entity.Language;
 import org.petmarket.language.service.LanguageService;
@@ -57,7 +57,7 @@ public class AdvertisementController {
     private final AdvertisementCategoryService categoryService;
     private final LanguageService languageService;
     private final OptionsService optionsService;
-    private final ImageService imageService;
+    private final AdvertisementImageService advertisementImageService;
     private final AdvertisementResponseTranslateMapper advertisementMapper;
     private final AdvertisementImageMapper imageMapper;
 
@@ -237,7 +237,7 @@ public class AdvertisementController {
                                                            @RequestParam("images") List<MultipartFile> images) {
         Advertisement advertisement = advertisementService.getAdvertisement(id);
         accessCheckerService.checkUpdateAccess(List.of(advertisement));
-        Set<AdvertisementImage> advertisementImages = imageService.uploadImages(advertisement, images);
+        Set<AdvertisementImage> advertisementImages = advertisementImageService.uploadImages(advertisement, images);
         return advertisementImages.stream().map(imageMapper::toDto).collect(Collectors.toSet());
     }
 }
