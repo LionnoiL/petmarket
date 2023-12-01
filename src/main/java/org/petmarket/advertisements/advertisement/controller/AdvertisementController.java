@@ -20,6 +20,10 @@ import org.petmarket.advertisements.advertisement.service.AdvertisementAccessChe
 import org.petmarket.advertisements.advertisement.service.AdvertisementService;
 import org.petmarket.advertisements.category.entity.AdvertisementCategory;
 import org.petmarket.advertisements.category.service.AdvertisementCategoryService;
+import org.petmarket.advertisements.images.dto.AdvertisementImageResponseDto;
+import org.petmarket.advertisements.images.entity.AdvertisementImage;
+import org.petmarket.advertisements.images.mapper.AdvertisementImageMapper;
+import org.petmarket.advertisements.images.service.ImageService;
 import org.petmarket.errorhandling.ErrorResponse;
 import org.petmarket.language.entity.Language;
 import org.petmarket.language.service.LanguageService;
@@ -27,12 +31,16 @@ import org.petmarket.options.service.OptionsService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.petmarket.utils.MessageUtils.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -49,7 +57,9 @@ public class AdvertisementController {
     private final AdvertisementCategoryService categoryService;
     private final LanguageService languageService;
     private final OptionsService optionsService;
+    private final ImageService imageService;
     private final AdvertisementResponseTranslateMapper advertisementMapper;
+    private final AdvertisementImageMapper imageMapper;
 
     @Operation(summary = "Get Advertisement by ID")
     @ApiResponses(value = {
@@ -197,5 +207,37 @@ public class AdvertisementController {
         return advertisements.stream()
                 .map(adv -> advertisementMapper.mapEntityToDto(adv, defaultSiteLanguage))
                 .toList();
+    }
+
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
+                    @Schema(implementation = AdvertisementResponseDto.class))
+            }),
+            @ApiResponse(responseCode = "400", description = BAD_REQUEST, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
+                    @Schema(implementation = ErrorResponse.class))
+            }),
+            @ApiResponse(responseCode = "401", description = UNAUTHORIZED, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
+                    @Schema(implementation = ErrorResponse.class))
+            }),
+            @ApiResponse(responseCode = "403", description = FORBIDDEN, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
+                    @Schema(implementation = ErrorResponse.class))
+            }),
+            @ApiResponse(responseCode = "404", description = ADVERTISEMENT_NOT_FOUND, content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
+                    @Schema(implementation = ErrorResponse.class))
+            })
+    })
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping(value = "/{id}/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public Set<AdvertisementImageResponseDto> uploadImages(@PathVariable Long id,
+                                                           @RequestParam("images") List<MultipartFile> images) {
+        Advertisement advertisement = advertisementService.getAdvertisement(id);
+        accessCheckerService.checkUpdateAccess(List.of(advertisement));
+        Set<AdvertisementImage> advertisementImages = imageService.uploadImages(advertisement, images);
+        return advertisementImages.stream().map(imageMapper::toDto).collect(Collectors.toSet());
     }
 }
