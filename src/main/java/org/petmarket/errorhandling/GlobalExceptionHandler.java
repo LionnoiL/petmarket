@@ -20,6 +20,24 @@ import java.sql.SQLIntegrityConstraintViolationException;
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
+    @ExceptionHandler(FileUploadException.class)
+    private ResponseEntity<ErrorResponse> handleException(FileUploadException exception) {
+        ErrorResponse response = new ErrorResponse(
+                exception.getMessage(),
+                System.currentTimeMillis()
+        );
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ImageConvertException.class)
+    private ResponseEntity<ErrorResponse> handleException(ImageConvertException exception) {
+        ErrorResponse response = new ErrorResponse(
+                exception.getMessage(),
+                System.currentTimeMillis()
+        );
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(AccessDeniedException.class)
     private ResponseEntity<ErrorResponse> handleException(AccessDeniedException exception) {
         ErrorResponse response = new ErrorResponse(

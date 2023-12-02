@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.petmarket.advertisements.attributes.entity.Attribute;
 import org.petmarket.advertisements.category.entity.AdvertisementCategory;
+import org.petmarket.advertisements.images.entity.AdvertisementImage;
 import org.petmarket.breeds.entity.Breed;
 import org.petmarket.delivery.entity.Delivery;
 import org.petmarket.location.entity.Location;
@@ -104,4 +105,8 @@ public class Advertisement implements TranslateHolder {
             joinColumns = @JoinColumn(name = "advertisement_id"),
             inverseJoinColumns = @JoinColumn(name = "attribute_id"))
     private List<Attribute> attributes = new ArrayList<>();
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "advertisement", fetch = FetchType.LAZY, orphanRemoval = true)
+    @OrderBy("mainImage DESC, id ASC")
+    private Set<AdvertisementImage> images;
 }
