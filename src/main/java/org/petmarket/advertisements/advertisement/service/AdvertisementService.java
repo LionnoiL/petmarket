@@ -4,8 +4,8 @@ import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.petmarket.advertisements.advertisement.dto.AdvertisementDetailsResponseDto;
 import org.petmarket.advertisements.advertisement.dto.AdvertisementRequestDto;
-import org.petmarket.advertisements.advertisement.dto.AdvertisementResponseDto;
 import org.petmarket.advertisements.advertisement.entity.Advertisement;
 import org.petmarket.advertisements.advertisement.entity.AdvertisementStatus;
 import org.petmarket.advertisements.advertisement.entity.AdvertisementTranslate;
@@ -147,8 +147,9 @@ public class AdvertisementService {
     }
 
     @Transactional
-    public AdvertisementResponseDto addAdvertisement(AdvertisementRequestDto request,
-                                                     BindingResult bindingResult, Authentication authentication) {
+    public AdvertisementDetailsResponseDto addAdvertisement(AdvertisementRequestDto request,
+                                                            BindingResult bindingResult,
+                                                            Authentication authentication) {
         ErrorUtils.checkItemNotCreatedException(bindingResult);
 
         Advertisement advertisement = advertisementMapper.mapDtoRequestToEntity(request);

@@ -11,8 +11,9 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.petmarket.advertisements.advertisement.dto.AdvertisementDetailsResponseDto;
 import org.petmarket.advertisements.advertisement.dto.AdvertisementRequestDto;
-import org.petmarket.advertisements.advertisement.dto.AdvertisementResponseDto;
+import org.petmarket.advertisements.advertisement.dto.AdvertisementShortResponseDto;
 import org.petmarket.advertisements.advertisement.entity.Advertisement;
 import org.petmarket.advertisements.advertisement.entity.AdvertisementStatus;
 import org.petmarket.advertisements.advertisement.mapper.AdvertisementResponseTranslateMapper;
@@ -65,7 +66,7 @@ public class AdvertisementController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
                     @Content(mediaType = APPLICATION_JSON_VALUE, schema =
-                    @Schema(implementation = AdvertisementResponseDto.class))
+                    @Schema(implementation = AdvertisementDetailsResponseDto.class))
             }),
             @ApiResponse(responseCode = "404", description = ADVERTISEMENT_NOT_FOUND, content = {
                     @Content(mediaType = APPLICATION_JSON_VALUE, schema =
@@ -74,7 +75,7 @@ public class AdvertisementController {
     })
     @GetMapping("/{id}/{langCode}")
     @ResponseBody
-    public AdvertisementResponseDto getAdvertisementById(
+    public AdvertisementDetailsResponseDto getAdvertisementById(
             @Parameter(description = "The ID of the Advertisement to retrieve", required = true,
                     schema = @Schema(type = "integer", format = "int64")
             )
@@ -94,7 +95,7 @@ public class AdvertisementController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
                     @Content(mediaType = APPLICATION_JSON_VALUE, schema =
-                    @Schema(implementation = AdvertisementResponseDto.class))
+                    @Schema(implementation = AdvertisementDetailsResponseDto.class))
             }),
             @ApiResponse(responseCode = "400", description = BAD_REQUEST, content = {
                     @Content(mediaType = APPLICATION_JSON_VALUE, schema =
@@ -112,7 +113,7 @@ public class AdvertisementController {
     @PreAuthorize("isAuthenticated()")
     @PostMapping
     @ResponseBody
-    public AdvertisementResponseDto addAdvertisement(
+    public AdvertisementDetailsResponseDto addAdvertisement(
             @RequestBody @Valid @NotNull(message = REQUEST_BODY_IS_MANDATORY) final AdvertisementRequestDto request,
             BindingResult bindingResult, Authentication authentication) {
         log.info("Received request to create Delivery - {}.", request);
@@ -122,7 +123,7 @@ public class AdvertisementController {
     @Operation(summary = "Get Favorite Advertisements")
     @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION)
     @GetMapping(path = "/favorite/{langCode}")
-    public Page<AdvertisementResponseDto> getFavoriteAds(
+    public Page<AdvertisementShortResponseDto> getFavoriteAds(
             @Parameter(description = "The Code Language of the advertisements to retrieve", required = true,
                     schema = @Schema(type = "string"), example = "ua"
             )
@@ -142,14 +143,14 @@ public class AdvertisementController {
         List<AdvertisementCategory> categories = categoryService.getByIds(categoriesIds);
         Page<Advertisement> advertisements = advertisementService.getFavoriteAds(categories,
                 pageable);
-        return advertisements.map(adv -> advertisementMapper.mapEntityToDto(adv, language));
+        return advertisements.map(adv -> advertisementMapper.mapEntityToShortDto(adv, language));
     }
 
     @Operation(summary = "Set Advertisement status to Draft")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
                     @Content(mediaType = APPLICATION_JSON_VALUE, schema =
-                    @Schema(implementation = AdvertisementResponseDto.class))
+                    @Schema(implementation = AdvertisementDetailsResponseDto.class))
             }),
             @ApiResponse(responseCode = "401", description = UNAUTHORIZED, content = {
                     @Content(mediaType = APPLICATION_JSON_VALUE, schema =
@@ -163,7 +164,7 @@ public class AdvertisementController {
     @PreAuthorize("isAuthenticated()")
     @PutMapping("/status-draft")
     @ResponseBody
-    public List<AdvertisementResponseDto> setStatusDraft(
+    public List<AdvertisementDetailsResponseDto> setStatusDraft(
             @Parameter(description = "List of advertisements identifiers",
                     schema = @Schema(type = "array[integer]")
             ) @RequestParam(required = false) List<Long> ids
@@ -181,7 +182,7 @@ public class AdvertisementController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
                     @Content(mediaType = APPLICATION_JSON_VALUE, schema =
-                    @Schema(implementation = AdvertisementResponseDto.class))
+                    @Schema(implementation = AdvertisementDetailsResponseDto.class))
             }),
             @ApiResponse(responseCode = "401", description = UNAUTHORIZED, content = {
                     @Content(mediaType = APPLICATION_JSON_VALUE, schema =
@@ -195,7 +196,7 @@ public class AdvertisementController {
     @PreAuthorize("isAuthenticated()")
     @PutMapping("/status-pending")
     @ResponseBody
-    public List<AdvertisementResponseDto> setStatusPublic(
+    public List<AdvertisementDetailsResponseDto> setStatusPublic(
             @Parameter(description = "List of advertisements identifiers",
                     schema = @Schema(type = "array[integer]")
             ) @RequestParam(required = false) List<Long> ids
@@ -212,7 +213,7 @@ public class AdvertisementController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
                     @Content(mediaType = APPLICATION_JSON_VALUE, schema =
-                    @Schema(implementation = AdvertisementResponseDto.class))
+                    @Schema(implementation = AdvertisementDetailsResponseDto.class))
             }),
             @ApiResponse(responseCode = "400", description = BAD_REQUEST, content = {
                     @Content(mediaType = APPLICATION_JSON_VALUE, schema =

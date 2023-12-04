@@ -3,6 +3,7 @@ package org.petmarket.advertisements.images.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.petmarket.advertisements.images.dto.AdvertisementImageResponseDto;
+import org.petmarket.advertisements.images.dto.AdvertisementImageShortResponseDto;
 import org.petmarket.advertisements.images.entity.AdvertisementImage;
 import org.petmarket.config.MapperConfig;
 
@@ -11,5 +12,8 @@ public interface AdvertisementImageMapper {
 
     @Mapping(target = "advertisementId", source = "advertisement.id")
     AdvertisementImageResponseDto toDto(AdvertisementImage image);
+
+    @Mapping(target = "url", source = "urlSmall")
+    AdvertisementImageShortResponseDto toShortDto(AdvertisementImage image);
 
 }
