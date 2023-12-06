@@ -22,7 +22,7 @@ public interface UserMapper {
             """
                     java(entity.getFirstName() + (entity.getLastName() != null && !entity.getLastName().isEmpty() ? " " + 
                     entity.getLastName().charAt(0) + "." : ""))
-                    """)
+                          """)
     AuthorShortResponseDto mapEntityToAuthorShortDto(User entity);
 
     User mapDtoRequestToDto(UserRequestDto dto);
