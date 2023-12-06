@@ -9,7 +9,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.petmarket.advertisements.advertisement.dto.AdvertisementResponseDto;
+import org.petmarket.advertisements.advertisement.dto.AdvertisementDetailsResponseDto;
+import org.petmarket.advertisements.advertisement.dto.AdvertisementShortResponseDto;
 import org.petmarket.advertisements.advertisement.entity.Advertisement;
 import org.petmarket.advertisements.advertisement.entity.AdvertisementStatus;
 import org.petmarket.advertisements.advertisement.entity.AdvertisementType;
@@ -65,7 +66,7 @@ public class AdvertisementAdminController {
             })
     })
     @GetMapping(path = "/{langCode}")
-    public Page<AdvertisementResponseDto> getAds(
+    public Page<AdvertisementShortResponseDto> getAds(
             @Parameter(description = "The Code Language of the advertisements to retrieve", required = true,
                     schema = @Schema(type = "string"), example = "ua"
             )
@@ -96,14 +97,14 @@ public class AdvertisementAdminController {
         List<City> cities = cityService.getByIds(citiesIds);
         Page<Advertisement> advertisements = advertisementService.getAdvertisements(categories, cities, status,
                 type, pageable);
-        return advertisements.map(adv -> advertisementMapper.mapEntityToDto(adv, language));
+        return advertisements.map(adv -> advertisementMapper.mapEntityToShortDto(adv, language));
     }
 
     @Operation(summary = "Set Advertisement status")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
                     @Content(mediaType = APPLICATION_JSON_VALUE, schema =
-                    @Schema(implementation = AdvertisementResponseDto.class))
+                    @Schema(implementation = AdvertisementDetailsResponseDto.class))
             }),
             @ApiResponse(responseCode = "401", description = UNAUTHORIZED, content = {
                     @Content(mediaType = APPLICATION_JSON_VALUE, schema =
@@ -116,7 +117,7 @@ public class AdvertisementAdminController {
     })
     @PutMapping("/status")
     @ResponseBody
-    public List<AdvertisementResponseDto> setStatusDraft(
+    public List<AdvertisementDetailsResponseDto> setStatusDraft(
             @Parameter(description = "List of advertisements identifiers",
                     schema = @Schema(type = "array[integer]")
             ) @RequestParam(required = false) List<Long> ids,
