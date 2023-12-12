@@ -137,9 +137,9 @@ public class AdvertisementService {
     public Page<Advertisement> getFavoriteAds(List<AdvertisementCategory> categories,
                                               Pageable pageable) {
         if (categories.isEmpty()) {
-            return advertisementRepository.findTop1000ByStatusOrderByCreatedDesc(AdvertisementStatus.ACTIVE, pageable);
+            return advertisementRepository.findAllByStatusOrderByCreatedDesc(AdvertisementStatus.ACTIVE, pageable);
         } else {
-            return advertisementRepository.findTop1000ByCategoryInAndStatusOrderByCreatedDesc(categories,
+            return advertisementRepository.findAllByCategoryInAndStatusOrderByCreatedDesc(categories,
                     AdvertisementStatus.ACTIVE,
                     pageable
             );

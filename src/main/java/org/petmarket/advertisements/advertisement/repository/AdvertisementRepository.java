@@ -54,8 +54,8 @@ public interface AdvertisementRepository extends AdvertisementRepositoryBasic {
             nativeQuery = true)
     List<Long> findFavoriteTags(@Param("limit") int limit);
 
-    Page<Advertisement> findTop1000ByCategoryInAndStatusOrderByCreatedDesc(
+    Page<Advertisement> findAllByCategoryInAndStatusOrderByCreatedDesc(
             List<AdvertisementCategory> categories, AdvertisementStatus status, Pageable pageable);
 
-    Page<Advertisement> findTop1000ByStatusOrderByCreatedDesc(AdvertisementStatus status, Pageable pageable);
+    Page<Advertisement> findAllByStatusOrderByCreatedDesc(AdvertisementStatus status, Pageable pageable);
 }
