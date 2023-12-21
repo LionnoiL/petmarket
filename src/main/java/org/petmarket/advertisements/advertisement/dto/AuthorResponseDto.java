@@ -3,6 +3,7 @@ package org.petmarket.advertisements.advertisement.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
+import org.petmarket.users.entity.UserType;
 
 import java.time.LocalDateTime;
 
@@ -29,4 +30,7 @@ public class AuthorResponseDto {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonProperty("last_activity")
     private LocalDateTime lastActivity;
+
+    @JsonProperty("user_type")
+    private UserType userType;
 }

@@ -40,6 +40,10 @@ public class User {
     @Column(name = "status")
     private UserStatus status;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "user_type")
+    private UserType userType;
+
     @Column(name = "user_name")
     private String username;
 

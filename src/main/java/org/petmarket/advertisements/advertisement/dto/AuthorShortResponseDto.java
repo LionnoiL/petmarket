@@ -2,6 +2,7 @@ package org.petmarket.advertisements.advertisement.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
+import org.petmarket.users.entity.UserType;
 
 @Setter
 @Getter
@@ -15,4 +16,7 @@ public class AuthorShortResponseDto {
 
     @JsonProperty("reviews_count")
     private int reviewsCount;
+
+    @JsonProperty("user_type")
+    private UserType userType;
 }
