@@ -15,6 +15,7 @@ import org.petmarket.pages.dto.SitePageResponseDto;
 import org.petmarket.pages.entity.SitePageType;
 import org.petmarket.pages.service.SitePageService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
@@ -27,6 +28,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
+@Validated
 @RequestMapping(value = "/v1/pages")
 public class PageController {
 

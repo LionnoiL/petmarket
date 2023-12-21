@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.petmarket.language.dto.LanguageResponseDto;
 import org.petmarket.language.service.LanguageService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -26,6 +27,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
+@Validated
 @RequestMapping(value = "/v1/languages")
 public class LanguageController {
 

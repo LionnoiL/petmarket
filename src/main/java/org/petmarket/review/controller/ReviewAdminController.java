@@ -13,6 +13,7 @@ import org.petmarket.errorhandling.ErrorResponse;
 import org.petmarket.review.service.ReviewService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import static org.petmarket.utils.MessageUtils.*;
@@ -22,6 +23,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
+@Validated
 @RequestMapping(value = "/v1/admin")
 public class ReviewAdminController {
 

@@ -17,6 +17,7 @@ import org.petmarket.language.dto.LanguageResponseDto;
 import org.petmarket.language.dto.LanguageUpdateRequestDto;
 import org.petmarket.language.service.LanguageService;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import static org.petmarket.utils.MessageUtils.*;
@@ -26,6 +27,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
+@Validated
 @RequestMapping(value = "/v1/admin/languages")
 public class LanguageAdminController {
 

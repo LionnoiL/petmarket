@@ -11,6 +11,7 @@ import org.petmarket.blog.dto.comment.BlogPostCommentResponse;
 import org.petmarket.blog.service.CommentService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import static org.petmarket.utils.MessageUtils.*;
@@ -19,6 +20,7 @@ import static org.petmarket.utils.MessageUtils.SERVER_ERROR;
 @RestController
 @RequestMapping("/v1/blog/comments")
 @RequiredArgsConstructor
+@Validated
 @Tag(name = "Blog", description = "Blog endpoints API")
 public class CommentController {
     private final CommentService commentService;

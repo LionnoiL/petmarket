@@ -15,6 +15,7 @@ import org.petmarket.blog.entity.Post;
 import org.petmarket.blog.service.PostService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import static org.petmarket.utils.MessageUtils.*;
@@ -22,6 +23,7 @@ import static org.petmarket.utils.MessageUtils.*;
 @RestController
 @RequestMapping("/v1/admin/blog")
 @RequiredArgsConstructor
+@Validated
 @Tag(name = "Blog", description = "Blog endpoints API")
 public class BlogPostAdminController {
     private final PostService postService;

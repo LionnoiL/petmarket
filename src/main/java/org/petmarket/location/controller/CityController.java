@@ -8,11 +8,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.errorhandling.ErrorResponse;
 import org.petmarket.location.dto.CityResponseDto;
 import org.petmarket.location.service.CityService;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,6 +26,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
+@Validated
 @RequestMapping(value = "/v1/cities")
 public class CityController {
 
@@ -96,7 +99,7 @@ public class CityController {
         @PathVariable String name,
         @Parameter(description = "The size of the page to be returned", required = true,
             schema = @Schema(type = "integer", defaultValue = "12")
-        ) @RequestParam(defaultValue = "12") int size
+        ) @RequestParam(defaultValue = "12") @Positive int size
     ) {
         log.info("Received request to get the City with name - {}.", name);
         List<CityResponseDto> dto = cityService.findByName(name, size);

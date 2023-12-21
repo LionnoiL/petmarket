@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.petmarket.errorhandling.ErrorResponse;
 import org.petmarket.location.dto.DistrictResponseDto;
 import org.petmarket.location.service.DistrictService;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import static org.petmarket.utils.MessageUtils.DISTRICT_NOT_FOUND;
@@ -22,6 +23,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
+@Validated
 @RequestMapping(value = "/v1/districts")
 public class DistrictController {
 

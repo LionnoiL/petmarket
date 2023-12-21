@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.petmarket.blog.entity.CommentStatus;
 import org.petmarket.breeds.dto.BreedCommentResponseDto;
@@ -11,6 +12,7 @@ import org.petmarket.breeds.service.BreedCommentService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +23,7 @@ import static org.petmarket.utils.MessageUtils.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v1/admin/breeds/comments")
+@Validated
 @Tag(name = "Breeds", description = "API endpoints for breed administration")
 public class BreedCommentAdminController {
     private final BreedCommentService commentService;
@@ -39,8 +42,8 @@ public class BreedCommentAdminController {
     )
     @GetMapping
     public List<BreedCommentResponseDto> getAllComments(
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "12") int size,
+            @RequestParam(defaultValue = "1") @Positive int page,
+            @RequestParam(defaultValue = "12") @Positive int size,
             @RequestParam(defaultValue = "ASC") String sortDirection,
             @RequestParam(required = true) CommentStatus status) {
         Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), "created");

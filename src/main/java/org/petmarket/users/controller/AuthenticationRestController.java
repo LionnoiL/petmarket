@@ -15,6 +15,7 @@ import org.petmarket.users.dto.UserRequestDto;
 import org.petmarket.users.service.UserAuthService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,6 +27,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @Tag(name = "Authentication", description = "the user authentication API")
 @RequiredArgsConstructor
 @RestController
+@Validated
 @RequestMapping(value = "/v1/auth/")
 public class AuthenticationRestController {
 

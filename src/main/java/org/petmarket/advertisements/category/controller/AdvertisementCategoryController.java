@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.advertisements.advertisement.dto.AdvertisementShortResponseDto;
@@ -32,6 +33,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
@@ -45,6 +47,7 @@ import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
+@Validated
 @RequestMapping(value = "/v1/categories")
 public class AdvertisementCategoryController {
 
@@ -126,7 +129,7 @@ public class AdvertisementCategoryController {
             @Parameter(description = "The size of the categories to be returned", required = true,
                     schema = @Schema(type = "integer", defaultValue = "10")
             )
-            @PathVariable Integer size) {
+            @PathVariable @Positive Integer size) {
         log.info("Received request to get favorite Categories.");
         Collection<AdvertisementCategoryResponseDto> dtos = categoryService.getFavorite(langCode,
                 size);
@@ -154,7 +157,7 @@ public class AdvertisementCategoryController {
             @Parameter(description = "The size of the categories to be returned", required = true,
                     schema = @Schema(type = "integer", defaultValue = "10")
             )
-            @PathVariable Integer size) {
+            @PathVariable @Positive Integer size) {
         log.info("Received request to get favorite Tags Categories.");
         Collection<AdvertisementCategoryTagResponseDto> dtos = categoryService.getFavoriteTags(
                 langCode, size);
@@ -176,10 +179,10 @@ public class AdvertisementCategoryController {
             @PathVariable Long id,
             @Parameter(description = "Number of page (1..N)", required = true,
                     schema = @Schema(type = "integer", defaultValue = "1")
-            ) @RequestParam(defaultValue = "1") int page,
+            ) @RequestParam(defaultValue = "1") @Positive int page,
             @Parameter(description = "The size of the page to be returned", required = true,
                     schema = @Schema(type = "integer", defaultValue = "30")
-            ) @RequestParam(defaultValue = "30") int size,
+            ) @RequestParam(defaultValue = "30") @Positive int size,
             @Parameter(description = "Sort direction (ASC, DESC)",
                     schema = @Schema(type = "string")
             ) @RequestParam(required = false, defaultValue = "ASC") String sortDirection,

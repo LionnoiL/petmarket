@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.advertisements.advertisement.dto.AdvertisementDetailsResponseDto;
@@ -36,6 +37,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -50,6 +52,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
+@Validated
 @RequestMapping(value = "/v1/advertisements")
 public class AdvertisementController {
 
@@ -130,10 +133,10 @@ public class AdvertisementController {
             @PathVariable String langCode,
             @Parameter(description = "Number of page (1..N)", required = true,
                     schema = @Schema(type = "integer", defaultValue = "1")
-            ) @RequestParam(defaultValue = "1") int page,
+            ) @RequestParam(defaultValue = "1") @Positive int page,
             @Parameter(description = "The size of the page to be returned", required = true,
                     schema = @Schema(type = "integer", defaultValue = "30")
-            ) @RequestParam(defaultValue = "30") int size,
+            ) @RequestParam(defaultValue = "30") @Positive int size,
             @Parameter(description = "List of categories identifiers",
                     schema = @Schema(type = "array[integer]")
             ) @RequestParam(required = false) List<Long> categoriesIds

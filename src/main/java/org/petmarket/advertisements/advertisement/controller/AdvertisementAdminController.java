@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.advertisements.advertisement.dto.AdvertisementDetailsResponseDto;
@@ -28,6 +29,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -39,6 +41,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
+@Validated
 @RequestMapping(value = "/v1/admin/advertisements")
 public class AdvertisementAdminController {
 
@@ -73,10 +76,10 @@ public class AdvertisementAdminController {
             @PathVariable String langCode,
             @Parameter(description = "Number of page (1..N)", required = true,
                     schema = @Schema(type = "integer", defaultValue = "1")
-            ) @RequestParam(defaultValue = "1") int page,
+            ) @RequestParam(defaultValue = "1") @Positive int page,
             @Parameter(description = "The size of the page to be returned", required = true,
                     schema = @Schema(type = "integer", defaultValue = "30")
-            ) @RequestParam(defaultValue = "30") int size,
+            ) @RequestParam(defaultValue = "30") @Positive int size,
             @Parameter(description = "Sort direction (ASC, DESC)",
                     schema = @Schema(type = "string")
             ) @RequestParam(required = false, defaultValue = "ASC") String sortDirection,

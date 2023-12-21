@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.petmarket.breeds.dto.BreedCommentRequestDto;
 import org.petmarket.breeds.dto.BreedCommentResponseDto;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,6 +26,7 @@ import static org.petmarket.utils.MessageUtils.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v1/breeds/comments")
+@Validated
 @Tag(name = "Breeds", description = "API endpoints for breed administration")
 public class BreedCommentController {
     private final BreedCommentService commentService;
@@ -79,8 +82,8 @@ public class BreedCommentController {
             })
     @GetMapping("/{breedId}")
     public List<BreedCommentResponseDto> getAll(@PathVariable Long breedId,
-                                                @RequestParam(defaultValue = "1") int page,
-                                                @RequestParam(defaultValue = "12") int size,
+                                                @RequestParam(defaultValue = "1") @Positive int page,
+                                                @RequestParam(defaultValue = "12") @Positive int size,
                                                 @RequestParam(defaultValue = "ASC") String sortDirection,
                                                 Authentication authentication) {
         Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), "created");

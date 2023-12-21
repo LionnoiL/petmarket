@@ -10,6 +10,7 @@ import org.petmarket.blog.dto.category.BlogPostCategoryRequestDto;
 import org.petmarket.blog.dto.category.BlogPostCategoryResponseDto;
 import org.petmarket.blog.service.CategoryService;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import static org.petmarket.utils.MessageUtils.*;
@@ -17,6 +18,7 @@ import static org.petmarket.utils.MessageUtils.*;
 @RestController
 @RequestMapping("/v1/admin/blog/categories")
 @RequiredArgsConstructor
+@Validated
 @Tag(name = "Blog", description = "Blog endpoints API")
 public class CategoryAdminController {
     private final CategoryService categoryService;
