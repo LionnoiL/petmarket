@@ -69,7 +69,11 @@ public class AdvertisementController {
     private final AdvertisementResponseTranslateMapper advertisementMapper;
     private final AdvertisementImageMapper imageMapper;
 
-    @Operation(summary = "Get Advertisement by ID")
+    @Operation(summary = "Get Advertisement by ID",
+            description = """
+                        Advertisements with Active status can be seen by all users.
+                        Ads with a different status can only be accessed by administrators or ad authors.
+                    """)
     @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
             @Content(mediaType = APPLICATION_JSON_VALUE, schema =
             @Schema(implementation = AdvertisementDetailsResponseDto.class))
@@ -86,7 +90,10 @@ public class AdvertisementController {
         return advertisementMapper.mapEntityToDto(advertisement, language);
     }
 
-    @Operation(summary = "Create a new Advertisement")
+    @Operation(summary = "Create a new Advertisement",
+            description = """
+                        Only authorized users have access to create ads.
+                    """)
     @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
             @Content(mediaType = APPLICATION_JSON_VALUE, schema =
             @Schema(implementation = AdvertisementDetailsResponseDto.class))
@@ -106,7 +113,7 @@ public class AdvertisementController {
     @Operation(summary = "Get Favorite Advertisements")
     @ApiResponseSuccessful
     @ApiResponseLanguageNotFound
-    @GetMapping(path = "/favorite/{langCode}")
+    @GetMapping("/favorite/{langCode}")
     public Page<AdvertisementShortResponseDto> getFavoriteAds(
             @ParameterLanguage @PathVariable String langCode,
             @ParameterPageNumber @RequestParam(defaultValue = "1") @Min(1) int page,
@@ -123,7 +130,12 @@ public class AdvertisementController {
         return advertisements.map(adv -> advertisementMapper.mapEntityToShortDto(adv, language));
     }
 
-    @Operation(summary = "Set Advertisement status to Draft")
+    @Operation(summary = "Set Advertisement status to Draft",
+            description = """
+                    Changes the status of the list of ads to Draft.
+                    Only authorized users have access.
+                    Users without administrator rights can only access their ads.
+                    """)
     @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
             @Content(mediaType = APPLICATION_JSON_VALUE, schema =
             @Schema(implementation = AdvertisementDetailsResponseDto.class))
@@ -146,7 +158,12 @@ public class AdvertisementController {
                 .toList();
     }
 
-    @Operation(summary = "Set Advertisement status to Pending")
+    @Operation(summary = "Set Advertisement status to Pending",
+            description = """
+                    Changes the status of the list of ads to Pending.
+                    Only authorized users have access.
+                    Users without administrator rights can only access their ads.
+                    """)
     @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
             @Content(mediaType = APPLICATION_JSON_VALUE, schema =
             @Schema(implementation = AdvertisementDetailsResponseDto.class))
@@ -169,6 +186,12 @@ public class AdvertisementController {
                 .toList();
     }
 
+    @Operation(summary = "Adding images to advertisement",
+            description = """
+                        Only authorized users have access.
+                        Users without administrator rights can only access their ads.
+                        One ad can have no more than 10 images
+                    """)
     @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
             @Content(mediaType = APPLICATION_JSON_VALUE, schema =
             @Schema(implementation = AdvertisementDetailsResponseDto.class))
