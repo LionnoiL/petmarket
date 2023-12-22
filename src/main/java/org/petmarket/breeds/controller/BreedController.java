@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.petmarket.breeds.dto.BreedResponseDto;
 import org.petmarket.breeds.service.BreedService;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,6 +17,7 @@ import static org.petmarket.utils.MessageUtils.*;
 @RestController
 @RequestMapping("/v1/breeds")
 @RequiredArgsConstructor
+@Validated
 @Tag(name = "Breeds", description = "API endpoints for breed administration")
 public class BreedController {
     private final BreedService breedService;

@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import org.petmarket.blog.dto.comment.BlogPostCommentResponse;
 import org.petmarket.blog.entity.CommentStatus;
 import org.petmarket.blog.service.CommentService;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,6 +19,7 @@ import static org.petmarket.utils.MessageUtils.*;
 @RestController
 @RequestMapping("/v1/admin/blog/comments")
 @AllArgsConstructor
+@Validated
 @Tag(name = "Blog", description = "Blog endpoints API")
 public class CommentAdminController {
     private final CommentService commentService;

@@ -14,6 +14,7 @@ import org.petmarket.advertisements.attributes.dto.AttributeGroupResponseDto;
 import org.petmarket.advertisements.attributes.service.AttributeGroupService;
 import org.petmarket.errorhandling.ErrorResponse;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
@@ -26,6 +27,7 @@ import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
+@Validated
 @RequestMapping(value = "/v1/attribute-groups")
 public class AttributeGroupController {
 

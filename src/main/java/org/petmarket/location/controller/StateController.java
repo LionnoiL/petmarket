@@ -14,6 +14,7 @@ import org.petmarket.errorhandling.ErrorResponse;
 import org.petmarket.location.dto.CityResponseDto;
 import org.petmarket.location.dto.StateResponseDto;
 import org.petmarket.location.service.StateService;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,6 +26,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
+@Validated
 @RequestMapping(value = "/v1/states")
 public class StateController {
 

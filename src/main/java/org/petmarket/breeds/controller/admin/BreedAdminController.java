@@ -11,6 +11,7 @@ import org.petmarket.breeds.dto.BreedRequestDto;
 import org.petmarket.breeds.dto.BreedResponseDto;
 import org.petmarket.breeds.service.BreedService;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import static org.petmarket.utils.MessageUtils.*;
@@ -18,6 +19,7 @@ import static org.petmarket.utils.MessageUtils.*;
 @RestController
 @RequestMapping("/v1/admin/breeds")
 @RequiredArgsConstructor
+@Validated
 @Tag(name = "Breeds", description = "API endpoints for breed administration")
 public class BreedAdminController {
     private final BreedService breedService;

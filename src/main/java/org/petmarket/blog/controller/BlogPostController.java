@@ -4,12 +4,14 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.petmarket.blog.dto.posts.BlogPostResponseDto;
 import org.petmarket.blog.service.PostService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,6 +21,7 @@ import static org.petmarket.utils.MessageUtils.*;
 @RestController
 @RequestMapping("/v1/blog")
 @RequiredArgsConstructor
+@Validated
 @Tag(name = "Blog", description = "Blog endpoints API")
 public class BlogPostController {
     private final PostService postService;
@@ -75,8 +78,8 @@ public class BlogPostController {
     )
     @GetMapping("/{langCode}")
     public List<BlogPostResponseDto> getAll(
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "12") int size,
+            @RequestParam(defaultValue = "1") @Positive int page,
+            @RequestParam(defaultValue = "12") @Positive int size,
             @RequestParam(defaultValue = "ASC") String sortDirection,
             @PathVariable String langCode,
             @RequestParam(required = false) Long categoryId) {

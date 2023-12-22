@@ -1,5 +1,6 @@
 package org.petmarket.errorhandling;
 
+import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
 import org.petmarket.aws.s3.S3Exception;
 import org.springframework.http.HttpHeaders;
@@ -19,6 +20,15 @@ import java.sql.SQLIntegrityConstraintViolationException;
 @RequiredArgsConstructor
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    private ResponseEntity<ErrorResponse> handleException(ConstraintViolationException exception) {
+        ErrorResponse response = new ErrorResponse(
+            exception.getMessage(),
+            System.currentTimeMillis()
+        );
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
 
     @ExceptionHandler(FileUploadException.class)
     private ResponseEntity<ErrorResponse> handleException(FileUploadException exception) {

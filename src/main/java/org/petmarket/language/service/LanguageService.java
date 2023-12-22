@@ -71,7 +71,9 @@ public class LanguageService {
                 .ifPresent(language -> {
                     throw new ItemNotCreatedException(LANGUAGE_IS_ALREADY_IN_DATABASE);
                 });
-
+        if (dto.getEnable() == null){
+            dto.setEnable(false);
+        }
         Language language = languageMapper.mapDtoRequestToEntity(dto);
         languageRepository.save(language);
         log.info("The Language was created");
