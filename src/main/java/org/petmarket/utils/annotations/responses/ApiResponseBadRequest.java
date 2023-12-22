@@ -1,4 +1,4 @@
-package org.petmarket.utils.annotations;
+package org.petmarket.utils.annotations.responses;
 
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -10,13 +10,14 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import static org.petmarket.utils.MessageUtils.UNAUTHORIZED;
+import static org.petmarket.utils.MessageUtils.BAD_REQUEST;
 
 @Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-@ApiResponse(responseCode = "401", description = UNAUTHORIZED, content = {
+@ApiResponse(responseCode = "400", description = BAD_REQUEST, content = {
         @Content(mediaType = "application/json", schema =
         @Schema(implementation = ErrorResponse.class))
 })
-public @interface ApiResponseUnauthorized {
+public @interface ApiResponseBadRequest {
+
 }

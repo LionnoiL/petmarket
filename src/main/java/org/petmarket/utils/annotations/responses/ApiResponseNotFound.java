@@ -1,4 +1,4 @@
-package org.petmarket.utils.annotations;
+package org.petmarket.utils.annotations.responses;
 
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;

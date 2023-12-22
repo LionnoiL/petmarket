@@ -1,4 +1,4 @@
-package org.petmarket.utils.annotations;
+package org.petmarket.utils.annotations.parametrs;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -10,9 +10,9 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.PARAMETER, ElementType.METHOD, ElementType.FIELD, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-@Parameter(description = "The size of the page to be returned", required = true,
-        schema = @Schema(type = "integer", defaultValue = "12")
+@Parameter(description = "The name of the field by which sorting will be performed",
+        schema = @Schema(type = "string")
 )
-public @interface ParameterPageSize {
+public @interface ParameterPageSortField {
 
 }

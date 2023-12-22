@@ -1,4 +1,4 @@
-package org.petmarket.utils.annotations;
+package org.petmarket.utils.annotations.parametrs;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -10,9 +10,9 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.PARAMETER, ElementType.METHOD, ElementType.FIELD, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-@Parameter(description = "Number of page (1..N)", required = true,
-        schema = @Schema(type = "integer", defaultValue = "1")
+@Parameter(description = "The Language code", required = true,
+        schema = @Schema(type = "string"), example = "ua"
 )
-public @interface ParameterPageNumber {
+public @interface ParameterLanguage {
 
 }
