@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.sql.SQLIntegrityConstraintViolationException;
@@ -20,6 +21,15 @@ import java.sql.SQLIntegrityConstraintViolationException;
 @RequiredArgsConstructor
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    private ResponseEntity<ErrorResponse> handleException(MethodArgumentTypeMismatchException exception) {
+        ErrorResponse response = new ErrorResponse(
+            exception.getMessage(),
+            System.currentTimeMillis()
+        );
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
 
     @ExceptionHandler(ConstraintViolationException.class)
     private ResponseEntity<ErrorResponse> handleException(ConstraintViolationException exception) {
