@@ -1,13 +1,15 @@
 package org.petmarket.blog.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.petmarket.blog.dto.category.BlogPostCategoryResponseDto;
 import org.petmarket.blog.service.CategoryService;
+import org.petmarket.utils.annotations.parametrs.*;
+import org.petmarket.utils.annotations.responses.ApiResponseBadRequest;
+import org.petmarket.utils.annotations.responses.ApiResponseNotFound;
+import org.petmarket.utils.annotations.responses.ApiResponseSuccessful;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -15,8 +17,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
-import static org.petmarket.utils.MessageUtils.*;
 
 @RestController
 @RequestMapping("/v1/blog/categories")
@@ -28,30 +28,17 @@ public class CategoryController {
 
     @Operation(
             summary = "Get all blog categories",
-            description = "Get all blog categories for the specified language code",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION),
-                    @ApiResponse(responseCode = "400", description = BAD_REQUEST),
-                    @ApiResponse(responseCode = "500", description = SERVER_ERROR)
-            },
-            parameters = {
-                    @Parameter(
-                            name = "langCode",
-                            description = "Language code",
-                            example = "ua",
-                            required = true
-                    ),
-                    @Parameter(name = "page", description = "Page number", example = "1"),
-                    @Parameter(name = "size", description = "Number of items per page", example = "12"),
-                    @Parameter(name = "sortDirection", description = "Sort direction", example = "ASC")
-            }
+            description = "Get all blog categories for the specified language code"
     )
+    @ApiResponseSuccessful
+    @ApiResponseBadRequest
+    @ApiResponseNotFound
     @GetMapping("/{langCode}")
     public List<BlogPostCategoryResponseDto> getAll(
-            @RequestParam(defaultValue = "1") @Positive int page,
-            @RequestParam(defaultValue = "12") @Positive int size,
-            @RequestParam(defaultValue = "ASC") String sortDirection,
-            @PathVariable(name = "langCode") String langCode) {
+            @ParameterPageNumber @RequestParam(defaultValue = "1") @Positive int page,
+            @ParameterPageSize @RequestParam(defaultValue = "12") @Positive int size,
+            @ParameterPageSort @RequestParam(defaultValue = "ASC") String sortDirection,
+            @ParameterLanguage @PathVariable(name = "langCode") String langCode) {
         Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), "id");
         Pageable pageable = PageRequest.of(page - 1, size, sort);
         return categoryService.getAll(pageable, langCode);
@@ -59,31 +46,15 @@ public class CategoryController {
 
     @Operation(
             summary = "Get a blog category by ID",
-            description = "Get a blog category by its ID and language code",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION),
-                    @ApiResponse(responseCode = "404", description = NOT_FOUND),
-                    @ApiResponse(responseCode = "500", description = SERVER_ERROR)
-            },
-            parameters = {
-                    @Parameter(
-                            name = "categoryId",
-                            description = "Category Id",
-                            example = "1",
-                            required = true
-                    ),
-                    @Parameter(
-                            name = "langCode",
-                            description = "Language code",
-                            example = "ua",
-                            required = true
-                    )
-            }
+            description = "Get a blog category by its ID and language code"
     )
+    @ApiResponseSuccessful
+    @ApiResponseBadRequest
+    @ApiResponseNotFound
     @GetMapping("/{categoryId}/{langCode}")
     public BlogPostCategoryResponseDto get(
-            @PathVariable(name = "categoryId") Long categoryId,
-            @PathVariable(name = "langCode") String langCode) {
+            @ParameterId @PathVariable(name = "categoryId") @Positive Long categoryId,
+            @ParameterLanguage @PathVariable(name = "langCode") String langCode) {
         return categoryService.get(categoryId, langCode);
     }
 }
