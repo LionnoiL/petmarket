@@ -1,20 +1,18 @@
 package org.petmarket.advertisements.attributes.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.advertisements.attributes.dto.AttributeGroupRequestDto;
 import org.petmarket.advertisements.attributes.dto.AttributeGroupResponseDto;
 import org.petmarket.advertisements.attributes.service.AttributeGroupService;
-import org.petmarket.errorhandling.ErrorResponse;
 import org.petmarket.utils.annotations.parametrs.ParameterId;
 import org.petmarket.utils.annotations.parametrs.ParameterLanguage;
 import org.petmarket.utils.annotations.responses.ApiResponseBadRequest;
@@ -27,7 +25,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import static org.petmarket.utils.MessageUtils.*;
+import static org.petmarket.utils.MessageUtils.REQUEST_BODY_IS_MANDATORY;
+import static org.petmarket.utils.MessageUtils.SUCCESSFULLY_OPERATION;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
 @Tag(name = "Attributes", description = "the advertisement attributes API")
@@ -68,7 +67,7 @@ public class AttributeGroupAdminController {
     @ApiResponseNotFound
     @PutMapping("/{id}/{langCode}")
     public AttributeGroupResponseDto updateGroup(
-            @ParameterId @PathVariable Long id,
+            @ParameterId @PathVariable @Min(1L) Long id,
             @ParameterLanguage @PathVariable String langCode,
             @RequestBody @Valid @NotNull(message = REQUEST_BODY_IS_MANDATORY) final AttributeGroupRequestDto request,
             BindingResult bindingResult) {
@@ -84,7 +83,7 @@ public class AttributeGroupAdminController {
     @ApiResponseNotFound
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteGroup(
-            @ParameterId @PathVariable Long id) {
+            @ParameterId @PathVariable @Min(1L) Long id) {
         log.info("Received request to delete the attribute group with id - {}.", id);
         attributeGroupService.deleteGroup(id);
         log.info("the attribute group with id - {} was deleted.", id);
