@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.advertisements.advertisement.dto.AdvertisementDetailsResponseDto;
@@ -63,8 +63,8 @@ public class AdvertisementAdminController {
     @GetMapping(path = "/{langCode}")
     public Page<AdvertisementShortResponseDto> getAds(
             @ParameterLanguage @PathVariable String langCode,
-            @ParameterPageNumber @RequestParam(defaultValue = "1") @Min(1) int page,
-            @ParameterPageSize @RequestParam(defaultValue = "30") @Min(1) int size,
+            @ParameterPageNumber @RequestParam(defaultValue = "1") @Positive int page,
+            @ParameterPageSize @RequestParam(defaultValue = "30") @Positive int size,
             @ParameterPageSort @RequestParam(required = false, defaultValue = "ASC") String sortDirection,
             @ParameterPageSortField @RequestParam(required = false, defaultValue = "created") String sortField,
             @RequestParam(required = false) AdvertisementStatus status,

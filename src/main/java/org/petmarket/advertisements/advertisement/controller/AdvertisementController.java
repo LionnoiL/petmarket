@@ -7,8 +7,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.advertisements.advertisement.dto.AdvertisementDetailsResponseDto;
@@ -81,7 +81,7 @@ public class AdvertisementController {
     @ApiResponseNotFound
     @GetMapping("/{id}/{langCode}")
     public AdvertisementDetailsResponseDto getAdvertisementById(
-            @ParameterId @PathVariable Long id,
+            @ParameterId @PathVariable @Positive Long id,
             @ParameterLanguage @PathVariable String langCode) {
         log.info("Received request to get Advertisement Advertisement with id - {}.", id);
         Language language = languageService.getByLangCode(langCode);
@@ -116,8 +116,8 @@ public class AdvertisementController {
     @GetMapping("/favorite/{langCode}")
     public Page<AdvertisementShortResponseDto> getFavoriteAds(
             @ParameterLanguage @PathVariable String langCode,
-            @ParameterPageNumber @RequestParam(defaultValue = "1") @Min(1) int page,
-            @ParameterPageSize @RequestParam(defaultValue = "30") @Min(1) int size,
+            @ParameterPageNumber @RequestParam(defaultValue = "1") @Positive int page,
+            @ParameterPageSize @RequestParam(defaultValue = "30") @Positive int size,
             @Parameter(description = "List of categories identifiers",
                     schema = @Schema(type = "array[integer]")
             ) @RequestParam(required = false) List<Long> categoriesIds

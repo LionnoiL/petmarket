@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.advertisements.attributes.dto.AttributeGroupResponseDto;
@@ -63,7 +63,7 @@ public class AttributeGroupController {
     @ApiResponseNotFound
     @GetMapping("/{id}/{langCode}")
     public AttributeGroupResponseDto getGroupById(
-            @ParameterId @PathVariable @Min(1L) Long id,
+            @ParameterId @PathVariable @Positive Long id,
             @ParameterLanguage @PathVariable String langCode) {
         log.info("Received request to get the group with id - {}.", id);
         AttributeGroupResponseDto dto = attributeGroupService.findById(id, langCode);
@@ -82,7 +82,7 @@ public class AttributeGroupController {
     @ApiResponseNotFound
     @GetMapping("/category/{id}/{langCode}")
     public ResponseEntity<Collection<AttributeGroupResponseDto>> getByCategory(
-            @ParameterId @PathVariable @Min(1L) Long id,
+            @ParameterId @PathVariable @Positive Long id,
             @ParameterLanguage @PathVariable String langCode) {
         log.info("Received request to get Groups by category {}", id);
         Collection<AttributeGroupResponseDto> dtos = attributeGroupService.getByCategory(id,

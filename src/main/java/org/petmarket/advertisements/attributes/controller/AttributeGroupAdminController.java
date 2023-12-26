@@ -6,8 +6,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.advertisements.attributes.dto.AttributeGroupRequestDto;
@@ -67,7 +67,7 @@ public class AttributeGroupAdminController {
     @ApiResponseNotFound
     @PutMapping("/{id}/{langCode}")
     public AttributeGroupResponseDto updateGroup(
-            @ParameterId @PathVariable @Min(1L) Long id,
+            @ParameterId @PathVariable @Positive Long id,
             @ParameterLanguage @PathVariable String langCode,
             @RequestBody @Valid @NotNull(message = REQUEST_BODY_IS_MANDATORY) final AttributeGroupRequestDto request,
             BindingResult bindingResult) {
@@ -83,7 +83,7 @@ public class AttributeGroupAdminController {
     @ApiResponseNotFound
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteGroup(
-            @ParameterId @PathVariable @Min(1L) Long id) {
+            @ParameterId @PathVariable @Positive Long id) {
         log.info("Received request to delete the attribute group with id - {}.", id);
         attributeGroupService.deleteGroup(id);
         log.info("the attribute group with id - {} was deleted.", id);
