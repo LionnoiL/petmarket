@@ -6,7 +6,6 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
@@ -23,11 +22,14 @@ import org.petmarket.advertisements.category.dto.AdvertisementCategoryResponseDt
 import org.petmarket.advertisements.category.dto.AdvertisementCategoryTagResponseDto;
 import org.petmarket.advertisements.category.entity.AdvertisementCategory;
 import org.petmarket.advertisements.category.service.AdvertisementCategoryService;
-import org.petmarket.errorhandling.ErrorResponse;
 import org.petmarket.language.entity.Language;
 import org.petmarket.language.service.LanguageService;
 import org.petmarket.location.entity.City;
 import org.petmarket.location.service.CityService;
+import org.petmarket.utils.annotations.parametrs.*;
+import org.petmarket.utils.annotations.responses.ApiResponseBadRequest;
+import org.petmarket.utils.annotations.responses.ApiResponseNotFound;
+import org.petmarket.utils.annotations.responses.ApiResponseSuccessful;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -39,7 +41,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Collection;
 import java.util.List;
 
-import static org.petmarket.utils.MessageUtils.CATEGORY_NOT_FOUND;
 import static org.petmarket.utils.MessageUtils.SUCCESSFULLY_OPERATION;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
@@ -59,27 +60,16 @@ public class AdvertisementCategoryController {
     private final AdvertisementResponseTranslateMapper advertisementMapper;
 
     @Operation(summary = "Get Category by ID")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
-                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
-                    @Schema(implementation = AdvertisementCategoryResponseDto.class))
-            }),
-            @ApiResponse(responseCode = "404", description = CATEGORY_NOT_FOUND, content = {
-                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
-                    @Schema(implementation = ErrorResponse.class))
-            })
+    @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
+            @Content(mediaType = APPLICATION_JSON_VALUE, schema =
+            @Schema(implementation = AdvertisementCategoryResponseDto.class))
     })
+    @ApiResponseBadRequest
+    @ApiResponseNotFound
     @GetMapping("/{id}/{langCode}")
-    @ResponseBody
     public AdvertisementCategoryResponseDto getCategoryById(
-            @Parameter(description = "The ID of the category to retrieve", required = true,
-                    schema = @Schema(type = "integer", format = "int64")
-            )
-            @PathVariable Long id,
-            @Parameter(description = "The Code Language of the category to retrieve", required = true,
-                    schema = @Schema(type = "string"), example = "ua"
-            )
-            @PathVariable String langCode) {
+            @ParameterId @PathVariable @Positive Long id,
+            @ParameterLanguage @PathVariable String langCode) {
         log.info("Received request to get the Category with id - {}.", id);
         AdvertisementCategoryResponseDto dto = categoryService.findById(id, langCode);
         log.info("the Category with id - {} was retrieved - {}.", id, dto);
@@ -87,22 +77,17 @@ public class AdvertisementCategoryController {
     }
 
     @Operation(summary = "Get all Categories.", description = "Obtaining all site categories")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
-                    @Content(
-                            mediaType = APPLICATION_JSON_VALUE,
-                            array = @ArraySchema(schema = @Schema(
-                                    implementation = AdvertisementCategoryResponseDto.class))
-                    )
-            })
-    })
-    @GetMapping("/{langCode}")
-    @ResponseBody
-    public ResponseEntity<Collection<AdvertisementCategoryResponseDto>> getAll(
-            @Parameter(description = "The Code Language of the categories to retrieve", required = true,
-                    schema = @Schema(type = "string"), example = "ua"
+    @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
+            @Content(
+                    mediaType = APPLICATION_JSON_VALUE,
+                    array = @ArraySchema(schema = @Schema(
+                            implementation = AdvertisementCategoryResponseDto.class))
             )
-            @PathVariable String langCode) {
+    })
+    @ApiResponseNotFound
+    @GetMapping("/{langCode}")
+    public ResponseEntity<Collection<AdvertisementCategoryResponseDto>> getAll(
+            @ParameterLanguage @PathVariable String langCode) {
         log.info("Received request to get all Categories.");
         Collection<AdvertisementCategoryResponseDto> dtos = categoryService.getAll(langCode);
         log.info("All Categories were retrieved - {}.", dtos);
@@ -110,26 +95,19 @@ public class AdvertisementCategoryController {
     }
 
     @Operation(summary = "Get favorite Categories.", description = "Obtaining favorite site categories")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
-                    @Content(
-                            mediaType = APPLICATION_JSON_VALUE,
-                            array = @ArraySchema(schema = @Schema(
-                                    implementation = AdvertisementCategoryResponseDto.class))
-                    )
-            })
+    @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
+            @Content(
+                    mediaType = APPLICATION_JSON_VALUE,
+                    array = @ArraySchema(schema = @Schema(
+                            implementation = AdvertisementCategoryResponseDto.class))
+            )
     })
+    @ApiResponseBadRequest
+    @ApiResponseNotFound
     @GetMapping("/favorite/{langCode}/{size}")
-    @ResponseBody
     public ResponseEntity<Collection<AdvertisementCategoryResponseDto>> getFavorite(
-            @Parameter(description = "The Code Language of the categories to retrieve", required = true,
-                    schema = @Schema(type = "string"), example = "ua"
-            )
-            @PathVariable String langCode,
-            @Parameter(description = "The size of the categories to be returned", required = true,
-                    schema = @Schema(type = "integer", defaultValue = "10")
-            )
-            @PathVariable @Positive Integer size) {
+            @ParameterLanguage @PathVariable String langCode,
+            @ParameterPageSize @PathVariable @Positive Integer size) {
         log.info("Received request to get favorite Categories.");
         Collection<AdvertisementCategoryResponseDto> dtos = categoryService.getFavorite(langCode,
                 size);
@@ -138,26 +116,19 @@ public class AdvertisementCategoryController {
     }
 
     @Operation(summary = "Get favorite tags for Categories.", description = "Obtaining favorite tags for categories")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
-                    @Content(
-                            mediaType = APPLICATION_JSON_VALUE,
-                            array = @ArraySchema(schema = @Schema(
-                                    implementation = AdvertisementCategoryTagResponseDto.class))
-                    )
-            })
+    @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
+            @Content(
+                    mediaType = APPLICATION_JSON_VALUE,
+                    array = @ArraySchema(schema = @Schema(
+                            implementation = AdvertisementCategoryTagResponseDto.class))
+            )
     })
+    @ApiResponseBadRequest
+    @ApiResponseNotFound
     @GetMapping("/favorite-tags/{langCode}/{size}")
-    @ResponseBody
     public ResponseEntity<Collection<AdvertisementCategoryTagResponseDto>> getFavoriteTags(
-            @Parameter(description = "The Code Language of the categories to retrieve", required = true,
-                    schema = @Schema(type = "string"), example = "ua"
-            )
-            @PathVariable String langCode,
-            @Parameter(description = "The size of the categories to be returned", required = true,
-                    schema = @Schema(type = "integer", defaultValue = "10")
-            )
-            @PathVariable @Positive Integer size) {
+            @ParameterLanguage @PathVariable String langCode,
+            @ParameterPageSize @PathVariable @Positive Integer size) {
         log.info("Received request to get favorite Tags Categories.");
         Collection<AdvertisementCategoryTagResponseDto> dtos = categoryService.getFavoriteTags(
                 langCode, size);
@@ -166,29 +137,17 @@ public class AdvertisementCategoryController {
     }
 
     @Operation(summary = "Get Advertisements by category")
-    @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION)
+    @ApiResponseSuccessful
+    @ApiResponseBadRequest
+    @ApiResponseNotFound
     @GetMapping(path = "/{id}/{langCode}/advertisements")
     public Page<AdvertisementShortResponseDto> getAllAdvertisementsByCategory(
-            @Parameter(description = "The Code Language of the advertisements to retrieve", required = true,
-                    schema = @Schema(type = "string"), example = "ua"
-            )
-            @PathVariable String langCode,
-            @Parameter(description = "The ID of the category to retrieve", required = true,
-                    schema = @Schema(type = "integer", format = "int64")
-            )
-            @PathVariable Long id,
-            @Parameter(description = "Number of page (1..N)", required = true,
-                    schema = @Schema(type = "integer", defaultValue = "1")
-            ) @RequestParam(defaultValue = "1") @Positive int page,
-            @Parameter(description = "The size of the page to be returned", required = true,
-                    schema = @Schema(type = "integer", defaultValue = "30")
-            ) @RequestParam(defaultValue = "30") @Positive int size,
-            @Parameter(description = "Sort direction (ASC, DESC)",
-                    schema = @Schema(type = "string")
-            ) @RequestParam(required = false, defaultValue = "ASC") String sortDirection,
-            @Parameter(description = "Sort field",
-                    schema = @Schema(type = "string")
-            ) @RequestParam(required = false, defaultValue = "created") String sortField,
+            @ParameterLanguage @PathVariable String langCode,
+            @ParameterId @PathVariable @Positive Long id,
+            @ParameterPageNumber @RequestParam(defaultValue = "1") @Positive int page,
+            @ParameterPageSize @RequestParam(defaultValue = "30") @Positive int size,
+            @ParameterPageSort @RequestParam(required = false, defaultValue = "ASC") String sortDirection,
+            @ParameterPageSortField @RequestParam(required = false, defaultValue = "created") String sortField,
             @Parameter(description = "List of attributes identifiers",
                     schema = @Schema(type = "array[integer]")
             ) @RequestParam(required = false) List<Long> attributesIds,

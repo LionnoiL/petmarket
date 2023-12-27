@@ -2,20 +2,19 @@ package org.petmarket.blog.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.petmarket.blog.dto.comment.BlogPostCommentRequest;
 import org.petmarket.blog.dto.comment.BlogPostCommentResponse;
 import org.petmarket.blog.service.CommentService;
+import org.petmarket.utils.annotations.parametrs.ParameterId;
+import org.petmarket.utils.annotations.responses.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import static org.petmarket.utils.MessageUtils.*;
-import static org.petmarket.utils.MessageUtils.SERVER_ERROR;
 
 @RestController
 @RequestMapping("/v1/blog/comments")
@@ -27,27 +26,17 @@ public class CommentController {
 
     @Operation(
             summary = "Create a new comment for a blog post",
-            description = "Create a new comment for a specific blog post",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION),
-                    @ApiResponse(responseCode = "400", description = BAD_REQUEST),
-                    @ApiResponse(responseCode = "401", description = UNAUTHORIZED),
-                    @ApiResponse(responseCode = "404", description = NOT_FOUND),
-                    @ApiResponse(responseCode = "500", description = SERVER_ERROR)
-            },
-            parameters = {
-                    @Parameter(
-                            name = "postId",
-                            description = "Post ID",
-                            example = "1",
-                            required = true
-                    )
-            }
+            description = "Create a new comment for a specific blog post"
     )
+    @ApiResponseSuccessful
+    @ApiResponseBadRequest
+    @ApiResponseNotFound
+    @ApiResponseUnauthorized
+    @ApiResponseForbidden
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/{postId}")
     public BlogPostCommentResponse createComment(
-            @PathVariable(name = "postId") Long postId,
+            @ParameterId @PathVariable(name = "postId") @Positive Long postId,
             @RequestBody @Valid @Parameter(description = "Blog post comment request dto", required = true)
             BlogPostCommentRequest request,
             Authentication authentication) {

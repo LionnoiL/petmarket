@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -26,10 +25,14 @@ import org.petmarket.advertisements.images.dto.AdvertisementImageResponseDto;
 import org.petmarket.advertisements.images.entity.AdvertisementImage;
 import org.petmarket.advertisements.images.mapper.AdvertisementImageMapper;
 import org.petmarket.advertisements.images.service.AdvertisementImageService;
-import org.petmarket.errorhandling.ErrorResponse;
 import org.petmarket.language.entity.Language;
 import org.petmarket.language.service.LanguageService;
 import org.petmarket.options.service.OptionsService;
+import org.petmarket.utils.annotations.parametrs.ParameterId;
+import org.petmarket.utils.annotations.parametrs.ParameterLanguage;
+import org.petmarket.utils.annotations.parametrs.ParameterPageNumber;
+import org.petmarket.utils.annotations.parametrs.ParameterPageSize;
+import org.petmarket.utils.annotations.responses.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -45,7 +48,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.petmarket.utils.MessageUtils.*;
+import static org.petmarket.utils.MessageUtils.REQUEST_BODY_IS_MANDATORY;
+import static org.petmarket.utils.MessageUtils.SUCCESSFULLY_OPERATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Tag(name = "Advertisement")
@@ -65,28 +69,20 @@ public class AdvertisementController {
     private final AdvertisementResponseTranslateMapper advertisementMapper;
     private final AdvertisementImageMapper imageMapper;
 
-    @Operation(summary = "Get Advertisement by ID")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
-                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
-                    @Schema(implementation = AdvertisementDetailsResponseDto.class))
-            }),
-            @ApiResponse(responseCode = "404", description = ADVERTISEMENT_NOT_FOUND, content = {
-                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
-                    @Schema(implementation = ErrorResponse.class))
-            })
+    @Operation(summary = "Get Advertisement by ID",
+            description = """
+                        Advertisements with Active status can be seen by all users.
+                        Ads with a different status can only be accessed by administrators or ad authors.
+                    """)
+    @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
+            @Content(mediaType = APPLICATION_JSON_VALUE, schema =
+            @Schema(implementation = AdvertisementDetailsResponseDto.class))
     })
+    @ApiResponseNotFound
     @GetMapping("/{id}/{langCode}")
-    @ResponseBody
     public AdvertisementDetailsResponseDto getAdvertisementById(
-            @Parameter(description = "The ID of the Advertisement to retrieve", required = true,
-                    schema = @Schema(type = "integer", format = "int64")
-            )
-            @PathVariable Long id,
-            @Parameter(description = "The Code Language of the Advertisement to retrieve", required = true,
-                    schema = @Schema(type = "string"), example = "ua"
-            )
-            @PathVariable String langCode) {
+            @ParameterId @PathVariable @Positive Long id,
+            @ParameterLanguage @PathVariable String langCode) {
         log.info("Received request to get Advertisement Advertisement with id - {}.", id);
         Language language = languageService.getByLangCode(langCode);
         Advertisement advertisement = advertisementService.getAdvertisement(id);
@@ -94,28 +90,19 @@ public class AdvertisementController {
         return advertisementMapper.mapEntityToDto(advertisement, language);
     }
 
-    @Operation(summary = "Create a new Advertisement")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
-                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
-                    @Schema(implementation = AdvertisementDetailsResponseDto.class))
-            }),
-            @ApiResponse(responseCode = "400", description = BAD_REQUEST, content = {
-                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
-                    @Schema(implementation = ErrorResponse.class))
-            }),
-            @ApiResponse(responseCode = "401", description = UNAUTHORIZED, content = {
-                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
-                    @Schema(implementation = ErrorResponse.class))
-            }),
-            @ApiResponse(responseCode = "403", description = FORBIDDEN, content = {
-                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
-                    @Schema(implementation = ErrorResponse.class))
-            })
+    @Operation(summary = "Create a new Advertisement",
+            description = """
+                        Only authorized users have access to create ads.
+                    """)
+    @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
+            @Content(mediaType = APPLICATION_JSON_VALUE, schema =
+            @Schema(implementation = AdvertisementDetailsResponseDto.class))
     })
+    @ApiResponseBadRequest
+    @ApiResponseUnauthorized
+    @ApiResponseForbidden
     @PreAuthorize("isAuthenticated()")
     @PostMapping
-    @ResponseBody
     public AdvertisementDetailsResponseDto addAdvertisement(
             @RequestBody @Valid @NotNull(message = REQUEST_BODY_IS_MANDATORY) final AdvertisementRequestDto request,
             BindingResult bindingResult, Authentication authentication) {
@@ -124,19 +111,13 @@ public class AdvertisementController {
     }
 
     @Operation(summary = "Get Favorite Advertisements")
-    @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION)
-    @GetMapping(path = "/favorite/{langCode}")
+    @ApiResponseSuccessful
+    @ApiResponseLanguageNotFound
+    @GetMapping("/favorite/{langCode}")
     public Page<AdvertisementShortResponseDto> getFavoriteAds(
-            @Parameter(description = "The Code Language of the advertisements to retrieve", required = true,
-                    schema = @Schema(type = "string"), example = "ua"
-            )
-            @PathVariable String langCode,
-            @Parameter(description = "Number of page (1..N)", required = true,
-                    schema = @Schema(type = "integer", defaultValue = "1")
-            ) @RequestParam(defaultValue = "1") @Positive int page,
-            @Parameter(description = "The size of the page to be returned", required = true,
-                    schema = @Schema(type = "integer", defaultValue = "30")
-            ) @RequestParam(defaultValue = "30") @Positive int size,
+            @ParameterLanguage @PathVariable String langCode,
+            @ParameterPageNumber @RequestParam(defaultValue = "1") @Positive int page,
+            @ParameterPageSize @RequestParam(defaultValue = "30") @Positive int size,
             @Parameter(description = "List of categories identifiers",
                     schema = @Schema(type = "array[integer]")
             ) @RequestParam(required = false) List<Long> categoriesIds
@@ -149,24 +130,20 @@ public class AdvertisementController {
         return advertisements.map(adv -> advertisementMapper.mapEntityToShortDto(adv, language));
     }
 
-    @Operation(summary = "Set Advertisement status to Draft")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
-                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
-                    @Schema(implementation = AdvertisementDetailsResponseDto.class))
-            }),
-            @ApiResponse(responseCode = "401", description = UNAUTHORIZED, content = {
-                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
-                    @Schema(implementation = ErrorResponse.class))
-            }),
-            @ApiResponse(responseCode = "403", description = FORBIDDEN, content = {
-                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
-                    @Schema(implementation = ErrorResponse.class))
-            })
+    @Operation(summary = "Set Advertisement status to Draft",
+            description = """
+                    Changes the status of the list of ads to Draft.
+                    Only authorized users have access.
+                    Users without administrator rights can only access their ads.
+                    """)
+    @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
+            @Content(mediaType = APPLICATION_JSON_VALUE, schema =
+            @Schema(implementation = AdvertisementDetailsResponseDto.class))
     })
+    @ApiResponseUnauthorized
+    @ApiResponseForbidden
     @PreAuthorize("isAuthenticated()")
     @PutMapping("/status-draft")
-    @ResponseBody
     public List<AdvertisementDetailsResponseDto> setStatusDraft(
             @Parameter(description = "List of advertisements identifiers",
                     schema = @Schema(type = "array[integer]")
@@ -181,24 +158,20 @@ public class AdvertisementController {
                 .toList();
     }
 
-    @Operation(summary = "Set Advertisement status to Pending")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
-                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
-                    @Schema(implementation = AdvertisementDetailsResponseDto.class))
-            }),
-            @ApiResponse(responseCode = "401", description = UNAUTHORIZED, content = {
-                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
-                    @Schema(implementation = ErrorResponse.class))
-            }),
-            @ApiResponse(responseCode = "403", description = FORBIDDEN, content = {
-                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
-                    @Schema(implementation = ErrorResponse.class))
-            })
+    @Operation(summary = "Set Advertisement status to Pending",
+            description = """
+                    Changes the status of the list of ads to Pending.
+                    Only authorized users have access.
+                    Users without administrator rights can only access their ads.
+                    """)
+    @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
+            @Content(mediaType = APPLICATION_JSON_VALUE, schema =
+            @Schema(implementation = AdvertisementDetailsResponseDto.class))
     })
+    @ApiResponseUnauthorized
+    @ApiResponseForbidden
     @PreAuthorize("isAuthenticated()")
     @PutMapping("/status-pending")
-    @ResponseBody
     public List<AdvertisementDetailsResponseDto> setStatusPublic(
             @Parameter(description = "List of advertisements identifiers",
                     schema = @Schema(type = "array[integer]")
@@ -213,28 +186,20 @@ public class AdvertisementController {
                 .toList();
     }
 
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
-                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
-                    @Schema(implementation = AdvertisementDetailsResponseDto.class))
-            }),
-            @ApiResponse(responseCode = "400", description = BAD_REQUEST, content = {
-                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
-                    @Schema(implementation = ErrorResponse.class))
-            }),
-            @ApiResponse(responseCode = "401", description = UNAUTHORIZED, content = {
-                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
-                    @Schema(implementation = ErrorResponse.class))
-            }),
-            @ApiResponse(responseCode = "403", description = FORBIDDEN, content = {
-                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
-                    @Schema(implementation = ErrorResponse.class))
-            }),
-            @ApiResponse(responseCode = "404", description = ADVERTISEMENT_NOT_FOUND, content = {
-                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
-                    @Schema(implementation = ErrorResponse.class))
-            })
+    @Operation(summary = "Adding images to advertisement",
+            description = """
+                        Only authorized users have access.
+                        Users without administrator rights can only access their ads.
+                        One ad can have no more than 10 images
+                    """)
+    @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
+            @Content(mediaType = APPLICATION_JSON_VALUE, schema =
+            @Schema(implementation = AdvertisementDetailsResponseDto.class))
     })
+    @ApiResponseBadRequest
+    @ApiResponseUnauthorized
+    @ApiResponseForbidden
+    @ApiResponseNotFound
     @PreAuthorize("isAuthenticated()")
     @PostMapping(value = "/{id}/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Set<AdvertisementImageResponseDto> uploadImages(@PathVariable Long id,

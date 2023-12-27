@@ -4,10 +4,13 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import org.petmarket.blog.dto.comment.BlogPostCommentResponse;
 import org.petmarket.blog.entity.CommentStatus;
 import org.petmarket.blog.service.CommentService;
+import org.petmarket.utils.annotations.parametrs.ParameterId;
+import org.petmarket.utils.annotations.responses.*;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,12 +29,12 @@ public class CommentAdminController {
 
     @Operation(
             summary = "Get all comments",
-            description = "Get all comments with pagination for admin",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION),
-                    @ApiResponse(responseCode = "500", description = SERVER_ERROR)
-            }
+            description = "Get all comments with pagination for admin"
     )
+    @ApiResponseSuccessful
+    @ApiResponseBadRequest
+    @ApiResponseUnauthorized
+    @ApiResponseForbidden
     @GetMapping
     public List<BlogPostCommentResponse> getAllComments() {
         return commentService.findAllCommentAdmin();
@@ -40,12 +43,6 @@ public class CommentAdminController {
     @Operation(
             summary = "Change comment status",
             description = "Change the status of a comment by ID",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION),
-                    @ApiResponse(responseCode = "400", description = BAD_REQUEST),
-                    @ApiResponse(responseCode = "404", description = NOT_FOUND),
-                    @ApiResponse(responseCode = "500", description = SERVER_ERROR)
-            },
             parameters = {
                     @Parameter(
                             name = "commentsIds",
@@ -55,6 +52,11 @@ public class CommentAdminController {
                     )
             }
     )
+    @ApiResponseSuccessful
+    @ApiResponseBadRequest
+    @ApiResponseNotFound
+    @ApiResponseUnauthorized
+    @ApiResponseForbidden
     @PutMapping("/{commentsIds}/updateStatus")
     public List<BlogPostCommentResponse> changeCommentStatus(
             @PathVariable Stack<Long> commentsIds,
@@ -64,23 +66,15 @@ public class CommentAdminController {
 
     @Operation(
             summary = "Delete a comment",
-            description = "Delete a comment by ID",
-            responses = {
-                    @ApiResponse(responseCode = "204", description = SUCCESSFULLY_DELETED),
-                    @ApiResponse(responseCode = "404", description = NOT_FOUND),
-                    @ApiResponse(responseCode = "500", description = SERVER_ERROR)
-            },
-            parameters = {
-                    @Parameter(
-                            name = "commentId",
-                            description = "Comment ID",
-                            example = "1",
-                            required = true
-                    )
-            }
+            description = "Delete a comment by ID"
     )
+    @ApiResponse(responseCode = "204", description = SUCCESSFULLY_DELETED)
+    @ApiResponseBadRequest
+    @ApiResponseNotFound
+    @ApiResponseUnauthorized
+    @ApiResponseForbidden
     @DeleteMapping("/{commentId}")
-    public void deleteComment(@PathVariable(name = "commentId") Long commentId) {
+    public void deleteComment(@ParameterId @PathVariable(name = "commentId") @Positive Long commentId) {
         commentService.delete(commentId);
     }
 }

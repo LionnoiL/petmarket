@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
@@ -19,12 +18,16 @@ import org.petmarket.advertisements.advertisement.mapper.AdvertisementResponseTr
 import org.petmarket.advertisements.advertisement.service.AdvertisementService;
 import org.petmarket.advertisements.category.entity.AdvertisementCategory;
 import org.petmarket.advertisements.category.service.AdvertisementCategoryService;
-import org.petmarket.errorhandling.ErrorResponse;
 import org.petmarket.language.entity.Language;
 import org.petmarket.language.service.LanguageService;
 import org.petmarket.location.entity.City;
 import org.petmarket.location.service.CityService;
 import org.petmarket.options.service.OptionsService;
+import org.petmarket.utils.annotations.parametrs.*;
+import org.petmarket.utils.annotations.responses.ApiResponseForbidden;
+import org.petmarket.utils.annotations.responses.ApiResponseLanguageNotFound;
+import org.petmarket.utils.annotations.responses.ApiResponseSuccessful;
+import org.petmarket.utils.annotations.responses.ApiResponseUnauthorized;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -34,7 +37,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static org.petmarket.utils.MessageUtils.*;
+import static org.petmarket.utils.MessageUtils.SUCCESSFULLY_OPERATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Tag(name = "Advertisement")
@@ -53,39 +56,17 @@ public class AdvertisementAdminController {
     private final AdvertisementResponseTranslateMapper advertisementMapper;
 
     @Operation(summary = "Get Advertisements")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION),
-            @ApiResponse(responseCode = "400", description = BAD_REQUEST, content = {
-                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
-                    @Schema(implementation = ErrorResponse.class))
-            }),
-            @ApiResponse(responseCode = "401", description = UNAUTHORIZED, content = {
-                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
-                    @Schema(implementation = ErrorResponse.class))
-            }),
-            @ApiResponse(responseCode = "403", description = FORBIDDEN, content = {
-                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
-                    @Schema(implementation = ErrorResponse.class))
-            })
-    })
+    @ApiResponseSuccessful
+    @ApiResponseUnauthorized
+    @ApiResponseForbidden
+    @ApiResponseLanguageNotFound
     @GetMapping(path = "/{langCode}")
     public Page<AdvertisementShortResponseDto> getAds(
-            @Parameter(description = "The Code Language of the advertisements to retrieve", required = true,
-                    schema = @Schema(type = "string"), example = "ua"
-            )
-            @PathVariable String langCode,
-            @Parameter(description = "Number of page (1..N)", required = true,
-                    schema = @Schema(type = "integer", defaultValue = "1")
-            ) @RequestParam(defaultValue = "1") @Positive int page,
-            @Parameter(description = "The size of the page to be returned", required = true,
-                    schema = @Schema(type = "integer", defaultValue = "30")
-            ) @RequestParam(defaultValue = "30") @Positive int size,
-            @Parameter(description = "Sort direction (ASC, DESC)",
-                    schema = @Schema(type = "string")
-            ) @RequestParam(required = false, defaultValue = "ASC") String sortDirection,
-            @Parameter(description = "Sort field",
-                    schema = @Schema(type = "string")
-            ) @RequestParam(required = false, defaultValue = "created") String sortField,
+            @ParameterLanguage @PathVariable String langCode,
+            @ParameterPageNumber @RequestParam(defaultValue = "1") @Positive int page,
+            @ParameterPageSize @RequestParam(defaultValue = "30") @Positive int size,
+            @ParameterPageSort @RequestParam(required = false, defaultValue = "ASC") String sortDirection,
+            @ParameterPageSortField @RequestParam(required = false, defaultValue = "created") String sortField,
             @RequestParam(required = false) AdvertisementStatus status,
             @RequestParam(required = false) AdvertisementType type,
             @Parameter(description = "List of categories identifiers", schema = @Schema(type = "array[integer]")
@@ -104,22 +85,13 @@ public class AdvertisementAdminController {
     }
 
     @Operation(summary = "Set Advertisement status")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
-                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
-                    @Schema(implementation = AdvertisementDetailsResponseDto.class))
-            }),
-            @ApiResponse(responseCode = "401", description = UNAUTHORIZED, content = {
-                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
-                    @Schema(implementation = ErrorResponse.class))
-            }),
-            @ApiResponse(responseCode = "403", description = FORBIDDEN, content = {
-                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
-                    @Schema(implementation = ErrorResponse.class))
-            })
+    @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
+            @Content(mediaType = APPLICATION_JSON_VALUE, schema =
+            @Schema(implementation = AdvertisementDetailsResponseDto.class))
     })
+    @ApiResponseUnauthorized
+    @ApiResponseForbidden
     @PutMapping("/status")
-    @ResponseBody
     public List<AdvertisementDetailsResponseDto> setStatusDraft(
             @Parameter(description = "List of advertisements identifiers",
                     schema = @Schema(type = "array[integer]")
