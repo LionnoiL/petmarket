@@ -2,7 +2,6 @@ package org.petmarket.options.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.petmarket.language.entity.Language;
 
 @Entity
 @Table(name = "options")
@@ -17,10 +16,10 @@ public class Options {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "lang_code")
-    private Language language;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "options_key", nullable = false, unique = true)
+    private OptionsKey key;
 
-    @Column(name = "phones")
-    private String phones;
+    @Column(name = "options_value")
+    private String value;
 }
