@@ -17,7 +17,6 @@ import org.petmarket.utils.ErrorUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 
-import java.util.Collection;
 import java.util.List;
 
 import static org.petmarket.utils.MessageUtils.*;
@@ -31,8 +30,13 @@ public class LanguageService {
     private final OptionsService optionsService;
     private final LanguageMapper languageMapper;
 
-    public Collection<LanguageResponseDto> getAll() {
+    public List<LanguageResponseDto> getAll() {
         List<Language> languages = languageRepository.findAll();
+        return languageMapper.mapEntityToDto(languages);
+    }
+
+    public List<LanguageResponseDto> getAllEnabled() {
+        List<Language> languages = languageRepository.findAllByEnableIsTrue();
         return languageMapper.mapEntityToDto(languages);
     }
 
@@ -71,7 +75,7 @@ public class LanguageService {
                 .ifPresent(language -> {
                     throw new ItemNotCreatedException(LANGUAGE_IS_ALREADY_IN_DATABASE);
                 });
-        if (dto.getEnable() == null){
+        if (dto.getEnable() == null) {
             dto.setEnable(false);
         }
         Language language = languageMapper.mapDtoRequestToEntity(dto);

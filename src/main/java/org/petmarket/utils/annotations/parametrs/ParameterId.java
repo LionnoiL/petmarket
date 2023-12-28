@@ -2,7 +2,6 @@ package org.petmarket.utils.annotations.parametrs;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Min;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

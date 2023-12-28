@@ -2,8 +2,6 @@ package org.petmarket.blog.controller.admin;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -22,7 +20,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import static org.petmarket.utils.MessageUtils.*;
+import static org.petmarket.utils.MessageUtils.SUCCESSFULLY_DELETED;
 
 @RestController
 @RequestMapping("/v1/admin/blog")
