@@ -103,5 +103,4 @@ public class BreedAdminController {
     public void delete(@ParameterId @PathVariable(name = "breedId") @Positive Long breedId) {
         breedService.delete(breedId);
     }
-
 }

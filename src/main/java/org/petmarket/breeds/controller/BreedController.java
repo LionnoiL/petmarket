@@ -50,5 +50,4 @@ public class BreedController {
             @ParameterId @RequestParam(required = false) @Positive Long categoryId) {
         return breedService.getAllByCategory(langCode, categoryId);
     }
-
 }
