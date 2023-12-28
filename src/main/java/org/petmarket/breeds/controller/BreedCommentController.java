@@ -3,7 +3,6 @@ package org.petmarket.breeds.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
@@ -19,14 +18,13 @@ import org.petmarket.utils.annotations.responses.*;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
-import static org.petmarket.utils.MessageUtils.SUCCESSFULLY_DELETED;
 
 @RestController
 @RequiredArgsConstructor
@@ -81,11 +79,12 @@ public class BreedCommentController {
             summary = "Delete a comment by ID for User",
             description = "Deletes a comment with the specified ID"
     )
-    @ApiResponse(responseCode = "204", description = SUCCESSFULLY_DELETED)
+    @ApiResponseDeleted
     @ApiResponseUnauthorized
     @ApiResponseForbidden
     @ApiResponseBadRequest
     @ApiResponseNotFound
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{commentId}")
     public void deleteMyComment(@ParameterId @PathVariable @Positive Long commentId,
                                 Authentication authentication) {

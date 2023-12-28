@@ -2,7 +2,6 @@ package org.petmarket.blog.controller.admin;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
@@ -11,13 +10,12 @@ import org.petmarket.blog.entity.CommentStatus;
 import org.petmarket.blog.service.CommentService;
 import org.petmarket.utils.annotations.parametrs.ParameterId;
 import org.petmarket.utils.annotations.responses.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Stack;
-
-import static org.petmarket.utils.MessageUtils.*;
 
 @RestController
 @RequestMapping("/v1/admin/blog/comments")
@@ -68,11 +66,12 @@ public class CommentAdminController {
             summary = "Delete a comment",
             description = "Delete a comment by ID"
     )
-    @ApiResponse(responseCode = "204", description = SUCCESSFULLY_DELETED)
+    @ApiResponseDeleted
     @ApiResponseBadRequest
     @ApiResponseNotFound
     @ApiResponseUnauthorized
     @ApiResponseForbidden
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{commentId}")
     public void deleteComment(@ParameterId @PathVariable(name = "commentId") @Positive Long commentId) {
         commentService.delete(commentId);

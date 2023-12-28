@@ -8,18 +8,24 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.petmarket.errorhandling.ErrorResponse;
 import org.petmarket.location.dto.CountryResponseDto;
 import org.petmarket.location.dto.StateResponseDto;
 import org.petmarket.location.service.CountryService;
+import org.petmarket.utils.annotations.parametrs.ParameterId;
+import org.petmarket.utils.annotations.responses.ApiResponseBadRequest;
+import org.petmarket.utils.annotations.responses.ApiResponseNotFound;
+import org.petmarket.utils.annotations.responses.ApiResponseSuccessful;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-import static org.petmarket.utils.MessageUtils.COUNTRY_NOT_FOUND;
 import static org.petmarket.utils.MessageUtils.SUCCESSFULLY_OPERATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -34,23 +40,12 @@ public class CountryController {
     private final CountryService countryService;
 
     @Operation(summary = "Get Country by ID")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
-                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
-                    @Schema(implementation = CountryResponseDto.class))
-            }),
-            @ApiResponse(responseCode = "404", description = COUNTRY_NOT_FOUND, content = {
-                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
-                    @Schema(implementation = ErrorResponse.class))
-            })
-    })
+    @ApiResponseSuccessful
+    @ApiResponseBadRequest
+    @ApiResponseNotFound
     @GetMapping("/{id}")
-    @ResponseBody
     public CountryResponseDto getStateById(
-        @Parameter(description = "The ID of the Country to retrieve", required = true,
-            schema = @Schema(type = "integer", format = "int64")
-        )
-        @PathVariable Long id) {
+            @ParameterId @PathVariable @Positive Long id) {
         log.info("Received request to get the Country with id - {}.", id);
         CountryResponseDto dto = countryService.findById(id);
         log.info("the Country with id - {} was retrieved - {}.", id, dto);
@@ -67,13 +62,14 @@ public class CountryController {
                     )
             })
     })
+    @ApiResponseBadRequest
+    @ApiResponseNotFound
     @GetMapping("/byName/{name}")
-    @ResponseBody
     public List<CountryResponseDto> getCountryByName(
-        @Parameter(description = "The Name of the Country to retrieve", required = true,
-            schema = @Schema(type = "string")
-        )
-        @PathVariable String name) {
+            @Parameter(description = "The Name of the Country to retrieve", required = true,
+                    schema = @Schema(type = "string")
+            )
+            @PathVariable String name) {
         log.info("Received request to get the Country with name - {}.", name);
         List<CountryResponseDto> dto = countryService.findByName(name);
         log.info("the Country with name - {} was retrieved - {}.", name, dto);
@@ -81,26 +77,18 @@ public class CountryController {
     }
 
     @Operation(summary = "Get the states of the Country")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
-                    @Content(
-                            mediaType = APPLICATION_JSON_VALUE,
-                            array = @ArraySchema(schema = @Schema(
-                                    implementation = StateResponseDto.class))
-                    )
-            }),
-            @ApiResponse(responseCode = "404", description = COUNTRY_NOT_FOUND, content = {
-                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
-                    @Schema(implementation = ErrorResponse.class))
-            })
+    @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
+            @Content(
+                    mediaType = APPLICATION_JSON_VALUE,
+                    array = @ArraySchema(schema = @Schema(
+                            implementation = StateResponseDto.class))
+            )
     })
+    @ApiResponseBadRequest
+    @ApiResponseNotFound
     @GetMapping("/{id}/states")
-    @ResponseBody
     public List<StateResponseDto> getStatesByState(
-        @Parameter(description = "The ID of the state to retrieve", required = true,
-            schema = @Schema(type = "integer", format = "int64")
-        )
-        @PathVariable Long id) {
+            @ParameterId @PathVariable @Positive Long id) {
         log.info("Received request to get the states of the country with id - {}.", id);
         List<StateResponseDto> dto = countryService.getStatesByCountryId(id);
         log.info("States of the country with id {} - {}", id, dto);

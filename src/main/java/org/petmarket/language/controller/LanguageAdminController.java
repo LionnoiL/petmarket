@@ -16,6 +16,8 @@ import org.petmarket.language.dto.LanguageUpdateRequestDto;
 import org.petmarket.language.service.LanguageService;
 import org.petmarket.utils.annotations.parametrs.ParameterLanguage;
 import org.petmarket.utils.annotations.responses.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -53,26 +55,21 @@ public class LanguageAdminController {
     }
 
     @Operation(summary = "Create a new Language")
-    @ApiResponse(responseCode = "201", description = SUCCESSFULLY_OPERATION, content = {
-            @Content(mediaType = APPLICATION_JSON_VALUE, schema =
-            @Schema(implementation = LanguageResponseDto.class))
-    })
+    @ApiResponseCreated
     @ApiResponseUnauthorized
     @ApiResponseForbidden
     @ApiResponseBadRequest
     @PostMapping
-    public LanguageResponseDto addLanguage(
+    public ResponseEntity<LanguageResponseDto> addLanguage(
             @RequestBody @Valid @NotNull(message = REQUEST_BODY_IS_MANDATORY) final LanguageCreateRequestDto request,
             BindingResult bindingResult) {
         log.info("Received request to create Language - {}.", request);
-        return languageService.addLanguage(request, bindingResult);
+        LanguageResponseDto responseDto = languageService.addLanguage(request, bindingResult);
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 
     @Operation(summary = "Update Language by CODE")
-    @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
-            @Content(mediaType = APPLICATION_JSON_VALUE, schema =
-            @Schema(implementation = LanguageResponseDto.class))
-    })
+    @ApiResponseSuccessful
     @ApiResponseUnauthorized
     @ApiResponseForbidden
     @ApiResponseBadRequest
