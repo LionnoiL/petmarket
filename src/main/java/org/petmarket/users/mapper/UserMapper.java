@@ -20,7 +20,7 @@ public interface UserMapper {
 
     @Mapping(target = "shortName", expression =
             """
-                    java(entity.getFirstName() + (entity.getLastName() != null && !entity.getLastName().isEmpty() ? " " + 
+                 java(entity.getFirstName() + (entity.getLastName() != null && !entity.getLastName().isEmpty() ? " " + 
                     entity.getLastName().charAt(0) + "." : ""))
                           """)
     AuthorShortResponseDto mapEntityToAuthorShortDto(User entity);

@@ -74,7 +74,8 @@ public class AdvertisementCategoryAdminController {
     @ApiResponseNotFound
     @PostMapping
     public AdvertisementCategoryResponseDto addCategory(
-            @RequestBody @Valid @NotNull(message = REQUEST_BODY_IS_MANDATORY) final AdvertisementCategoryCreateRequestDto request, BindingResult bindingResult) {
+            @RequestBody @Valid @NotNull(message = REQUEST_BODY_IS_MANDATORY)
+            final AdvertisementCategoryCreateRequestDto request, BindingResult bindingResult) {
         log.info("Received request to create Advertisement Category - {}.", request);
         return categoryService.addCategory(request, bindingResult);
     }
@@ -92,7 +93,8 @@ public class AdvertisementCategoryAdminController {
     public AdvertisementCategoryResponseDto updateCategory(
             @ParameterId @PathVariable @Positive Long id,
             @ParameterLanguage @PathVariable String langCode,
-            @RequestBody @Valid @NotNull(message = REQUEST_BODY_IS_MANDATORY) final AdvertisementCategoryUpdateRequestDto request, BindingResult bindingResult) {
+            @RequestBody @Valid @NotNull(message = REQUEST_BODY_IS_MANDATORY)
+            final AdvertisementCategoryUpdateRequestDto request, BindingResult bindingResult) {
         log.info("Received request to update advertisement category - {} with id {}.", request, id);
         return categoryService.updateCategory(id, langCode, request, bindingResult);
     }
