@@ -1,18 +1,20 @@
 package org.petmarket.breeds.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.petmarket.breeds.dto.BreedResponseDto;
 import org.petmarket.breeds.service.BreedService;
+import org.petmarket.utils.annotations.parametrs.ParameterId;
+import org.petmarket.utils.annotations.parametrs.ParameterLanguage;
+import org.petmarket.utils.annotations.responses.ApiResponseBadRequest;
+import org.petmarket.utils.annotations.responses.ApiResponseNotFound;
+import org.petmarket.utils.annotations.responses.ApiResponseSuccessful;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
-import static org.petmarket.utils.MessageUtils.*;
 
 @RestController
 @RequestMapping("/v1/breeds")
@@ -24,40 +26,28 @@ public class BreedController {
 
     @Operation(
             summary = "Get Breed",
-            description = "Get information about a breed.",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION),
-                    @ApiResponse(responseCode = "404", description = NOT_FOUND)
-            },
-            parameters = {
-                    @Parameter(name = "breedId", description = "breed id", example = "1"),
-                    @Parameter(name = "langCode", description = "Code of language", example = "ua")
-            }
+            description = "Get information about a breed."
     )
+    @ApiResponseSuccessful
+    @ApiResponseBadRequest
+    @ApiResponseNotFound
     @GetMapping("/{breedId}/{langCode}")
-    public BreedResponseDto get(@PathVariable Long breedId, @PathVariable String langCode) {
+    public BreedResponseDto get(@ParameterId @PathVariable @Positive Long breedId,
+                                @ParameterLanguage @PathVariable String langCode) {
         return breedService.get(breedId, langCode);
     }
 
     @Operation(
             summary = "Get All Breeds",
-            description = "Get a list of all breeds.",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION),
-                    @ApiResponse(responseCode = "400", description = BAD_REQUEST),
-                    @ApiResponse(responseCode = "404", description = NOT_FOUND),
-                    @ApiResponse(responseCode = "500", description = SERVER_ERROR)
-            },
-            parameters = {
-                    @Parameter(name = "langCode", description = "Code of language", example = "ua"),
-                    @Parameter(name = "categoryId", description = "find breeds by category", example = "1",
-                            required = false)
-            }
+            description = "Get a list of all breeds."
     )
+    @ApiResponseSuccessful
+    @ApiResponseBadRequest
+    @ApiResponseNotFound
     @GetMapping("/{langCode}")
     public List<BreedResponseDto> getAll(
-            @PathVariable String langCode,
-            @RequestParam(required = false) Long categoryId) {
+            @ParameterLanguage @PathVariable String langCode,
+            @ParameterId @RequestParam(required = false) @Positive Long categoryId) {
         return breedService.getAllByCategory(langCode, categoryId);
     }
 

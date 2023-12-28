@@ -11,6 +11,11 @@ import lombok.RequiredArgsConstructor;
 import org.petmarket.breeds.dto.BreedCommentRequestDto;
 import org.petmarket.breeds.dto.BreedCommentResponseDto;
 import org.petmarket.breeds.service.BreedCommentService;
+import org.petmarket.utils.annotations.parametrs.ParameterId;
+import org.petmarket.utils.annotations.parametrs.ParameterPageNumber;
+import org.petmarket.utils.annotations.parametrs.ParameterPageSize;
+import org.petmarket.utils.annotations.parametrs.ParameterPageSort;
+import org.petmarket.utils.annotations.responses.*;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -21,7 +26,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static org.petmarket.utils.MessageUtils.*;
+import static org.petmarket.utils.MessageUtils.SUCCESSFULLY_DELETED;
 
 @RestController
 @RequiredArgsConstructor
@@ -34,58 +39,38 @@ public class BreedCommentController {
     @PreAuthorize("isAuthenticated()")
     @Operation(
             summary = "Add Comment (any user)",
-            description = "Add a comment to a breed.",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION),
-                    @ApiResponse(responseCode = "400", description = BAD_REQUEST)
-            },
-            parameters = {
-                    @Parameter(name = "breedId", description = "Breed Id", example = "1")
-            }
+            description = "Add a comment to a breed."
     )
+    @ApiResponseSuccessful
+    @ApiResponseBadRequest
+    @ApiResponseUnauthorized
+    @ApiResponseNotFound
     @PostMapping("/{breedId}")
     public BreedCommentResponseDto addComment(
-            @PathVariable("breedId") Long breedId,
-                                              @RequestBody
-                                              @Valid
-                                              @Schema(description = "Comment data to be added")
-                                              @Parameter(name = "Comment breed Dto",
-                                                      required = true)
-                                              BreedCommentRequestDto requestDto,
-                                              Authentication authentication) {
+            @ParameterId @PathVariable("breedId") @Positive Long breedId,
+            @RequestBody
+            @Valid
+            @Schema(description = "Comment data to be added")
+            @Parameter(name = "Comment breed Dto",
+                    required = true)
+            BreedCommentRequestDto requestDto,
+            Authentication authentication) {
         return commentService.addComment(breedId, requestDto, authentication);
     }
 
     @Operation(summary = "Get all breed comments",
-            description = "Get a list of all comments for a specific breed",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION),
-                    @ApiResponse(responseCode = "500", description = SERVER_ERROR)
-            },
-            parameters = {
-                    @Parameter(
-                            name = "breedId",
-                            description = "ID of the breed",
-                            example = "1"),
-                    @Parameter(
-                            name = "page",
-                            description = "Page number",
-                            example = "1"),
-                    @Parameter(
-                            name = "size",
-                            description = "Number of items per page",
-                            example = "12"),
-                    @Parameter(
-                            name = "sortDirection",
-                            description = "Sort direction",
-                            example = "ASC")
-            })
+            description = "Get a list of all comments for a specific breed"
+    )
+    @ApiResponseSuccessful
+    @ApiResponseBadRequest
+    @ApiResponseNotFound
     @GetMapping("/{breedId}")
-    public List<BreedCommentResponseDto> getAll(@PathVariable Long breedId,
-                                                @RequestParam(defaultValue = "1") @Positive int page,
-                                                @RequestParam(defaultValue = "12") @Positive int size,
-                                                @RequestParam(defaultValue = "ASC") String sortDirection,
-                                                Authentication authentication) {
+    public List<BreedCommentResponseDto> getAll(
+            @ParameterId @PathVariable @Positive Long breedId,
+            @ParameterPageNumber @RequestParam(defaultValue = "1") @Positive int page,
+            @ParameterPageSize @RequestParam(defaultValue = "12") @Positive int size,
+            @ParameterPageSort @RequestParam(defaultValue = "ASC") String sortDirection,
+            Authentication authentication) {
         Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), "created");
         Pageable pageable = PageRequest.of(page - 1, size, sort);
         return commentService.findAll(breedId, pageable, authentication);
@@ -94,21 +79,16 @@ public class BreedCommentController {
     @PreAuthorize("isAuthenticated()")
     @Operation(
             summary = "Delete a comment by ID for User",
-            description = "Deletes a comment with the specified ID",
-            responses = {
-                    @ApiResponse(responseCode = "204", description = SUCCESSFULLY_DELETED),
-                    @ApiResponse(responseCode = "400", description = BAD_REQUEST),
-                    @ApiResponse(responseCode = "403", description = FORBIDDEN),
-                    @ApiResponse(responseCode = "404", description = NOT_FOUND),
-                    @ApiResponse(responseCode = "500", description = SERVER_ERROR)
-            },
-            parameters = {
-                    @Parameter(name = "commentId", description = "Comment Id", example = "1")
-            }
+            description = "Deletes a comment with the specified ID"
     )
+    @ApiResponse(responseCode = "204", description = SUCCESSFULLY_DELETED)
+    @ApiResponseUnauthorized
+    @ApiResponseForbidden
+    @ApiResponseBadRequest
+    @ApiResponseNotFound
     @DeleteMapping("/{commentId}")
-    public void deleteMyComment(@PathVariable Long commentId, Authentication authentication) {
+    public void deleteMyComment(@ParameterId @PathVariable @Positive Long commentId,
+                                Authentication authentication) {
         commentService.deleteMyBreedComment(commentId, authentication);
     }
-
 }
