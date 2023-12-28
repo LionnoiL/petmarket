@@ -46,6 +46,8 @@ public class LanguageAdminController {
                             implementation = LanguageResponseDto.class))
             )
     })
+    @ApiResponseUnauthorized
+    @ApiResponseForbidden
     @GetMapping
     public List<LanguageResponseDto> getAll() {
         log.info("Received request to get all Languages.");
