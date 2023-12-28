@@ -6,20 +6,26 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.petmarket.errorhandling.ErrorResponse;
 import org.petmarket.payment.dto.PaymentResponseDto;
 import org.petmarket.payment.service.PaymentService;
+import org.petmarket.utils.annotations.parametrs.ParameterId;
+import org.petmarket.utils.annotations.parametrs.ParameterLanguage;
+import org.petmarket.utils.annotations.responses.ApiResponseBadRequest;
+import org.petmarket.utils.annotations.responses.ApiResponseNotFound;
+import org.petmarket.utils.annotations.responses.ApiResponseSuccessful;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collection;
 
-import static org.petmarket.utils.MessageUtils.LANGUAGE_OR_PAYMENT_NOT_FOUND;
 import static org.petmarket.utils.MessageUtils.SUCCESSFULLY_OPERATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -34,27 +40,13 @@ public class PaymentController {
     private final PaymentService paymentService;
 
     @Operation(summary = "Get Payment by ID")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
-                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
-                    @Schema(implementation = PaymentResponseDto.class))
-            }),
-            @ApiResponse(responseCode = "404", description = LANGUAGE_OR_PAYMENT_NOT_FOUND, content = {
-                    @Content(mediaType = APPLICATION_JSON_VALUE, schema =
-                    @Schema(implementation = ErrorResponse.class))
-            })
-    })
+    @ApiResponseSuccessful
+    @ApiResponseBadRequest
+    @ApiResponseNotFound
     @GetMapping("/{id}/{langCode}")
-    @ResponseBody
     public PaymentResponseDto getPaymentById(
-            @Parameter(description = "The ID of the payments to retrieve", required = true,
-                    schema = @Schema(type = "integer", format = "int64")
-            )
-            @PathVariable Long id,
-            @Parameter(description = "The Code Language of the payments to retrieve", required = true,
-                    schema = @Schema(type = "string"), example = "ua"
-            )
-            @PathVariable String langCode) {
+            @ParameterId @PathVariable @Positive Long id,
+            @ParameterLanguage @PathVariable String langCode) {
         log.info("Received request to get the payment with id - {}.", id);
         PaymentResponseDto dto = paymentService.findEnabledById(id, langCode);
         log.info("the payment with id - {} was retrieved - {}.", id, dto);
@@ -62,17 +54,15 @@ public class PaymentController {
     }
 
     @Operation(summary = "Get all payments.", description = "Obtaining all payments")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
-                    @Content(
-                            mediaType = APPLICATION_JSON_VALUE,
-                            array = @ArraySchema(schema = @Schema(
-                                    implementation = PaymentResponseDto.class))
-                    )
-            })
+    @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
+            @Content(
+                    mediaType = APPLICATION_JSON_VALUE,
+                    array = @ArraySchema(schema = @Schema(
+                            implementation = PaymentResponseDto.class))
+            )
     })
+    @ApiResponseNotFound
     @GetMapping("/{langCode}")
-    @ResponseBody
     public ResponseEntity<Collection<PaymentResponseDto>> getAll(
             @Parameter(description = "The Code Language of the payments to retrieve", required = true,
                     schema = @Schema(type = "string"), example = "ua"

@@ -83,7 +83,9 @@ public class AdvertisementCategoryAdminController {
             @RequestBody @Valid @NotNull(message = REQUEST_BODY_IS_MANDATORY)
             final AdvertisementCategoryUpdateRequestDto request, BindingResult bindingResult) {
         log.info("Received request to update advertisement category - {} with id {}.", request, id);
-        AdvertisementCategoryResponseDto responseDto = categoryService.updateCategory(id, langCode, request, bindingResult);
+        AdvertisementCategoryResponseDto responseDto = categoryService.updateCategory(
+                id, langCode, request, bindingResult
+        );
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 
