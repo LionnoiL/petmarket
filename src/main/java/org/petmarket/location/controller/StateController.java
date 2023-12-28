@@ -93,10 +93,9 @@ public class StateController {
                             implementation = CityResponseDto.class))
             )
     })
-
-    @GetMapping("/{id}/cities")
     @ApiResponseBadRequest
     @ApiResponseNotFound
+    @GetMapping("/{id}/cities")
     public List<CityResponseDto> getCitiesByState(
             @ParameterId @PathVariable @Positive Long id) {
         log.info("Received request to get the cities of the state with id - {}.", id);

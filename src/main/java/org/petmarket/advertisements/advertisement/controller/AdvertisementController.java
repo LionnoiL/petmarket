@@ -2,6 +2,7 @@ package org.petmarket.advertisements.advertisement.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -36,7 +37,9 @@ import org.petmarket.utils.annotations.responses.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
@@ -74,10 +77,7 @@ public class AdvertisementController {
                         Advertisements with Active status can be seen by all users.
                         Ads with a different status can only be accessed by administrators or ad authors.
                     """)
-    @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
-            @Content(mediaType = APPLICATION_JSON_VALUE, schema =
-            @Schema(implementation = AdvertisementDetailsResponseDto.class))
-    })
+    @ApiResponseSuccessful
     @ApiResponseNotFound
     @GetMapping("/{id}/{langCode}")
     public AdvertisementDetailsResponseDto getAdvertisementById(
@@ -94,20 +94,20 @@ public class AdvertisementController {
             description = """
                         Only authorized users have access to create ads.
                     """)
-    @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
-            @Content(mediaType = APPLICATION_JSON_VALUE, schema =
-            @Schema(implementation = AdvertisementDetailsResponseDto.class))
-    })
+    @ApiResponseCreated
     @ApiResponseBadRequest
     @ApiResponseUnauthorized
     @ApiResponseForbidden
     @PreAuthorize("isAuthenticated()")
     @PostMapping
-    public AdvertisementDetailsResponseDto addAdvertisement(
+    public ResponseEntity<AdvertisementDetailsResponseDto> addAdvertisement(
             @RequestBody @Valid @NotNull(message = REQUEST_BODY_IS_MANDATORY) final AdvertisementRequestDto request,
             BindingResult bindingResult, Authentication authentication) {
         log.info("Received request to create Delivery - {}.", request);
-        return advertisementService.addAdvertisement(request, bindingResult, authentication);
+        AdvertisementDetailsResponseDto responseDto = advertisementService.addAdvertisement(
+                request, bindingResult, authentication
+        );
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 
     @Operation(summary = "Get Favorite Advertisements")
@@ -137,8 +137,11 @@ public class AdvertisementController {
                     Users without administrator rights can only access their ads.
                     """)
     @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
-            @Content(mediaType = APPLICATION_JSON_VALUE, schema =
-            @Schema(implementation = AdvertisementDetailsResponseDto.class))
+            @Content(
+                    mediaType = APPLICATION_JSON_VALUE,
+                    array = @ArraySchema(schema = @Schema(
+                            implementation = AdvertisementDetailsResponseDto.class))
+            )
     })
     @ApiResponseUnauthorized
     @ApiResponseForbidden
@@ -165,8 +168,11 @@ public class AdvertisementController {
                     Users without administrator rights can only access their ads.
                     """)
     @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
-            @Content(mediaType = APPLICATION_JSON_VALUE, schema =
-            @Schema(implementation = AdvertisementDetailsResponseDto.class))
+            @Content(
+                    mediaType = APPLICATION_JSON_VALUE,
+                    array = @ArraySchema(schema = @Schema(
+                            implementation = AdvertisementDetailsResponseDto.class))
+            )
     })
     @ApiResponseUnauthorized
     @ApiResponseForbidden
@@ -193,8 +199,11 @@ public class AdvertisementController {
                         One ad can have no more than 10 images
                     """)
     @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
-            @Content(mediaType = APPLICATION_JSON_VALUE, schema =
-            @Schema(implementation = AdvertisementDetailsResponseDto.class))
+            @Content(
+                    mediaType = APPLICATION_JSON_VALUE,
+                    array = @ArraySchema(schema = @Schema(
+                            implementation = AdvertisementImageResponseDto.class))
+            )
     })
     @ApiResponseBadRequest
     @ApiResponseUnauthorized

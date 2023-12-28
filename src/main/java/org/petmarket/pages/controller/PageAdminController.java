@@ -74,6 +74,6 @@ public class PageAdminController {
         log.info("Received request to delete the Page with id - {}.", id);
         pageService.deletePage(id);
         log.info("the Page with id - {} was deleted.", id);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

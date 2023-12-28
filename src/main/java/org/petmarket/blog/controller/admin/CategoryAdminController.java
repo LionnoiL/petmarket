@@ -2,7 +2,6 @@ package org.petmarket.blog.controller.admin;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
@@ -14,10 +13,9 @@ import org.petmarket.utils.annotations.parametrs.ParameterId;
 import org.petmarket.utils.annotations.parametrs.ParameterLanguage;
 import org.petmarket.utils.annotations.responses.*;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import static org.petmarket.utils.MessageUtils.*;
 
 @RestController
 @RequestMapping("/v1/admin/blog/categories")
@@ -31,17 +29,18 @@ public class CategoryAdminController {
             summary = "Save a new blog category",
             description = "Create a new blog category with the default language code"
     )
-    @ApiResponseSuccessful
+    @ApiResponseCreated
     @ApiResponseBadRequest
     @ApiResponseUnauthorized
     @ApiResponseForbidden
     @PostMapping
-    public BlogPostCategoryResponseDto save(@RequestBody
-                                            @Valid
-                                            @Parameter(description = "Blog post category request dto",
-                                                    required = true)
-                                            BlogPostCategoryRequestDto requestDto) {
-        return categoryService.save(requestDto);
+    public ResponseEntity<BlogPostCategoryResponseDto> save(@RequestBody
+                                                            @Valid
+                                                            @Parameter(description = "Blog post category request dto",
+                                                                    required = true)
+                                                            BlogPostCategoryRequestDto requestDto) {
+        BlogPostCategoryResponseDto responseDto = categoryService.save(requestDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 
     @Operation(
@@ -88,7 +87,7 @@ public class CategoryAdminController {
             summary = "Delete a blog category",
             description = "Delete a blog category by ID"
     )
-    @ApiResponse(responseCode = "204", description = SUCCESSFULLY_DELETED)
+    @ApiResponseDeleted
     @ApiResponseBadRequest
     @ApiResponseNotFound
     @ApiResponseUnauthorized

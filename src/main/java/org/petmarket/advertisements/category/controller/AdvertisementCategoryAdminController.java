@@ -2,9 +2,7 @@ package org.petmarket.advertisements.category.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -28,10 +26,7 @@ import org.petmarket.language.service.LanguageService;
 import org.petmarket.location.entity.City;
 import org.petmarket.location.service.CityService;
 import org.petmarket.utils.annotations.parametrs.*;
-import org.petmarket.utils.annotations.responses.ApiResponseBadRequest;
-import org.petmarket.utils.annotations.responses.ApiResponseForbidden;
-import org.petmarket.utils.annotations.responses.ApiResponseNotFound;
-import org.petmarket.utils.annotations.responses.ApiResponseUnauthorized;
+import org.petmarket.utils.annotations.responses.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -45,8 +40,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 import static org.petmarket.utils.MessageUtils.REQUEST_BODY_IS_MANDATORY;
-import static org.petmarket.utils.MessageUtils.SUCCESSFULLY_OPERATION;
-import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
 @Tag(name = "Advertisement Categories", description = "the site advertisement categories API")
 @Slf4j
@@ -64,10 +57,7 @@ public class AdvertisementCategoryAdminController {
     private final AdvertisementResponseTranslateMapper advertisementMapper;
 
     @Operation(summary = "Create a new Advertisement Category")
-    @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
-            @Content(mediaType = APPLICATION_JSON_VALUE, schema =
-            @Schema(implementation = AdvertisementCategoryResponseDto.class))
-    })
+    @ApiResponseSuccessful
     @ApiResponseBadRequest
     @ApiResponseUnauthorized
     @ApiResponseForbidden
@@ -81,26 +71,24 @@ public class AdvertisementCategoryAdminController {
     }
 
     @Operation(summary = "Update Advertisement Category by ID")
-    @ApiResponse(responseCode = "201", description = SUCCESSFULLY_OPERATION, content = {
-            @Content(mediaType = APPLICATION_JSON_VALUE, schema =
-            @Schema(implementation = AdvertisementCategoryResponseDto.class))
-    })
+    @ApiResponseCreated
     @ApiResponseBadRequest
     @ApiResponseUnauthorized
     @ApiResponseForbidden
     @ApiResponseNotFound
     @PutMapping("/{id}/{langCode}")
-    public AdvertisementCategoryResponseDto updateCategory(
+    public ResponseEntity<AdvertisementCategoryResponseDto> updateCategory(
             @ParameterId @PathVariable @Positive Long id,
             @ParameterLanguage @PathVariable String langCode,
             @RequestBody @Valid @NotNull(message = REQUEST_BODY_IS_MANDATORY)
             final AdvertisementCategoryUpdateRequestDto request, BindingResult bindingResult) {
         log.info("Received request to update advertisement category - {} with id {}.", request, id);
-        return categoryService.updateCategory(id, langCode, request, bindingResult);
+        AdvertisementCategoryResponseDto responseDto = categoryService.updateCategory(id, langCode, request, bindingResult);
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 
     @Operation(summary = "Delete Advertisement Category by ID")
-    @ApiResponse(responseCode = "204", description = SUCCESSFULLY_OPERATION)
+    @ApiResponseDeleted
     @ApiResponseBadRequest
     @ApiResponseUnauthorized
     @ApiResponseForbidden
@@ -111,11 +99,11 @@ public class AdvertisementCategoryAdminController {
         log.info("Received request to delete the Advertisement Category with id - {}.", id);
         categoryService.deleteCategory(id);
         log.info("the Advertisement Category with id - {} was deleted.", id);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @Operation(summary = "Update Advertisement Category parent")
-    @ApiResponse(responseCode = "204", description = SUCCESSFULLY_OPERATION)
+    @ApiResponseSuccessful
     @ApiResponseBadRequest
     @ApiResponseUnauthorized
     @ApiResponseForbidden
@@ -132,7 +120,7 @@ public class AdvertisementCategoryAdminController {
     }
 
     @Operation(summary = "Get Advertisements by category")
-    @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION)
+    @ApiResponseSuccessful
     @ApiResponseBadRequest
     @ApiResponseUnauthorized
     @ApiResponseForbidden

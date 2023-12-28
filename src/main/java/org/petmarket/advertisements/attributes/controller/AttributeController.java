@@ -15,6 +15,7 @@ import org.petmarket.utils.annotations.parametrs.ParameterId;
 import org.petmarket.utils.annotations.parametrs.ParameterLanguage;
 import org.petmarket.utils.annotations.responses.ApiResponseBadRequest;
 import org.petmarket.utils.annotations.responses.ApiResponseNotFound;
+import org.petmarket.utils.annotations.responses.ApiResponseSuccessful;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,10 +39,7 @@ public class AttributeController {
     private final AttributeService attributeService;
 
     @Operation(summary = "Get Attribute by ID")
-    @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
-            @Content(mediaType = APPLICATION_JSON_VALUE, schema =
-            @Schema(implementation = AttributeResponseDto.class))
-    })
+    @ApiResponseSuccessful
     @ApiResponseBadRequest
     @ApiResponseNotFound
     @GetMapping("/{id}/{langCode}")

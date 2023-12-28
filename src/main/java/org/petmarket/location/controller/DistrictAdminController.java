@@ -31,17 +31,18 @@ public class DistrictAdminController {
     private final DistrictService districtService;
 
     @Operation(summary = "Create a new District")
-    @ApiResponseSuccessful
+    @ApiResponseCreated
     @ApiResponseBadRequest
     @ApiResponseUnauthorized
     @ApiResponseForbidden
     @ApiResponseNotFound
     @PostMapping
-    public DistrictResponseDto addDistrict(
+    public ResponseEntity<DistrictResponseDto> addDistrict(
             @RequestBody @Valid @NotNull(message = REQUEST_BODY_IS_MANDATORY) final DistrictRequestDto request,
             BindingResult bindingResult) {
         log.info("Received request to create District - {}.", request);
-        return districtService.addDistrict(request, bindingResult);
+        DistrictResponseDto responseDto = districtService.addDistrict(request, bindingResult);
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 
     @Operation(summary = "Update District by ID")
@@ -71,6 +72,6 @@ public class DistrictAdminController {
         log.info("Received request to delete the District with id - {}.", id);
         districtService.deleteDistrict(id);
         log.info("the District with id - {} was deleted.", id);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

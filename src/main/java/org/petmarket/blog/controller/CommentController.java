@@ -11,6 +11,8 @@ import org.petmarket.blog.dto.comment.BlogPostCommentResponse;
 import org.petmarket.blog.service.CommentService;
 import org.petmarket.utils.annotations.parametrs.ParameterId;
 import org.petmarket.utils.annotations.responses.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
@@ -28,18 +30,19 @@ public class CommentController {
             summary = "Create a new comment for a blog post",
             description = "Create a new comment for a specific blog post"
     )
-    @ApiResponseSuccessful
+    @ApiResponseCreated
     @ApiResponseBadRequest
     @ApiResponseNotFound
     @ApiResponseUnauthorized
     @ApiResponseForbidden
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/{postId}")
-    public BlogPostCommentResponse createComment(
+    public ResponseEntity<BlogPostCommentResponse> createComment(
             @ParameterId @PathVariable(name = "postId") @Positive Long postId,
             @RequestBody @Valid @Parameter(description = "Blog post comment request dto", required = true)
             BlogPostCommentRequest request,
             Authentication authentication) {
-        return commentService.addComment(postId, request, authentication);
+        BlogPostCommentResponse responseDto = commentService.addComment(postId, request, authentication);
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 }

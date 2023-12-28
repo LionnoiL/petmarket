@@ -2,9 +2,7 @@ package org.petmarket.advertisements.advertisement.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
@@ -36,9 +34,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
-import static org.petmarket.utils.MessageUtils.SUCCESSFULLY_OPERATION;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Tag(name = "Advertisement")
 @Slf4j
@@ -85,10 +80,7 @@ public class AdvertisementAdminController {
     }
 
     @Operation(summary = "Set Advertisement status")
-    @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
-            @Content(mediaType = APPLICATION_JSON_VALUE, schema =
-            @Schema(implementation = AdvertisementDetailsResponseDto.class))
-    })
+    @ApiResponseSuccessful
     @ApiResponseUnauthorized
     @ApiResponseForbidden
     @PutMapping("/status")

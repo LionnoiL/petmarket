@@ -72,6 +72,6 @@ public class CityAdminController {
         log.info("Received request to delete the City with id - {}.", id);
         cityService.deleteCity(id);
         log.info("the City with id - {} was deleted.", id);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

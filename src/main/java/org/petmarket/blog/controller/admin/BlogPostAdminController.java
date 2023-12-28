@@ -2,7 +2,6 @@ package org.petmarket.blog.controller.admin;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
@@ -16,11 +15,10 @@ import org.petmarket.utils.annotations.parametrs.ParameterId;
 import org.petmarket.utils.annotations.parametrs.ParameterLanguage;
 import org.petmarket.utils.annotations.responses.*;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import static org.petmarket.utils.MessageUtils.SUCCESSFULLY_DELETED;
 
 @RestController
 @RequestMapping("/v1/admin/blog")
@@ -34,18 +32,19 @@ public class BlogPostAdminController {
             summary = "Create a new blog post",
             description = "Create a new blog post with the default language code"
     )
-    @ApiResponseSuccessful
+    @ApiResponseCreated
     @ApiResponseBadRequest
     @ApiResponseNotFound
     @ApiResponseUnauthorized
     @ApiResponseForbidden
     @PostMapping
-    public BlogPostResponseDto createPost(@RequestBody
+    public ResponseEntity<BlogPostResponseDto> createPost(@RequestBody
                                           @Valid
                                           @Parameter(description = "Blog post request dto", required = true)
                                           BlogPostRequestDto requestDto,
                                           Authentication authentication) {
-        return postService.savePost(requestDto, authentication);
+        BlogPostResponseDto responseDto = postService.savePost(requestDto, authentication);
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 
     @Operation(
@@ -107,7 +106,7 @@ public class BlogPostAdminController {
             summary = "Delete a blog post",
             description = "Delete a blog post by ID"
     )
-    @ApiResponse(responseCode = "204", description = SUCCESSFULLY_DELETED)
+    @ApiResponseDeleted
     @ApiResponseBadRequest
     @ApiResponseNotFound
     @ApiResponseUnauthorized

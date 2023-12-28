@@ -60,10 +60,7 @@ public class AdvertisementCategoryController {
     private final AdvertisementResponseTranslateMapper advertisementMapper;
 
     @Operation(summary = "Get Category by ID")
-    @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
-            @Content(mediaType = APPLICATION_JSON_VALUE, schema =
-            @Schema(implementation = AdvertisementCategoryResponseDto.class))
-    })
+    @ApiResponseSuccessful
     @ApiResponseBadRequest
     @ApiResponseNotFound
     @GetMapping("/{id}/{langCode}")
