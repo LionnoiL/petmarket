@@ -1,9 +1,6 @@
 package org.petmarket.location.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -22,8 +19,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import static org.petmarket.utils.MessageUtils.REQUEST_BODY_IS_MANDATORY;
-import static org.petmarket.utils.MessageUtils.SUCCESSFULLY_OPERATION;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Tag(name = "Location", description = "the location API")
 @Slf4j
@@ -50,10 +45,7 @@ public class DistrictAdminController {
     }
 
     @Operation(summary = "Update District by ID")
-    @ApiResponse(responseCode = "201", description = SUCCESSFULLY_OPERATION, content = {
-            @Content(mediaType = APPLICATION_JSON_VALUE, schema =
-            @Schema(implementation = DistrictResponseDto.class))
-    })
+    @ApiResponseSuccessful
     @ApiResponseBadRequest
     @ApiResponseUnauthorized
     @ApiResponseForbidden
@@ -68,7 +60,7 @@ public class DistrictAdminController {
     }
 
     @Operation(summary = "Delete District by ID")
-    @ApiResponse(responseCode = "204", description = SUCCESSFULLY_OPERATION)
+    @ApiResponseDeleted
     @ApiResponseBadRequest
     @ApiResponseUnauthorized
     @ApiResponseForbidden

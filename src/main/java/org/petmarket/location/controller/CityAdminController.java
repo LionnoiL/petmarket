@@ -1,7 +1,6 @@
 package org.petmarket.location.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -20,7 +19,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import static org.petmarket.utils.MessageUtils.REQUEST_BODY_IS_MANDATORY;
-import static org.petmarket.utils.MessageUtils.SUCCESSFULLY_OPERATION;
 
 @Tag(name = "Location", description = "the location API")
 @Slf4j
@@ -33,17 +31,18 @@ public class CityAdminController {
     private final CityService cityService;
 
     @Operation(summary = "Create a new City")
-    @ApiResponseSuccessful
+    @ApiResponseCreated
     @ApiResponseBadRequest
     @ApiResponseUnauthorized
     @ApiResponseForbidden
     @ApiResponseNotFound
     @PostMapping
-    public CityResponseDto addCity(
+    public ResponseEntity<CityResponseDto> addCity(
             @RequestBody @Valid @NotNull(message = REQUEST_BODY_IS_MANDATORY) final CityRequestDto request,
             BindingResult bindingResult) {
         log.info("Received request to create City - {}.", request);
-        return cityService.addCity(request, bindingResult);
+        CityResponseDto responseDto = cityService.addCity(request, bindingResult);
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 
     @Operation(summary = "Update City by ID")
@@ -62,7 +61,7 @@ public class CityAdminController {
     }
 
     @Operation(summary = "Delete City by ID")
-    @ApiResponse(responseCode = "204", description = SUCCESSFULLY_OPERATION)
+    @ApiResponseDeleted
     @ApiResponseBadRequest
     @ApiResponseUnauthorized
     @ApiResponseForbidden
