@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.petmarket.errorhandling.ItemNotFoundException;
 import org.petmarket.language.entity.Language;
 import org.petmarket.language.repository.LanguageRepository;
+import org.petmarket.options.dto.OptionsRequestDto;
 import org.petmarket.options.entity.Options;
 import org.petmarket.options.entity.OptionsKey;
 import org.petmarket.options.repository.OptionsRepository;
@@ -21,9 +22,24 @@ public class OptionsService {
     private final LanguageRepository languageRepository;
 
     public Language getDefaultSiteLanguage() {
-        Options options = optionsRepository.findByKey(OptionsKey.DEFAULT_LANGUAGE)
-                .orElseThrow(() -> new ItemNotFoundException("Options not found"));
-        return languageRepository.findByLangCodeAndEnableIsTrue(options.getValue())
+        String langCode = getOptionsValueByKey(OptionsKey.DEFAULT_LANGUAGE);
+        return languageRepository.findByLangCodeAndEnableIsTrue(langCode)
                 .orElseThrow(() -> new ItemNotFoundException(LANGUAGE_NOT_FOUND));
+    }
+
+    public Options getOptionsByKey(OptionsKey key){
+        return optionsRepository.findByKey(key).orElseThrow(() -> new ItemNotFoundException("Options not found"));
+    }
+
+    public String getOptionsValueByKey(OptionsKey key){
+        Options options = getOptionsByKey(key);
+        return options.getValue();
+    }
+
+    public Options setOptionsValueByKey(OptionsKey key, OptionsRequestDto dto) {
+        Options options = getOptionsByKey(key);
+        options.setValue(dto.getValue());
+        optionsRepository.save(options);
+        return options;
     }
 }
