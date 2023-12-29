@@ -48,16 +48,16 @@ public class OptionsService {
         return options;
     }
 
-    public List<Long> getFavoriteAttributesGroupIds(){
+    public List<Long> getFavoriteAttributesGroupIds() {
         List<Long> result = new ArrayList<>();
 
         String optionsValueByKey = getOptionsValueByKey(OptionsKey.FAVORITE_ATTRIBUTE_1_ID);
-        if (!Strings.isBlank(optionsValueByKey)){
+        if (!Strings.isBlank(optionsValueByKey)) {
             result.add(Long.valueOf(optionsValueByKey));
         }
 
         optionsValueByKey = getOptionsValueByKey(OptionsKey.FAVORITE_ATTRIBUTE_2_ID);
-        if (!Strings.isBlank(optionsValueByKey)){
+        if (!Strings.isBlank(optionsValueByKey)) {
             result.add(Long.valueOf(optionsValueByKey));
         }
         return result;
