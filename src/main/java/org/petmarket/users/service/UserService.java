@@ -75,6 +75,7 @@ public class UserService {
         }
     }
 
+    @Transactional
     public void uploadImage(User user, MultipartFile image) {
         FileStorageName storage = imageService.convertAndSendImage(catalogName, user.getId(),
                 image, imageWidth, imageHeight, "avatar");
