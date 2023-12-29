@@ -39,6 +39,9 @@ public class UserResponseDto {
     private String site;
     private int rating;
 
+    @JsonProperty("user_avatar_url")
+    private String userAvatarUrl;
+
     //TODO location, language
 
     private List<Role> roles;

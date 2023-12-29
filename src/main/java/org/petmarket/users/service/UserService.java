@@ -4,27 +4,33 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.errorhandling.ItemNotFoundException;
+import org.petmarket.files.FileStorageName;
+import org.petmarket.images.ImageService;
 import org.petmarket.security.jwt.JwtUser;
-import org.petmarket.users.dto.UserResponseDto;
 import org.petmarket.users.entity.User;
-import org.petmarket.users.mapper.UserMapper;
 import org.petmarket.users.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 
-/**
- * @author Andriy Gaponov
- */
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class UserService {
 
+    @Value("${aws.s3.catalog.users}")
+    private String catalogName;
+    @Value("${users.images.avatar.width}")
+    private int imageWidth;
+    @Value("${users.images.avatar.height}")
+    private int imageHeight;
+
     private final UserRepository userRepository;
-    private final UserMapper userMapper;
+    private final ImageService imageService;
 
     public static Long getCurrentUserId() {
         JwtUser principal = (JwtUser) SecurityContextHolder.getContext().getAuthentication()
@@ -34,9 +40,7 @@ public class UserService {
 
     public User findByUsername(String username) throws ItemNotFoundException {
         User user = userRepository.findByEmail(username)
-                .orElseThrow(() -> {
-                    throw new ItemNotFoundException("User email not found");
-                });
+                .orElseThrow(() -> new ItemNotFoundException("User email not found"));
         log.info("IN findByUsername - user: {} found by username: {}", user, username);
         return user;
     }
@@ -45,9 +49,8 @@ public class UserService {
         try {
             JwtUser principal = (JwtUser) SecurityContextHolder.getContext().getAuthentication()
                     .getPrincipal();
-            return userRepository.findById(principal.getId()).orElseThrow(() -> {
-                throw new ItemNotFoundException("User not found by id: " + principal.getId());
-            });
+            return userRepository.findById(principal.getId())
+                    .orElseThrow(() -> new ItemNotFoundException("User not found by id: " + principal.getId()));
         } catch (Exception e) {
             return null;
         }
@@ -58,11 +61,9 @@ public class UserService {
         return auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
     }
 
-    public UserResponseDto findById(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> {
-            throw new ItemNotFoundException("User not found by id: " + userId);
-        });
-        return userMapper.mapEntityToDto(user);
+    public User findById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new ItemNotFoundException("User not found by id: " + userId));
     }
 
     @Transactional
@@ -73,5 +74,11 @@ public class UserService {
             userRepository.save(user);
         }
     }
-}
 
+    public void uploadImage(User user, MultipartFile image) {
+        FileStorageName storage = imageService.convertAndSendImage(catalogName, user.getId(),
+                image, imageWidth, imageHeight, "avatar");
+        user.setUserAvatarUrl(storage.getFullName());
+        userRepository.save(user);
+    }
+}

@@ -1,4 +1,4 @@
-package org.petmarket.advertisements.images.service;
+package org.petmarket.images;
 
 import com.luciad.imageio.webp.WebPWriteParam;
 import org.petmarket.errorhandling.ImageConvertException;

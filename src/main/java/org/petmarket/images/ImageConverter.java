@@ -1,4 +1,4 @@
-package org.petmarket.advertisements.images.service;
+package org.petmarket.images;
 
 import java.io.File;
 
