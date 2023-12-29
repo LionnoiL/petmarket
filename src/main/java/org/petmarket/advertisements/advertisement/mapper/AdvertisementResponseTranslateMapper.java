@@ -6,6 +6,7 @@ import org.petmarket.advertisements.advertisement.dto.AdvertisementDetailsRespon
 import org.petmarket.advertisements.advertisement.dto.AdvertisementShortResponseDto;
 import org.petmarket.advertisements.advertisement.entity.Advertisement;
 import org.petmarket.advertisements.advertisement.entity.AdvertisementTranslate;
+import org.petmarket.advertisements.attributes.entity.Attribute;
 import org.petmarket.advertisements.attributes.mapper.AttributeTranslateMapper;
 import org.petmarket.advertisements.category.mapper.AdvertisementCategoryResponseTranslateMapper;
 import org.petmarket.breeds.mapper.BreedMapper;
@@ -17,8 +18,10 @@ import org.petmarket.translate.LanguageHolder;
 import org.petmarket.translate.TranslationService;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -51,8 +54,16 @@ public class AdvertisementResponseTranslateMapper {
         dto.setCategory(categoryMapper.mapEntityToDto(entity.getCategory(), language));
         dto.setPayments(paymentMapper.mapEntityToDto(entity.getPayments(), language));
         dto.setDeliveries(deliveryMapper.mapEntityToDto(entity.getDeliveries(), language));
-        dto.setAttributes(attributeMapper.mapEntityToDto(entity.getAttributes(), language));
         dto.setBreed(breedMapper.toDto(entity.getBreed(), language));
+
+        List<Attribute> allAttributes = entity.getAttributes();
+        List<Attribute> favoriteAttributes = getFavoriteAttributes(allAttributes);
+
+        List<Attribute> nonFavoriteAttributes = new ArrayList<>(allAttributes);
+        nonFavoriteAttributes.removeAll(favoriteAttributes);
+
+        dto.setFavoriteAttributes(attributeMapper.mapEntityToDto(favoriteAttributes, language));
+        dto.setAttributes(attributeMapper.mapEntityToDto(nonFavoriteAttributes, language));
 
         return dto;
     }
@@ -80,8 +91,15 @@ public class AdvertisementResponseTranslateMapper {
         dto.setTitle(translation.getTitle());
         dto.setDescription(translation.getDescription());
         dto.setLangCode(language.getLangCode());
-        dto.setAttributes(attributeMapper.mapEntityToDto(entity.getAttributes(), language));
 
+        List<Attribute> allAttributes = entity.getAttributes();
+        List<Attribute> favoriteAttributes = getFavoriteAttributes(allAttributes);
+
+        List<Attribute> nonFavoriteAttributes = new ArrayList<>(allAttributes);
+        nonFavoriteAttributes.removeAll(favoriteAttributes);
+
+        dto.setFavoriteAttributes(attributeMapper.mapEntityToDto(favoriteAttributes, language));
+        dto.setAttributes(attributeMapper.mapEntityToDto(nonFavoriteAttributes, language));
         return dto;
     }
 
@@ -92,6 +110,19 @@ public class AdvertisementResponseTranslateMapper {
         }
         return advertisements.stream()
                 .map(p -> mapEntityToShortDto(p, language))
+                .toList();
+    }
+
+    private List<Attribute> getFavoriteAttributes(List<Attribute> attributes) {
+        List<Long> specificList = optionsService.getFavoriteAttributesGroupIds();
+        return attributes.stream()
+                .filter(attribute -> specificList.stream()
+                        .anyMatch(favoriteId -> Objects.equals(favoriteId, attribute.getGroup().getId())))
+                .sorted((a1, a2) -> {
+                    int indexA1 = specificList.indexOf(a1.getGroup().getId());
+                    int indexA2 = specificList.indexOf(a2.getGroup().getId());
+                    return Integer.compare(indexA1, indexA2);
+                })
                 .toList();
     }
 }
