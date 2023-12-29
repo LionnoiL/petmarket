@@ -28,7 +28,8 @@ public class OptionsService {
     }
 
     public Options getOptionsByKey(OptionsKey key) {
-        return optionsRepository.findByKey(key).orElseThrow(() -> new ItemNotFoundException("Options not found"));
+        return optionsRepository.findByKey(key)
+                .orElseThrow(() -> new ItemNotFoundException("Option not found with key: " + key));
     }
 
     public String getOptionsValueByKey(OptionsKey key) {
