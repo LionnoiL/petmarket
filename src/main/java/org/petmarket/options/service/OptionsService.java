@@ -27,11 +27,11 @@ public class OptionsService {
                 .orElseThrow(() -> new ItemNotFoundException(LANGUAGE_NOT_FOUND));
     }
 
-    public Options getOptionsByKey(OptionsKey key){
+    public Options getOptionsByKey(OptionsKey key) {
         return optionsRepository.findByKey(key).orElseThrow(() -> new ItemNotFoundException("Options not found"));
     }
 
-    public String getOptionsValueByKey(OptionsKey key){
+    public String getOptionsValueByKey(OptionsKey key) {
         Options options = getOptionsByKey(key);
         return options.getValue();
     }
