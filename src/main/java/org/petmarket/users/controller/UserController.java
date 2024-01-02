@@ -13,13 +13,22 @@ import lombok.extern.slf4j.Slf4j;
 import org.petmarket.errorhandling.ErrorResponse;
 import org.petmarket.users.dto.ResetPasswordRequestDto;
 import org.petmarket.users.dto.UserResponseDto;
+import org.petmarket.users.entity.User;
+import org.petmarket.users.mapper.UserMapper;
 import org.petmarket.users.service.UserAuthService;
 import org.petmarket.users.service.UserService;
+import org.petmarket.utils.annotations.responses.ApiResponseBadRequest;
+import org.petmarket.utils.annotations.responses.ApiResponseSuccessful;
+import org.petmarket.utils.annotations.responses.ApiResponseUnauthorized;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
 import static org.petmarket.utils.MessageUtils.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -33,6 +42,7 @@ public class UserController {
 
     private final UserService userService;
     private final UserAuthService userAuthService;
+    private final UserMapper userMapper;
 
     @Operation(summary = "Send request to reset user password")
     @ApiResponses(value = {
@@ -43,7 +53,6 @@ public class UserController {
             })
     })
     @PostMapping("/{email}/reset-password")
-    @ResponseBody
     public ResponseEntity<Void> sendResetPassword(
             @Parameter(description = "Email of the user whose password needs to be reset", required = true,
                     schema = @Schema(type = "string")
@@ -69,7 +78,6 @@ public class UserController {
             })
     })
     @PostMapping("/reset-password")
-    @ResponseBody
     public ResponseEntity<Void> resetPassword(@RequestBody @Valid ResetPasswordRequestDto requestDto,
                                               BindingResult bindingResult) {
         log.info("Received request to reset user password with Verification code.");
@@ -97,6 +105,19 @@ public class UserController {
     )
     @GetMapping("/{userId}")
     public UserResponseDto getUser(@PathVariable Long userId) {
-        return userService.findById(userId);
+        User user = userService.findById(userId);
+        return userMapper.mapEntityToDto(user);
+    }
+
+    @Operation(summary = "Adding images to user")
+    @ApiResponseSuccessful
+    @ApiResponseBadRequest
+    @ApiResponseUnauthorized
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping(value = "/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public UserResponseDto uploadImages(@RequestParam("image") MultipartFile image) {
+        User user = userService.getCurrentUser();
+        userService.uploadImage(user, image);
+        return userMapper.mapEntityToDto(user);
     }
 }

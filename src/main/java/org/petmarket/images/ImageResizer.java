@@ -1,4 +1,4 @@
-package org.petmarket.advertisements.images.service;
+package org.petmarket.images;
 
 import org.petmarket.errorhandling.ImageConvertException;
 import org.springframework.stereotype.Service;

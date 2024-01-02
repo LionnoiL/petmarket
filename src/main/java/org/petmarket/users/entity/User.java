@@ -87,6 +87,9 @@ public class User {
     @Column(name = "email_confirm_code")
     private String emailConfirmCode;
 
+    @Column(name = "user_avatar_url")
+    private String userAvatarUrl;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_roles",
             joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
