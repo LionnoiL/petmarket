@@ -1,7 +1,6 @@
 package org.petmarket.images;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.petmarket.aws.s3.S3Service;
 import org.petmarket.errorhandling.ImageConvertException;
 import org.petmarket.files.FileStorageName;
@@ -11,7 +10,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 
-@Slf4j
 @RequiredArgsConstructor
 @Service
 public class ImageService {
