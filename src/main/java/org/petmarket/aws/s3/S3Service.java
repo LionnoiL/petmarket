@@ -70,11 +70,11 @@ public class S3Service implements StorageService {
     }
 
     public String getFileNameAws(String urlString) {
-        if (urlString == null || urlString.isEmpty()){
+        if (urlString == null || urlString.isEmpty()) {
             return "";
         }
         String[] strings = urlString.split("/");
-        if (strings.length == 0){
+        if (strings.length == 0) {
             return "";
         }
         return strings[strings.length - 1];
