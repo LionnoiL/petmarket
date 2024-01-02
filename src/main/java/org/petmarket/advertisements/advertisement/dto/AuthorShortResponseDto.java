@@ -19,4 +19,7 @@ public class AuthorShortResponseDto {
 
     @JsonProperty("user_type")
     private UserType userType;
+
+    @JsonProperty("user_avatar_url")
+    private String userAvatarUrl;
 }
