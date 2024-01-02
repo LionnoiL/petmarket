@@ -68,4 +68,15 @@ public class S3Service implements StorageService {
             throw new S3Exception("Error delete file from S3");
         }
     }
+
+    public String getFileNameAws(String urlString) {
+        if (urlString == null || urlString.isEmpty()){
+            return "";
+        }
+        String[] strings = urlString.split("/");
+        if (strings.length == 0){
+            return "";
+        }
+        return strings[strings.length - 1];
+    }
 }

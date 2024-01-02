@@ -79,7 +79,9 @@ public class UserService {
     public void uploadImage(User user, MultipartFile image) {
         FileStorageName storage = imageService.convertAndSendImage(catalogName, user.getId(),
                 image, imageWidth, imageHeight, "avatar");
+        String oldAvatarUrl = user.getUserAvatarUrl();
         user.setUserAvatarUrl(storage.getFullName());
         userRepository.save(user);
+        imageService.deleteImage(catalogName, oldAvatarUrl);
     }
 }

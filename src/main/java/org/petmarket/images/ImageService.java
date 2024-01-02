@@ -41,4 +41,9 @@ public class ImageService {
     private File getTempFile(String prefix, String suffix) throws IOException {
         return File.createTempFile(prefix, suffix);
     }
+
+    public void deleteImage(String awsCatalog, String url){
+        String fileNameAws = s3Service.getFileNameAws(url);
+        s3Service.deleteFile(awsCatalog, fileNameAws);
+    }
 }
