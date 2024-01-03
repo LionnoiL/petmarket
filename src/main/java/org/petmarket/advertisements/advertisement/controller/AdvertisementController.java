@@ -26,6 +26,7 @@ import org.petmarket.advertisements.images.dto.AdvertisementImageResponseDto;
 import org.petmarket.advertisements.images.entity.AdvertisementImage;
 import org.petmarket.advertisements.images.mapper.AdvertisementImageMapper;
 import org.petmarket.advertisements.images.service.AdvertisementImageService;
+import org.petmarket.errorhandling.ItemNotFoundException;
 import org.petmarket.language.entity.Language;
 import org.petmarket.language.service.LanguageService;
 import org.petmarket.options.service.OptionsService;
@@ -47,12 +48,12 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.petmarket.utils.MessageUtils.REQUEST_BODY_IS_MANDATORY;
-import static org.petmarket.utils.MessageUtils.SUCCESSFULLY_OPERATION;
+import static org.petmarket.utils.MessageUtils.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Tag(name = "Advertisement")
@@ -124,7 +125,13 @@ public class AdvertisementController {
     ) {
         Pageable pageable = PageRequest.of(page - 1, size);
         Language language = languageService.getByLangCode(langCode);
-        List<AdvertisementCategory> categories = categoryService.getByIds(categoriesIds);
+        List<AdvertisementCategory> categories = new ArrayList<>();
+        if (categoriesIds != null) {
+            categories = categoryService.getByIds(categoriesIds);
+            if (categories.size() != categoriesIds.size()) {
+                throw new ItemNotFoundException(CATEGORY_NOT_FOUND);
+            }
+        }
         Page<Advertisement> advertisements = advertisementService.getFavoriteAds(categories,
                 pageable);
         return advertisements.map(adv -> advertisementMapper.mapEntityToShortDto(adv, language));
