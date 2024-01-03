@@ -22,6 +22,7 @@ public class AuthenticationEntryPointJwt implements AuthenticationEntryPoint {
         httpServletResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
         ErrorResponse response = new ErrorResponse(
+                HttpServletResponse.SC_UNAUTHORIZED,
                 "You need to login first in order to perform this action.",
                 System.currentTimeMillis()
         );

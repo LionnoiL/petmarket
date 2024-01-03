@@ -2,6 +2,7 @@ package org.petmarket.errorhandling;
 
 import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.petmarket.aws.s3.S3Exception;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -18,141 +19,85 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import java.sql.SQLIntegrityConstraintViolationException;
 
+@Slf4j
 @RequiredArgsConstructor
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    private ResponseEntity<ErrorResponse> handleException(MethodArgumentTypeMismatchException exception) {
-        ErrorResponse response = new ErrorResponse(
-            exception.getMessage(),
-            System.currentTimeMillis()
-        );
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    private ResponseEntity<Object> handleException(MethodArgumentTypeMismatchException exception) {
+        return buildExceptionBody(exception, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    private ResponseEntity<ErrorResponse> handleException(ConstraintViolationException exception) {
-        ErrorResponse response = new ErrorResponse(
-            exception.getMessage(),
-            System.currentTimeMillis()
-        );
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    private ResponseEntity<Object> handleException(ConstraintViolationException exception) {
+        return buildExceptionBody(exception, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(FileUploadException.class)
-    private ResponseEntity<ErrorResponse> handleException(FileUploadException exception) {
-        ErrorResponse response = new ErrorResponse(
-                exception.getMessage(),
-                System.currentTimeMillis()
-        );
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    private ResponseEntity<Object> handleException(FileUploadException exception) {
+        return buildExceptionBody(exception, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(ImageConvertException.class)
-    private ResponseEntity<ErrorResponse> handleException(ImageConvertException exception) {
-        ErrorResponse response = new ErrorResponse(
-                exception.getMessage(),
-                System.currentTimeMillis()
-        );
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    private ResponseEntity<Object> handleException(ImageConvertException exception) {
+        return buildExceptionBody(exception, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    private ResponseEntity<ErrorResponse> handleException(AccessDeniedException exception) {
-        ErrorResponse response = new ErrorResponse(
-                exception.getMessage(),
-                System.currentTimeMillis()
-        );
-        return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
+    private ResponseEntity<Object> handleException(AccessDeniedException exception) {
+        return buildExceptionBody(exception, HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler(BadRequestException.class)
-    private ResponseEntity<ErrorResponse> handleException(BadRequestException exception) {
-        ErrorResponse response = new ErrorResponse(
-                exception.getMessage(),
-                System.currentTimeMillis()
-        );
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    private ResponseEntity<Object> handleException(BadRequestException exception) {
+        return buildExceptionBody(exception, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(S3Exception.class)
-    private ResponseEntity<ErrorResponse> handleException(S3Exception exception) {
-        ErrorResponse response = new ErrorResponse(
-                exception.getMessage(),
-                System.currentTimeMillis()
-        );
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    private ResponseEntity<Object> handleException(S3Exception exception) {
+        return buildExceptionBody(exception, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(LoginException.class)
-    private ResponseEntity<ErrorResponse> handleException(LoginException exception) {
-        ErrorResponse response = new ErrorResponse(
-                exception.getMessage(),
-                System.currentTimeMillis()
-        );
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    private ResponseEntity<Object> handleException(LoginException exception) {
+        return buildExceptionBody(exception, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(BadCredentialsException.class)
-    private ResponseEntity<ErrorResponse> handleException(BadCredentialsException exception) {
-        ErrorResponse response = new ErrorResponse(
-                "Bad credentials",
-                System.currentTimeMillis()
-        );
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    private ResponseEntity<Object> handleException(BadCredentialsException exception) {
+        return buildExceptionBody(exception, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    private ResponseEntity<ErrorResponse> handleException(IllegalArgumentException exception) {
-        ErrorResponse response = new ErrorResponse(
-                "Illegal argument",
-                System.currentTimeMillis()
-        );
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    private ResponseEntity<Object> handleException(IllegalArgumentException exception) {
+        return buildExceptionBody(exception, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(ItemNotFoundException.class)
-    private ResponseEntity<ErrorResponse> handleException(ItemNotFoundException exception) {
-        ErrorResponse response = new ErrorResponse(
-                exception.getMessage(),
-                System.currentTimeMillis()
-        );
-        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    private ResponseEntity<Object> handleException(ItemNotFoundException exception) {
+        return buildExceptionBody(exception, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(UsernameNotFoundException.class)
-    private ResponseEntity<ErrorResponse> handleException(UsernameNotFoundException exception) {
-        ErrorResponse response = new ErrorResponse(
-                exception.getMessage(),
-                System.currentTimeMillis()
-        );
-        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    private ResponseEntity<Object> handleException(UsernameNotFoundException exception) {
+        return buildExceptionBody(exception, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler
-    private ResponseEntity<ErrorResponse> handleException(ItemNotCreatedException exception) {
-        ErrorResponse response = new ErrorResponse(
-                exception.getMessage(), System.currentTimeMillis()
-        );
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    private ResponseEntity<Object> handleException(ItemNotCreatedException exception) {
+        return buildExceptionBody(exception, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler
-    private ResponseEntity<ErrorResponse> handleException(
+    private ResponseEntity<Object> handleException(
             SQLIntegrityConstraintViolationException exception) {
-        ErrorResponse response = new ErrorResponse(
-                exception.getMessage(), System.currentTimeMillis()
-        );
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        return buildExceptionBody(exception, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler
-    private ResponseEntity<ErrorResponse> handleException(ItemNotUpdatedException exception) {
-        ErrorResponse response = new ErrorResponse(
-                exception.getMessage(), System.currentTimeMillis()
-        );
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    private ResponseEntity<Object> handleException(ItemNotUpdatedException exception) {
+        return buildExceptionBody(exception, HttpStatus.BAD_REQUEST);
     }
 
     @Override
@@ -160,9 +105,16 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             HttpMessageNotReadableException exception,
             HttpHeaders headers, HttpStatusCode status,
             WebRequest request) {
-        ErrorResponse response = new ErrorResponse(
-                exception.getMessage(), System.currentTimeMillis()
-        );
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        return buildExceptionBody(exception, HttpStatus.BAD_REQUEST);
+    }
+
+    private ResponseEntity<Object> buildExceptionBody(Exception exception, HttpStatus httpStatus) {
+        ErrorResponse exceptionResponse = ErrorResponse.builder()
+                .status(httpStatus.value())
+                .message(exception.getMessage())
+                .timestamp(System.currentTimeMillis())
+                .build();
+        log.debug(exception.getMessage());
+        return ResponseEntity.status(httpStatus).body(exceptionResponse);
     }
 }
