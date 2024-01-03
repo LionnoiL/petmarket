@@ -39,6 +39,9 @@ public class UserResponseDto {
     private String site;
     private int rating;
 
+    @JsonProperty("reviews_count")
+    private int reviewsCount;
+
     @JsonProperty("user_avatar_url")
     private String userAvatarUrl;
 

@@ -69,6 +69,10 @@ public class User {
     @Column(name = "rating")
     private int rating;
 
+    @Min(0)
+    @Column(name = "reviews_count")
+    private int reviewsCount;
+
     @ManyToOne
     @JoinColumn(name = "location_id")
     private Location location;
