@@ -17,7 +17,6 @@ import org.petmarket.advertisements.attributes.entity.Attribute;
 import org.petmarket.advertisements.attributes.repository.AttributeRepository;
 import org.petmarket.advertisements.category.entity.AdvertisementCategory;
 import org.petmarket.advertisements.category.repository.AdvertisementCategoryRepository;
-import org.petmarket.advertisements.images.service.AdvertisementImageService;
 import org.petmarket.breeds.entity.Breed;
 import org.petmarket.breeds.repository.BreedRepository;
 import org.petmarket.delivery.entity.Delivery;
@@ -44,7 +43,6 @@ import org.petmarket.users.repository.UserRepository;
 import org.petmarket.utils.ErrorUtils;
 import org.petmarket.utils.TransliterateUtils;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
@@ -52,7 +50,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -80,7 +77,6 @@ public class AdvertisementService {
     private final ReviewMapper reviewMapper;
     private final OptionsService optionsService;
     private final TransliterateUtils transliterateUtils;
-    private final AdvertisementImageService advertisementImageService;
 
     public Page<Advertisement> getByCategoryTypeCitiesAttributes(
             AdvertisementCategory category, List<Attribute> attributes, List<City> cities, AdvertisementType type,
@@ -337,24 +333,5 @@ public class AdvertisementService {
         LocalDate currentDate = LocalDate.now();
         LocalDate dateEnding = currentDate.plusDays(10);
         advertisement.setEnding(dateEnding);
-    }
-
-    @Transactional
-    public void deleteOldDraftsImages() {
-        int pageNumber = 0;
-        Page<Advertisement> advertisementsPage;
-
-        do {
-            advertisementsPage = advertisementRepository
-                    .findAdvertisementByStatusAndUpdatedBeforeAndImagesIsNotEmpty(
-                            AdvertisementStatus.DRAFT,
-                            LocalDateTime.now().minusDays(10),
-                            PageRequest.of(pageNumber, 1000)
-                    );
-            for (Advertisement advertisement : advertisementsPage) {
-                advertisementImageService.deleteImages(advertisement.getImages());
-            }
-            pageNumber++;
-        } while (advertisementsPage.hasNext());
     }
 }

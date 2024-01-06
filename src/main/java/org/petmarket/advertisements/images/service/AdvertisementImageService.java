@@ -1,6 +1,7 @@
 package org.petmarket.advertisements.images.service;
 
 import com.nimbusds.jose.shaded.gson.Gson;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.advertisements.advertisement.entity.Advertisement;
@@ -10,9 +11,12 @@ import org.petmarket.errorhandling.FileUploadException;
 import org.petmarket.files.FileStorageName;
 import org.petmarket.images.ImageService;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -37,6 +41,8 @@ public class AdvertisementImageService {
     private int smallImageHeight;
     @Value("${advertisement.images.max-count}")
     private int maxImagesCount;
+    @Value("${advertisement.draft.images.daysThreshold}")
+    private int daysThreshold;
 
     public Set<AdvertisementImage> uploadImages(Advertisement advertisement, List<MultipartFile> images) {
         if ((images.size() + advertisement.getImages().size()) > maxImagesCount) {
@@ -68,12 +74,22 @@ public class AdvertisementImageService {
         return result;
     }
 
-    public void deleteImages(Set<AdvertisementImage> images) {
-        Advertisement advertisement = images.iterator().next().getAdvertisement();
-        for (AdvertisementImage image : images) {
-            imageService.deleteImage(catalogName, image.getUrl());
-            imageService.deleteImage(catalogName, image.getUrlSmall());
-        }
-        advertisement.getImages().removeAll(images);
+    @Transactional
+    public void deleteOldDraftsImages() {
+        int pageNumber = 0;
+        Page<AdvertisementImage> advertisementImagePage;
+
+        do {
+            advertisementImagePage = advertisementImageRepository
+                    .findImagesBeforeDeletionDate(
+                            LocalDateTime.now().minusDays(daysThreshold),
+                            PageRequest.of(pageNumber, 1000));
+            for (AdvertisementImage image : advertisementImagePage.getContent()) {
+                imageService.deleteImage(catalogName, image.getUrl());
+                imageService.deleteImage(catalogName, image.getUrlSmall());
+            }
+            advertisementImageRepository.deleteAll(advertisementImagePage.getContent());
+            pageNumber++;
+        } while (advertisementImagePage.hasNext());
     }
 }
