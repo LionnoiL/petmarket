@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -58,4 +59,8 @@ public interface AdvertisementRepository extends AdvertisementRepositoryBasic {
             List<AdvertisementCategory> categories, AdvertisementStatus status, Pageable pageable);
 
     Page<Advertisement> findAllByStatusOrderByCreatedDesc(AdvertisementStatus status, Pageable pageable);
+
+    Page<Advertisement> findAdvertisementByStatusAndUpdatedBeforeAndImagesIsNotEmpty(AdvertisementStatus status,
+                                                                                     LocalDateTime dateBefore,
+                                                                                     Pageable pageable);
 }

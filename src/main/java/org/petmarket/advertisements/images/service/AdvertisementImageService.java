@@ -67,4 +67,13 @@ public class AdvertisementImageService {
         }
         return result;
     }
+
+    public void deleteImages(Set<AdvertisementImage> images) {
+        Advertisement advertisement = images.iterator().next().getAdvertisement();
+        for (AdvertisementImage image : images) {
+            imageService.deleteImage(catalogName, image.getUrl());
+            imageService.deleteImage(catalogName, image.getUrlSmall());
+        }
+        advertisement.getImages().removeAll(images);
+    }
 }
