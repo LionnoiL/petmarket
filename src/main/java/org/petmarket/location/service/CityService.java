@@ -1,7 +1,6 @@
 package org.petmarket.location.service;
 
 import jakarta.transaction.Transactional;
-import java.util.Collections;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.errorhandling.ItemNotFoundException;
@@ -20,6 +19,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 
+import java.util.Collections;
 import java.util.List;
 
 import static org.petmarket.utils.MessageUtils.*;
@@ -65,7 +65,11 @@ public class CityService {
         if (citiesIds == null) {
             return Collections.emptyList();
         }
-        return cityRepository.findAllById(citiesIds);
+        List<City> cities = cityRepository.findAllById(citiesIds);
+        if (cities.size() != citiesIds.size()) {
+            throw new ItemNotFoundException(CITY_NOT_FOUND);
+        }
+        return cities;
     }
 
     @Transactional
