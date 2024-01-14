@@ -15,10 +15,7 @@ import org.petmarket.security.jwt.JwtUser;
 import org.petmarket.users.dto.ResetPasswordRequestDto;
 import org.petmarket.users.dto.UserRequestDto;
 import org.petmarket.users.dto.UserResponseDto;
-import org.petmarket.users.entity.LoginProvider;
-import org.petmarket.users.entity.Role;
-import org.petmarket.users.entity.User;
-import org.petmarket.users.entity.UserStatus;
+import org.petmarket.users.entity.*;
 import org.petmarket.users.mapper.UserMapper;
 import org.petmarket.users.repository.RoleRepository;
 import org.petmarket.users.repository.UserRepository;
@@ -77,6 +74,7 @@ public class UserAuthService {
         user.setId(null);
         user.setLoginProvider(LoginProvider.LOCAL);
         user.setUsername(userRequestDto.getEmail());
+        user.setUserType(UserType.USER);
         User registeredUser = userRepository.save(user);
 
         return userMapper.mapEntityToDto(registeredUser);
