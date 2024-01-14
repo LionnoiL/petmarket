@@ -304,6 +304,13 @@ public class AdvertisementService {
         }
     }
 
+    public Page<Advertisement> getAuthorsAdvertisements(Long authorId, Long excludedAdvertisementId,
+                                                        Pageable pageable) {
+        return advertisementRepository
+                .findAllByAuthorIdAndStatusAndIdNotOrderByCreatedDesc(
+                        authorId, AdvertisementStatus.ACTIVE, excludedAdvertisementId, pageable);
+    }
+
     private User getUserByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new ItemNotFoundException(USER_NOT_FOUND));
