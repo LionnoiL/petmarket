@@ -1,10 +1,10 @@
 package org.petmarket.advertisements.category.entity;
 
 import jakarta.persistence.*;
-import java.util.Objects;
 import lombok.*;
 import org.petmarket.translate.TranslateHolder;
 
+import java.util.Objects;
 import java.util.Set;
 
 @Entity

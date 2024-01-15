@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.advertisements.advertisement.dto.AdvertisementDetailsResponseDto;
 import org.petmarket.advertisements.advertisement.dto.AdvertisementRequestDto;
+import org.petmarket.advertisements.advertisement.dto.AdvertisementSearchDto;
 import org.petmarket.advertisements.advertisement.dto.AdvertisementShortResponseDto;
 import org.petmarket.advertisements.advertisement.entity.Advertisement;
 import org.petmarket.advertisements.advertisement.entity.AdvertisementStatus;
@@ -29,6 +30,8 @@ import org.petmarket.advertisements.images.service.AdvertisementImageService;
 import org.petmarket.errorhandling.ItemNotFoundException;
 import org.petmarket.language.entity.Language;
 import org.petmarket.language.service.LanguageService;
+import org.petmarket.location.dto.CityResponseDto;
+import org.petmarket.location.service.CityService;
 import org.petmarket.options.service.OptionsService;
 import org.petmarket.utils.annotations.parametrs.ParameterId;
 import org.petmarket.utils.annotations.parametrs.ParameterLanguage;
@@ -70,6 +73,7 @@ public class AdvertisementController {
     private final LanguageService languageService;
     private final OptionsService optionsService;
     private final AdvertisementImageService advertisementImageService;
+    private final CityService cityService;
     private final AdvertisementResponseTranslateMapper advertisementMapper;
     private final AdvertisementImageMapper imageMapper;
 
@@ -224,5 +228,29 @@ public class AdvertisementController {
         accessCheckerService.checkUpdateAccess(List.of(advertisement));
         Set<AdvertisementImage> advertisementImages = advertisementImageService.uploadImages(advertisement, images);
         return advertisementImages.stream().map(imageMapper::toDto).collect(Collectors.toSet());
+    }
+
+    @Operation(summary = "Search advertisements",
+            description = """
+                       
+                    """)
+    @ApiResponseSuccessful
+    @ApiResponseNotFound
+    @GetMapping("/{langCode}/search")
+    public AdvertisementSearchDto searchAdvertisements(
+            @ParameterLanguage @PathVariable String langCode,
+            @ParameterPageNumber @RequestParam(defaultValue = "1") @Positive int page,
+            @ParameterPageSize @RequestParam(defaultValue = "30") @Positive int size,
+            @RequestParam String searchTerm,
+            @RequestParam Long cityId) {
+        Language language = languageService.getByLangCode(langCode);
+        CityResponseDto city = cityService.findById(cityId);
+
+        Page<Advertisement> advertisements = advertisementService.search(searchTerm, cityId, page, size);
+        Page<AdvertisementShortResponseDto> advertisementShortResponseDtos = advertisements.map(
+                adv -> advertisementMapper.mapEntityToShortDto(adv, language)
+        );
+
+        return new AdvertisementSearchDto(searchTerm, langCode, null, city, advertisementShortResponseDtos);
     }
 }

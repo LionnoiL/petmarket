@@ -1,13 +1,9 @@
 package org.petmarket.advertisements.advertisement.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.petmarket.advertisements.category.dto.AdvertisementCategoryResponseDto;
-import org.petmarket.location.entity.Location;
+import org.petmarket.location.dto.CityResponseDto;
 import org.springframework.data.domain.Page;
 
 @Setter
@@ -22,6 +18,6 @@ public class AdvertisementSearchDto {
     @JsonProperty("lang_code")
     private String langCode;
     private AdvertisementCategoryResponseDto category;
-    private Location location;
+    private CityResponseDto city;
     private Page<AdvertisementShortResponseDto> advertisements;
 }

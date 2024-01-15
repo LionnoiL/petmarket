@@ -1,23 +1,15 @@
 package org.petmarket.advertisements.advertisement.service;
 
-import static org.petmarket.utils.MessageUtils.ADVERTISEMENT_NOT_FOUND;
-import static org.petmarket.utils.MessageUtils.BREED_NOT_FOUND;
-import static org.petmarket.utils.MessageUtils.CATEGORY_NOT_FOUND;
-import static org.petmarket.utils.MessageUtils.CITY_NOT_FOUND;
-import static org.petmarket.utils.MessageUtils.LANGUAGE_IS_PRESENT_IN_LIST;
-import static org.petmarket.utils.MessageUtils.LANGUAGE_NOT_FOUND;
-import static org.petmarket.utils.MessageUtils.NO_TRANSLATION;
-import static org.petmarket.utils.MessageUtils.USER_NOT_FOUND;
-
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.search.engine.search.query.SearchQuery;
+import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.scope.SearchScope;
+import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.petmarket.advertisements.advertisement.dto.AdvertisementDetailsResponseDto;
 import org.petmarket.advertisements.advertisement.dto.AdvertisementRequestDto;
 import org.petmarket.advertisements.advertisement.entity.Advertisement;
@@ -57,11 +49,21 @@ import org.petmarket.users.repository.UserRepository;
 import org.petmarket.utils.ErrorUtils;
 import org.petmarket.utils.TransliterateUtils;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+
+import static org.petmarket.utils.MessageUtils.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -83,11 +85,12 @@ public class AdvertisementService {
     private final ReviewMapper reviewMapper;
     private final OptionsService optionsService;
     private final TransliterateUtils transliterateUtils;
+    private final EntityManager entityManager;
 
     public Page<Advertisement> getByCategoryTypeCitiesAttributes(
-        AdvertisementCategory category, List<Attribute> attributes, List<City> cities,
-        AdvertisementType type,
-        AdvertisementStatus status, Pageable pageable
+            AdvertisementCategory category, List<Attribute> attributes, List<City> cities,
+            AdvertisementType type,
+            AdvertisementStatus status, Pageable pageable
     ) {
 
         Specification<Object> where = Specification.where((root, query, criteriaBuilder) -> {
@@ -119,9 +122,9 @@ public class AdvertisementService {
     }
 
     public Page<Advertisement> getAdvertisements(List<AdvertisementCategory> categories,
-        List<City> cities,
-        AdvertisementStatus status,
-        AdvertisementType type, Pageable pageable) {
+                                                 List<City> cities,
+                                                 AdvertisementStatus status,
+                                                 AdvertisementType type, Pageable pageable) {
         Specification<Object> where = Specification.where((root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             if (!categories.isEmpty()) {
@@ -143,31 +146,31 @@ public class AdvertisementService {
     }
 
     public Page<Advertisement> getFavoriteAds(List<AdvertisementCategory> categories,
-        Pageable pageable) {
+                                              Pageable pageable) {
         if (categories.isEmpty()) {
             return advertisementRepository.findAllByStatusOrderByCreatedDesc(
-                AdvertisementStatus.ACTIVE, pageable);
+                    AdvertisementStatus.ACTIVE, pageable);
         } else {
             return advertisementRepository.findAllByCategoryInAndStatusOrderByCreatedDesc(
-                categories,
-                AdvertisementStatus.ACTIVE,
-                pageable
+                    categories,
+                    AdvertisementStatus.ACTIVE,
+                    pageable
             );
         }
     }
 
     @Transactional
     public AdvertisementDetailsResponseDto addAdvertisement(AdvertisementRequestDto request,
-        BindingResult bindingResult,
-        Authentication authentication) {
+                                                            BindingResult bindingResult,
+                                                            Authentication authentication) {
         ErrorUtils.checkItemNotCreatedException(bindingResult);
 
         Advertisement advertisement = advertisementMapper.mapDtoRequestToEntity(request);
         advertisement.setAlias(
-            transliterateUtils.getAlias(
-                Advertisement.class.getSimpleName(),
-                request.getTitle()
-            )
+                transliterateUtils.getAlias(
+                        Advertisement.class.getSimpleName(),
+                        request.getTitle()
+                )
         );
         advertisement.setAuthor(getUserByEmail(authentication.getName()));
         advertisement.setStatus(AdvertisementStatus.DRAFT);
@@ -196,20 +199,20 @@ public class AdvertisementService {
 
     private void fillDeliveries(Advertisement advertisement, AdvertisementRequestDto request) {
         List<Delivery> deliveries = deliveryRepository.getDeliveriesFromIds(
-            request.getDeliveriesIds());
+                request.getDeliveriesIds());
         advertisement.setDeliveries(deliveries);
     }
 
     private void fillTranslation(Advertisement advertisement, AdvertisementRequestDto request,
-        Language defaultSiteLanguage) {
+                                 Language defaultSiteLanguage) {
         advertisement.setTranslations(new HashSet<>());
         AdvertisementTranslate translation = AdvertisementTranslate.builder()
-            .id(null)
-            .advertisement(advertisement)
-            .title(request.getTitle())
-            .description(request.getDescription())
-            .language(defaultSiteLanguage)
-            .build();
+                .id(null)
+                .advertisement(advertisement)
+                .title(request.getTitle())
+                .description(request.getDescription())
+                .language(defaultSiteLanguage)
+                .build();
         addTranslation(advertisement, translation);
     }
 
@@ -217,11 +220,11 @@ public class AdvertisementService {
         AdvertisementCategory category = null;
         if (request.getCategoryId() != null) {
             category = categoryRepository.findById(request.getCategoryId())
-                .orElseThrow(
-                    () -> {
-                        throw new ItemNotFoundException(CATEGORY_NOT_FOUND);
-                    }
-                );
+                    .orElseThrow(
+                            () -> {
+                                throw new ItemNotFoundException(CATEGORY_NOT_FOUND);
+                            }
+                    );
         }
         advertisement.setCategory(category);
     }
@@ -230,9 +233,9 @@ public class AdvertisementService {
         Breed breed = null;
         if (request.getBreedId() != null) {
             breed = breedRepository.findById(request.getBreedId()).orElseThrow(
-                () -> {
-                    throw new ItemNotFoundException(BREED_NOT_FOUND);
-                }
+                    () -> {
+                        throw new ItemNotFoundException(BREED_NOT_FOUND);
+                    }
             );
         }
         advertisement.setBreed(breed);
@@ -242,45 +245,45 @@ public class AdvertisementService {
         Location location = null;
         if (request.getCityId() != null) {
             City city = cityRepository.findById(request.getCityId()).orElseThrow(
-                () -> {
-                    throw new ItemNotFoundException(CITY_NOT_FOUND);
-                }
+                    () -> {
+                        throw new ItemNotFoundException(CITY_NOT_FOUND);
+                    }
             );
             location = Location.builder()
-                .city(city)
-                .latitude(request.getLatitude())
-                .longitude(request.getLongitude())
-                .build();
+                    .city(city)
+                    .latitude(request.getLatitude())
+                    .longitude(request.getLongitude())
+                    .build();
         }
         advertisement.setLocation(location);
     }
 
     private void fillAttributes(Advertisement advertisement, AdvertisementRequestDto request) {
         List<Attribute> attributes = attributeRepository.getAttributesFromIds(
-            request.getAttributesIds());
+                request.getAttributesIds());
         advertisement.setAttributes(attributes);
     }
 
     public Collection<AdvertisementReviewResponseDto> getReviewsByAdvertisementId(Long id) {
         getAdvertisement(id);
         return reviewMapper.mapEntityToAdvertisementDto(
-            reviewRepository.findReviewByAdvertisementID(id));
+                reviewRepository.findReviewByAdvertisementID(id));
     }
 
     public AdvertisementReviewResponseDto addReview(Long id, AdvertisementReviewRequestDto request,
-        BindingResult bindingResult, Authentication authentication) {
+                                                    BindingResult bindingResult, Authentication authentication) {
         ErrorUtils.checkItemNotCreatedException(bindingResult);
 
         User author = getUserByEmail(authentication.getName());
         Advertisement advertisement = getAdvertisement(id);
 
         Review review = Review.builder()
-            .author(author)
-            .type(ReviewType.USER_TO_ADVERTISEMENT)
-            .value(request.getValue())
-            .description(request.getDescription())
-            .advertisement(advertisement)
-            .build();
+                .author(author)
+                .type(ReviewType.USER_TO_ADVERTISEMENT)
+                .value(request.getValue())
+                .description(request.getDescription())
+                .advertisement(advertisement)
+                .build();
         reviewRepository.save(review);
 
         return reviewMapper.mapEntityToAdvertisementDto(review);
@@ -288,14 +291,14 @@ public class AdvertisementService {
 
     private Language getLanguage(String langCode) {
         return languageRepository.findByLangCodeAndEnableIsTrue(langCode)
-            .orElseThrow(() -> {
-                throw new ItemNotFoundException(LANGUAGE_NOT_FOUND);
-            });
+                .orElseThrow(() -> {
+                    throw new ItemNotFoundException(LANGUAGE_NOT_FOUND);
+                });
     }
 
     public Advertisement getAdvertisement(Long id) {
         return advertisementRepository.findById(id)
-            .orElseThrow(() -> new ItemNotFoundException(ADVERTISEMENT_NOT_FOUND));
+                .orElseThrow(() -> new ItemNotFoundException(ADVERTISEMENT_NOT_FOUND));
     }
 
     public List<Advertisement> getAdvertisements(List<Long> ids) {
@@ -316,19 +319,36 @@ public class AdvertisementService {
     }
 
     @Transactional
-    public List<AdvertisementTranslate> search(String searchTerm) {
-        return null;
+    public Page<Advertisement> search(String searchTerm, Long cityId, @Positive int page, @Positive int size) {
+        SearchSession searchSession = Search.session(entityManager);
+        SearchScope<AdvertisementTranslate> scope = searchSession.scope(AdvertisementTranslate.class);
+
+        SearchQuery<AdvertisementTranslate> searchQuery = searchSession.search(AdvertisementTranslate.class)
+                .where(scope.predicate().match()
+                        .fields("title", "description")
+                        .matching(searchTerm + " AND*")
+                        .fuzzy(1)
+                        .toPredicate()
+                )
+                .toQuery();
+
+        List<AdvertisementTranslate> hits = searchQuery.fetchHits((page - 1) * size, size);
+        long totalHits = searchQuery.fetchTotalHitCount();
+
+        List<Advertisement> list = hits.stream().map(at -> at.getAdvertisement()).distinct().toList();
+        Pageable pageable = PageRequest.of(page - 1, size);
+        return new PageImpl<>(list, pageable, totalHits);
     }
 
     private User getUserByEmail(String email) {
         return userRepository.findByEmail(email)
-            .orElseThrow(() -> new ItemNotFoundException(USER_NOT_FOUND));
+                .orElseThrow(() -> new ItemNotFoundException(USER_NOT_FOUND));
     }
 
     private AdvertisementTranslate getTranslation(Advertisement advertisement, Language language) {
         return advertisement.getTranslations().stream()
-            .filter(t -> t.getLanguage().equals(language))
-            .findFirst().orElseThrow(() -> new TranslateException(NO_TRANSLATION));
+                .filter(t -> t.getLanguage().equals(language))
+                .findFirst().orElseThrow(() -> new TranslateException(NO_TRANSLATION));
     }
 
     private void addTranslation(Advertisement advertisement, AdvertisementTranslate translation) {
@@ -341,8 +361,8 @@ public class AdvertisementService {
 
     private boolean checkLanguage(Advertisement advertisement, Language language) {
         return advertisement.getTranslations()
-            .stream()
-            .anyMatch(t -> t.getLanguage().equals(language));
+                .stream()
+                .anyMatch(t -> t.getLanguage().equals(language));
     }
 
     private void fillDateEnding(Advertisement advertisement) {
