@@ -6,6 +6,7 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.search.engine.search.predicate.dsl.BooleanPredicateClausesStep;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
@@ -323,14 +324,29 @@ public class AdvertisementService {
         SearchSession searchSession = Search.session(entityManager);
         SearchScope<AdvertisementTranslate> scope = searchSession.scope(AdvertisementTranslate.class);
 
+//        SearchQuery<AdvertisementTranslate> searchQuery = searchSession.search(AdvertisementTranslate.class)
+//                .where(scope.predicate().match()
+//                        .fields("title", "description")
+//                        .matching(searchTerm + " AND*")
+//                        .fuzzy(1)
+//                        .toPredicate()
+//                )
+//                .toQuery();
+
         SearchQuery<AdvertisementTranslate> searchQuery = searchSession.search(AdvertisementTranslate.class)
-                .where(scope.predicate().match()
-                        .fields("title", "description")
-                        .matching(searchTerm + " AND*")
-                        .fuzzy(1)
-                        .toPredicate()
-                )
-                .toQuery();
+            .where(f -> {
+                BooleanPredicateClausesStep<?> queryStep = f.bool();
+                if (cityId != null)
+                    queryStep.must(
+                        f.match().field("advertisement.location.city.id").matching(cityId));
+                if (searchTerm != null)
+                    queryStep.must(f.match().field("title").matching(searchTerm).fuzzy(1));
+//            if (name != null) {
+//                if (!searchInDescription) queryStep.must(f.match().field("name").matching(name).fuzzy(2));
+//                else queryStep.must(f.match().fields("name", "description").matching(name).fuzzy(2));
+//            }
+                return queryStep;
+            }).toQuery();
 
         List<AdvertisementTranslate> hits = searchQuery.fetchHits((page - 1) * size, size);
         long totalHits = searchQuery.fetchTotalHitCount();

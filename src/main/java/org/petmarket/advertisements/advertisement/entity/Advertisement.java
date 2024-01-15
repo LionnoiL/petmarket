@@ -2,6 +2,8 @@ package org.petmarket.advertisements.advertisement.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.petmarket.advertisements.attributes.entity.Attribute;
 import org.petmarket.advertisements.category.entity.AdvertisementCategory;
 import org.petmarket.advertisements.images.entity.AdvertisementImage;
@@ -31,6 +33,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
+@Indexed
 public class Advertisement implements TranslateHolder {
 
     @Id
@@ -62,6 +65,7 @@ public class Advertisement implements TranslateHolder {
 
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "location_id")
+    @IndexedEmbedded
     private Location location;
 
     @Column(name = "advertisement_status", nullable = false)

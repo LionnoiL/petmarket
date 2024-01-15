@@ -1,7 +1,10 @@
 package org.petmarket.location.entity;
 
 import jakarta.persistence.*;
+import java.util.List;
 import lombok.*;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 @Entity
 @Table(name = "cities")
@@ -10,10 +13,12 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Indexed
 public class City {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @DocumentId
     private Long id;
 
     @Column(name = "name", nullable = false)
@@ -38,4 +43,7 @@ public class City {
     @ManyToOne
     @JoinColumn(name = "district_id")
     private District district;
+
+    @OneToMany(mappedBy = "city")
+    private List<Location> locations;
 }
