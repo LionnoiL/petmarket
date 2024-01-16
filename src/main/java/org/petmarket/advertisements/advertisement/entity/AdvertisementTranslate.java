@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.petmarket.language.entity.Language;
 import org.petmarket.translate.LanguageHolder;
 
@@ -29,7 +28,6 @@ public class AdvertisementTranslate implements LanguageHolder {
 
     @ManyToOne
     @JoinColumn(name = "owner_id")
-    @IndexedEmbedded
     private Advertisement advertisement;
 
     @Column(name = "title")

@@ -2,6 +2,7 @@ package org.petmarket.advertisements.advertisement.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.petmarket.advertisements.attributes.entity.Attribute;
@@ -54,6 +55,7 @@ public class Advertisement implements TranslateHolder {
 
     @ManyToOne
     @JoinColumn(name = "category_id")
+    @IndexedEmbedded
     private AdvertisementCategory category;
 
     @ManyToOne
@@ -87,9 +89,11 @@ public class Advertisement implements TranslateHolder {
 
     @ManyToOne
     @JoinColumn(name = "breed_id")
+    @IndexedEmbedded
     private Breed breed;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "advertisement", fetch = FetchType.LAZY, orphanRemoval = true)
+    @IndexedEmbedded
     private Set<AdvertisementTranslate> translations;
 
     @ManyToMany
@@ -108,6 +112,7 @@ public class Advertisement implements TranslateHolder {
     @JoinTable(name = "attribute_values",
             joinColumns = @JoinColumn(name = "advertisement_id"),
             inverseJoinColumns = @JoinColumn(name = "attribute_id"))
+    @IndexedEmbedded
     private List<Attribute> attributes = new ArrayList<>();
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "advertisement", fetch = FetchType.LAZY, orphanRemoval = true)
