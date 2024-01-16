@@ -246,11 +246,13 @@ public class AdvertisementController {
         Language language = languageService.getByLangCode(langCode);
         CityResponseDto city = cityService.findById(cityId);
 
+
         Page<Advertisement> advertisements = advertisementService.search(searchTerm, cityId, page, size);
         Page<AdvertisementShortResponseDto> advertisementShortResponseDtos = advertisements.map(
                 adv -> advertisementMapper.mapEntityToShortDto(adv, language)
         );
 
-        return new AdvertisementSearchDto(searchTerm, langCode, null, city, advertisementShortResponseDtos);
+
+        return new AdvertisementSearchDto(searchTerm, langCode, null, null, advertisementShortResponseDtos);
     }
 }

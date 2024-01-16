@@ -7,6 +7,8 @@ import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.search.engine.search.predicate.dsl.BooleanPredicateClausesStep;
+import org.hibernate.search.engine.search.predicate.dsl.MatchPredicateFieldStep;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
@@ -59,10 +61,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 import static org.petmarket.utils.MessageUtils.*;
 
@@ -319,41 +318,63 @@ public class AdvertisementService {
         }
     }
 
-    @Transactional
     public Page<Advertisement> search(String searchTerm, Long cityId, @Positive int page, @Positive int size) {
         SearchSession searchSession = Search.session(entityManager);
-        SearchScope<AdvertisementTranslate> scope = searchSession.scope(AdvertisementTranslate.class);
-
-//        SearchQuery<AdvertisementTranslate> searchQuery = searchSession.search(AdvertisementTranslate.class)
-//                .where(scope.predicate().match()
-//                        .fields("title", "description")
-//                        .matching(searchTerm + " AND*")
-//                        .fuzzy(1)
-//                        .toPredicate()
-//                )
-//                .toQuery();
-
-        SearchQuery<AdvertisementTranslate> searchQuery = searchSession.search(AdvertisementTranslate.class)
-            .where(f -> {
-                BooleanPredicateClausesStep<?> queryStep = f.bool();
-                if (cityId != null)
-                    queryStep.must(
-                        f.match().field("advertisement.location.city.id").matching(cityId));
-                if (searchTerm != null)
-                    queryStep.must(f.match().field("title").matching(searchTerm).fuzzy(1));
-//            if (name != null) {
-//                if (!searchInDescription) queryStep.must(f.match().field("name").matching(name).fuzzy(2));
-//                else queryStep.must(f.match().fields("name", "description").matching(name).fuzzy(2));
-//            }
-                return queryStep;
-            }).toQuery();
-
-        List<AdvertisementTranslate> hits = searchQuery.fetchHits((page - 1) * size, size);
-        long totalHits = searchQuery.fetchTotalHitCount();
-
-        List<Advertisement> list = hits.stream().map(at -> at.getAdvertisement()).distinct().toList();
         Pageable pageable = PageRequest.of(page - 1, size);
-        return new PageImpl<>(list, pageable, totalHits);
+        Long categoryId = getCategoryIdFromSearch(searchTerm);
+
+        SearchQuery<Advertisement> searchQuery = searchSession.search(Advertisement.class)
+                .where(f -> {
+                    BooleanPredicateClausesStep<?> queryStep = f.bool();
+                    if (categoryId != null) {
+                        queryStep.must(
+                                f.terms().field("category.id").matchingAny(categoryId));
+                    }
+                    if (cityId != null) {
+                        queryStep.must(
+                                f.terms().field("location.city.id").matchingAny(cityId));
+                    }
+                    if (searchTerm != null) {
+                        queryStep.must(buildSearchQuery(f, searchTerm));
+                    }
+                    return queryStep;
+                }).toQuery();
+
+        long totalHits = searchQuery.fetchTotalHitCount();
+        List<Advertisement> hits = searchQuery.fetchHits((page - 1) * size, size);
+
+        return new PageImpl<>(hits, pageable, totalHits);
+    }
+
+    private Long getCategoryIdFromSearch(String search) {
+        SearchSession searchSession = Search.session(entityManager);
+        List<Advertisement> hits = searchSession.search(Advertisement.class)
+                .where(f -> buildSearchQuery(f, search))
+                .fetchHits(20);
+
+        HashMap<Long, Long> categoriesIdsCount = new HashMap<>();
+
+        for (Advertisement adv : hits) {
+            categoriesIdsCount.put(adv.getCategory().getId(),
+                    categoriesIdsCount.getOrDefault(adv.getCategory().getId(), 0L) + 1);
+        }
+
+        if (hits.isEmpty()) {
+            return null;
+        }
+
+        return categoriesIdsCount.entrySet().stream()
+                .max(Map.Entry.comparingByValue()).get().getKey();
+    }
+
+    private BooleanPredicateClausesStep<?> buildSearchQuery(SearchPredicateFactory f, String search) {
+        return f.bool()
+                .should(f.match().field("translations.title").boost(2.0F).matching(search).fuzzy(1))
+                .should(f.match().field("translations.description").boost(1.5F).matching(search).fuzzy(1))
+                .should(f.match().field("category.translations.title").boost(1.5F).matching(search).fuzzy(1))
+                .should(f.match().field("attributes.translations.title").boost(1.5F).matching(search).fuzzy(1))
+                .should(f.match().field("breed.translations.title").boost(1.0F).matching(search).fuzzy(1))
+                .should(f.match().field("location.city.name").boost(1.0F).matching(search).fuzzy(1));
     }
 
     private User getUserByEmail(String email) {

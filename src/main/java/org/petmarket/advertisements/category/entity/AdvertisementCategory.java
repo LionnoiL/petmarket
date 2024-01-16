@@ -2,6 +2,9 @@ package org.petmarket.advertisements.category.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
+import org.petmarket.advertisements.advertisement.entity.Advertisement;
 import org.petmarket.translate.TranslateHolder;
 
 import java.util.Objects;
@@ -14,6 +17,7 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Indexed
 public class AdvertisementCategory implements TranslateHolder {
 
     @Id
@@ -35,7 +39,11 @@ public class AdvertisementCategory implements TranslateHolder {
     private boolean availableInFavorite;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "category", fetch = FetchType.LAZY, orphanRemoval = true)
+    @IndexedEmbedded
     private Set<AdvertisementCategoryTranslate> translations;
+
+    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
+    private Set<Advertisement> advertisements;
 
     @Override
     public boolean equals(Object o) {

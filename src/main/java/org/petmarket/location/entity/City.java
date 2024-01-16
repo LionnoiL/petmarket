@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import java.util.List;
 import lombok.*;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 @Entity
@@ -18,10 +19,10 @@ public class City {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @DocumentId
     private Long id;
 
     @Column(name = "name", nullable = false)
+    @FullTextField
     private String name;
 
     @Column(name = "alias", nullable = false)

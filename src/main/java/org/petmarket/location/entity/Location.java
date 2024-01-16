@@ -23,7 +23,7 @@ public class Location {
 
     @ManyToOne
     @JoinColumn(name = "city_id")
-    @IndexedEmbedded
+    @IndexedEmbedded(includeEmbeddedObjectId = true)
     private City city;
 
     @Column(name = "latitude")
