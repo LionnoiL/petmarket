@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ScaledNumberField;
 import org.petmarket.advertisements.attributes.entity.Attribute;
 import org.petmarket.advertisements.category.entity.AdvertisementCategory;
 import org.petmarket.advertisements.images.entity.AdvertisementImage;
@@ -74,6 +75,7 @@ public class Advertisement implements TranslateHolder {
     private AdvertisementStatus status;
 
     @Column(name = "price")
+    @ScaledNumberField
     private BigDecimal price;
 
     @Column(name = "quantity")

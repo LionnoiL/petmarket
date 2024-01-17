@@ -12,10 +12,7 @@ import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.petmarket.advertisements.advertisement.dto.AdvertisementDetailsResponseDto;
 import org.petmarket.advertisements.advertisement.dto.AdvertisementRequestDto;
-import org.petmarket.advertisements.advertisement.entity.Advertisement;
-import org.petmarket.advertisements.advertisement.entity.AdvertisementStatus;
-import org.petmarket.advertisements.advertisement.entity.AdvertisementTranslate;
-import org.petmarket.advertisements.advertisement.entity.AdvertisementType;
+import org.petmarket.advertisements.advertisement.entity.*;
 import org.petmarket.advertisements.advertisement.mapper.AdvertisementMapper;
 import org.petmarket.advertisements.advertisement.mapper.AdvertisementResponseTranslateMapper;
 import org.petmarket.advertisements.advertisement.repository.AdvertisementRepository;
@@ -57,6 +54,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -315,30 +313,17 @@ public class AdvertisementService {
         }
     }
 
-    public Page<Advertisement> search(String searchTerm, Long cityId, int page, int size) {
+    public Page<Advertisement> search(String searchTerm, int page, int size, List<Long> breedsIds,
+                                      List<Long> attributeIds, List<Long> cityIds, BigDecimal minPrice,
+                                      BigDecimal maxPrice, AdvertisementSortOption sortOption) {
         SearchSession searchSession = Search.session(entityManager);
         Pageable pageable = PageRequest.of(page - 1, size);
         Long categoryId = getCategoryIdFromSearch(searchTerm);
 
         SearchQuery<Advertisement> searchQuery = searchSession.search(Advertisement.class)
-                .where(f -> {
-                    BooleanPredicateClausesStep<?> queryStep = f.bool();
-                    if (categoryId != null) {
-                        queryStep.must(
-                                f.terms().field("category.id").matchingAny(categoryId));
-                    }
-                    if (cityId != null) {
-                        queryStep.must(
-                                f.terms().field("location.city.id").matchingAny(cityId));
-                    }
-                    if (searchTerm != null && !searchTerm.isBlank()) {
-                        queryStep.must(buildSearchQuery(f, searchTerm));
-                    }
-                    if (searchTerm == null || searchTerm.isBlank()) {
-                        queryStep.must(f.matchAll());
-                    }
-                    return queryStep;
-                }).toQuery();
+                .where(f -> buildSearchQueryWithFilters(
+                        f, searchTerm, categoryId, breedsIds, attributeIds, cityIds, minPrice, maxPrice))
+                .toQuery();
 
         long totalHits = searchQuery.fetchTotalHitCount();
         List<Advertisement> hits = searchQuery.fetchHits((page - 1) * size, size);
@@ -367,6 +352,39 @@ public class AdvertisementService {
 
         return categoriesIdsCount.entrySet().stream()
                 .max(Map.Entry.comparingByValue()).get().getKey();
+    }
+
+    private BooleanPredicateClausesStep<?> buildSearchQueryWithFilters(SearchPredicateFactory f, String searchTerm,
+                                                                       Long categoryId, List<Long> breedsIds,
+                                                                       List<Long> attributeIds, List<Long> cityIds,
+                                                                       BigDecimal minPrice, BigDecimal maxPrice) {
+        BooleanPredicateClausesStep<?> queryStep = f.bool();
+        if (categoryId != null) {
+            queryStep.must(
+                    f.terms().field("category.id").matchingAny(categoryId));
+        }
+        if (searchTerm != null && !searchTerm.isBlank()) {
+            queryStep.must(buildSearchQuery(f, searchTerm));
+        }
+        if (searchTerm == null || searchTerm.isBlank()) {
+            queryStep.must(f.matchAll());
+        }
+        if (breedsIds != null && !breedsIds.isEmpty()) {
+            queryStep.must(f.terms().field("breed.id").matchingAny(breedsIds));
+        }
+        if (attributeIds != null && !attributeIds.isEmpty()) {
+            queryStep.must(f.terms().field("attributes.id").matchingAny(attributeIds));
+        }
+        if (cityIds != null && !cityIds.isEmpty()) {
+            queryStep.must(f.terms().field("location.city.id").matchingAny(cityIds));
+        }
+        if (minPrice != null) {
+            queryStep.must(f.range().field("price").atLeast(minPrice));
+        }
+        if (maxPrice != null) {
+            queryStep.must(f.range().field("price").atMost(maxPrice));
+        }
+        return queryStep;
     }
 
     private BooleanPredicateClausesStep<?> buildSearchQuery(SearchPredicateFactory f, String search) {

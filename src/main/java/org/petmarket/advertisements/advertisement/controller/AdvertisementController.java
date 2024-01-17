@@ -17,6 +17,7 @@ import org.petmarket.advertisements.advertisement.dto.AdvertisementRequestDto;
 import org.petmarket.advertisements.advertisement.dto.AdvertisementSearchDto;
 import org.petmarket.advertisements.advertisement.dto.AdvertisementShortResponseDto;
 import org.petmarket.advertisements.advertisement.entity.Advertisement;
+import org.petmarket.advertisements.advertisement.entity.AdvertisementSortOption;
 import org.petmarket.advertisements.advertisement.entity.AdvertisementStatus;
 import org.petmarket.advertisements.advertisement.mapper.AdvertisementResponseTranslateMapper;
 import org.petmarket.advertisements.advertisement.service.AdvertisementAccessCheckerService;
@@ -32,7 +33,6 @@ import org.petmarket.errorhandling.ItemNotFoundException;
 import org.petmarket.language.entity.Language;
 import org.petmarket.language.service.LanguageService;
 import org.petmarket.location.dto.CityResponseDto;
-import org.petmarket.location.service.CityService;
 import org.petmarket.options.service.OptionsService;
 import org.petmarket.utils.annotations.parametrs.ParameterId;
 import org.petmarket.utils.annotations.parametrs.ParameterLanguage;
@@ -52,6 +52,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -74,7 +75,6 @@ public class AdvertisementController {
     private final LanguageService languageService;
     private final OptionsService optionsService;
     private final AdvertisementImageService advertisementImageService;
-    private final CityService cityService;
     private final AdvertisementResponseTranslateMapper advertisementMapper;
     private final AdvertisementImageMapper imageMapper;
 
@@ -245,11 +245,16 @@ public class AdvertisementController {
             @ParameterPageNumber @RequestParam(defaultValue = "1") @Positive int page,
             @ParameterPageSize @RequestParam(defaultValue = "30") @Positive int size,
             @RequestParam(required = false) String searchTerm,
-            @RequestParam(required = false) Long cityId) {
+            @RequestParam(required = false) List<Long> breedIds,
+            @RequestParam(required = false) List<Long> attributeIds,
+            @RequestParam(required = false) List<Long> cityIds,
+            @RequestParam(required = false) BigDecimal minPrice,
+            @RequestParam(required = false) BigDecimal maxPrice,
+            @RequestParam(required = false) AdvertisementSortOption sortOption) {
         Language language = languageService.getByLangCode(langCode);
-        CityResponseDto city = null;
         AdvertisementCategoryResponseDto category = null;
-        Page<Advertisement> advertisements = advertisementService.search(searchTerm, cityId, page, size);
+        Page<Advertisement> advertisements = advertisementService.search(
+                searchTerm, page, size, breedIds, attributeIds, cityIds, minPrice, maxPrice, sortOption);
         Page<AdvertisementShortResponseDto> advertisementShortResponseDtos = advertisements.map(
                 adv -> advertisementMapper.mapEntityToShortDto(adv, language)
         );
@@ -257,10 +262,7 @@ public class AdvertisementController {
         if (!advertisements.isEmpty()) {
             category = categoryService.findById(advertisements.getContent().get(0).getCategory().getId(), langCode);
         }
-        if (cityId != null) {
-            city = cityService.findById(cityId);
-        }
 
-        return new AdvertisementSearchDto(searchTerm, langCode, category, city, advertisementShortResponseDtos);
+        return new AdvertisementSearchDto(searchTerm, langCode, category, null, advertisementShortResponseDtos);
     }
 }
