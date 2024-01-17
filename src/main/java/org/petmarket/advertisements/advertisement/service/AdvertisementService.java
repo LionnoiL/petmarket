@@ -3,15 +3,12 @@ package org.petmarket.advertisements.advertisement.service;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
-import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.search.engine.search.predicate.dsl.BooleanPredicateClausesStep;
-import org.hibernate.search.engine.search.predicate.dsl.MatchPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.petmarket.advertisements.advertisement.dto.AdvertisementDetailsResponseDto;
 import org.petmarket.advertisements.advertisement.dto.AdvertisementRequestDto;
@@ -318,7 +315,7 @@ public class AdvertisementService {
         }
     }
 
-    public Page<Advertisement> search(String searchTerm, Long cityId, @Positive int page, @Positive int size) {
+    public Page<Advertisement> search(String searchTerm, Long cityId, int page, int size) {
         SearchSession searchSession = Search.session(entityManager);
         Pageable pageable = PageRequest.of(page - 1, size);
         Long categoryId = getCategoryIdFromSearch(searchTerm);
@@ -334,8 +331,11 @@ public class AdvertisementService {
                         queryStep.must(
                                 f.terms().field("location.city.id").matchingAny(cityId));
                     }
-                    if (searchTerm != null) {
+                    if (searchTerm != null && !searchTerm.isBlank()) {
                         queryStep.must(buildSearchQuery(f, searchTerm));
+                    }
+                    if (searchTerm == null || searchTerm.isBlank()) {
+                        queryStep.must(f.matchAll());
                     }
                     return queryStep;
                 }).toQuery();
@@ -347,18 +347,20 @@ public class AdvertisementService {
     }
 
     private Long getCategoryIdFromSearch(String search) {
+        if (search == null || search.isBlank()) {
+            return null;
+        }
+
         SearchSession searchSession = Search.session(entityManager);
         List<Advertisement> hits = searchSession.search(Advertisement.class)
                 .where(f -> buildSearchQuery(f, search))
                 .fetchHits(20);
-
         HashMap<Long, Long> categoriesIdsCount = new HashMap<>();
 
         for (Advertisement adv : hits) {
             categoriesIdsCount.put(adv.getCategory().getId(),
                     categoriesIdsCount.getOrDefault(adv.getCategory().getId(), 0L) + 1);
         }
-
         if (hits.isEmpty()) {
             return null;
         }

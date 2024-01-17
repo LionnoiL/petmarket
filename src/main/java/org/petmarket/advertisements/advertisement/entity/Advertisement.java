@@ -54,7 +54,7 @@ public class Advertisement implements TranslateHolder {
 
     @ManyToOne
     @JoinColumn(name = "category_id")
-    @IndexedEmbedded
+    @IndexedEmbedded(includeEmbeddedObjectId = true)
     private AdvertisementCategory category;
 
     @ManyToOne

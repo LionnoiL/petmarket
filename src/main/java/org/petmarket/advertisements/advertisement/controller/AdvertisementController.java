@@ -21,6 +21,7 @@ import org.petmarket.advertisements.advertisement.entity.AdvertisementStatus;
 import org.petmarket.advertisements.advertisement.mapper.AdvertisementResponseTranslateMapper;
 import org.petmarket.advertisements.advertisement.service.AdvertisementAccessCheckerService;
 import org.petmarket.advertisements.advertisement.service.AdvertisementService;
+import org.petmarket.advertisements.category.dto.AdvertisementCategoryResponseDto;
 import org.petmarket.advertisements.category.entity.AdvertisementCategory;
 import org.petmarket.advertisements.category.service.AdvertisementCategoryService;
 import org.petmarket.advertisements.images.dto.AdvertisementImageResponseDto;
@@ -232,7 +233,9 @@ public class AdvertisementController {
 
     @Operation(summary = "Search advertisements",
             description = """
-                       
+                        Search for ads by city and search term.
+                        If the city is not specified, the search will be carried out throughout the country.
+                        If the search term is not specified, all ads in the city will be displayed.
                     """)
     @ApiResponseSuccessful
     @ApiResponseNotFound
@@ -241,18 +244,23 @@ public class AdvertisementController {
             @ParameterLanguage @PathVariable String langCode,
             @ParameterPageNumber @RequestParam(defaultValue = "1") @Positive int page,
             @ParameterPageSize @RequestParam(defaultValue = "30") @Positive int size,
-            @RequestParam String searchTerm,
-            @RequestParam Long cityId) {
+            @RequestParam(required = false) String searchTerm,
+            @RequestParam(required = false) Long cityId) {
         Language language = languageService.getByLangCode(langCode);
-        CityResponseDto city = cityService.findById(cityId);
-
-
+        CityResponseDto city = null;
+        AdvertisementCategoryResponseDto category = null;
         Page<Advertisement> advertisements = advertisementService.search(searchTerm, cityId, page, size);
         Page<AdvertisementShortResponseDto> advertisementShortResponseDtos = advertisements.map(
                 adv -> advertisementMapper.mapEntityToShortDto(adv, language)
         );
 
+        if (!advertisements.isEmpty()) {
+            category = categoryService.findById(advertisements.getContent().get(0).getCategory().getId(), langCode);
+        }
+        if (cityId != null) {
+            city = cityService.findById(cityId);
+        }
 
-        return new AdvertisementSearchDto(searchTerm, langCode, null, null, advertisementShortResponseDtos);
+        return new AdvertisementSearchDto(searchTerm, langCode, category, city, advertisementShortResponseDtos);
     }
 }
