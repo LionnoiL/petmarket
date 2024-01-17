@@ -7,5 +7,5 @@ public enum AdvertisementSortOption {
     PRICE_HIGHEST,
     NEWEST,
     OLDEST,
-    MOST_RELEVANT
+    DEFAULT
 }

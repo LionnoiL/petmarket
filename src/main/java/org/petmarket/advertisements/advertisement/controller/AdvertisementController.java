@@ -32,7 +32,6 @@ import org.petmarket.advertisements.images.service.AdvertisementImageService;
 import org.petmarket.errorhandling.ItemNotFoundException;
 import org.petmarket.language.entity.Language;
 import org.petmarket.language.service.LanguageService;
-import org.petmarket.location.dto.CityResponseDto;
 import org.petmarket.options.service.OptionsService;
 import org.petmarket.utils.annotations.parametrs.ParameterId;
 import org.petmarket.utils.annotations.parametrs.ParameterLanguage;
@@ -250,7 +249,7 @@ public class AdvertisementController {
             @RequestParam(required = false) List<Long> cityIds,
             @RequestParam(required = false) BigDecimal minPrice,
             @RequestParam(required = false) BigDecimal maxPrice,
-            @RequestParam(required = false) AdvertisementSortOption sortOption) {
+            @RequestParam(required = false, defaultValue = "RATING_HIGHEST") AdvertisementSortOption sortOption) {
         Language language = languageService.getByLangCode(langCode);
         AdvertisementCategoryResponseDto category = null;
         Page<Advertisement> advertisements = advertisementService.search(
@@ -263,6 +262,9 @@ public class AdvertisementController {
             category = categoryService.findById(advertisements.getContent().get(0).getCategory().getId(), langCode);
         }
 
-        return new AdvertisementSearchDto(searchTerm, langCode, category, null, advertisementShortResponseDtos);
+        return AdvertisementSearchDto.builder()
+                .advertisements(advertisementShortResponseDtos)
+                .category(category)
+                .build();
     }
 }

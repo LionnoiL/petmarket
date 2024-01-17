@@ -8,7 +8,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.hibernate.search.engine.search.predicate.dsl.BooleanPredicateClausesStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
+import org.hibernate.search.engine.search.sort.SearchSort;
+import org.hibernate.search.engine.search.sort.dsl.FieldSortOptionsStep;
+import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.petmarket.advertisements.advertisement.dto.AdvertisementDetailsResponseDto;
 import org.petmarket.advertisements.advertisement.dto.AdvertisementRequestDto;
@@ -317,16 +321,19 @@ public class AdvertisementService {
                                       List<Long> attributeIds, List<Long> cityIds, BigDecimal minPrice,
                                       BigDecimal maxPrice, AdvertisementSortOption sortOption) {
         SearchSession searchSession = Search.session(entityManager);
+        SearchScope<Advertisement> scope = searchSession.scope(Advertisement.class);
         Pageable pageable = PageRequest.of(page - 1, size);
         Long categoryId = getCategoryIdFromSearch(searchTerm);
 
         SearchQuery<Advertisement> searchQuery = searchSession.search(Advertisement.class)
                 .where(f -> buildSearchQueryWithFilters(
                         f, searchTerm, categoryId, breedsIds, attributeIds, cityIds, minPrice, maxPrice))
+                .sort(buildAdvertisementSort(scope, sortOption))
                 .toQuery();
 
         long totalHits = searchQuery.fetchTotalHitCount();
-        List<Advertisement> hits = searchQuery.fetchHits((page - 1) * size, size);
+        List<Advertisement> hits = searchQuery
+                .fetchHits((page - 1) * size, size);
 
         return new PageImpl<>(hits, pageable, totalHits);
     }
@@ -352,6 +359,20 @@ public class AdvertisementService {
 
         return categoriesIdsCount.entrySet().stream()
                 .max(Map.Entry.comparingByValue()).get().getKey();
+    }
+
+    private SearchSort buildAdvertisementSort(SearchScope<Advertisement> scope, AdvertisementSortOption sortOption) {
+        SearchSortFactory f = scope.sort();
+        FieldSortOptionsStep<?, ?> s;
+        switch (sortOption) {
+            case RATING_LOWEST -> s = f.field("rating").asc();
+            case PRICE_LOWEST -> s = f.field("price").asc();
+            case PRICE_HIGHEST -> s = f.field("price").desc();
+            case NEWEST -> s = f.field("updated").desc();
+            case OLDEST -> s = f.field("updated").asc();
+            default -> s = f.field("rating").desc();
+        }
+        return s.toSort();
     }
 
     private BooleanPredicateClausesStep<?> buildSearchQueryWithFilters(SearchPredicateFactory f, String searchTerm,

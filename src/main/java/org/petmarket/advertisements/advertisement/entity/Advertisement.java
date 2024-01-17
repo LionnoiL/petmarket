@@ -2,6 +2,8 @@ package org.petmarket.advertisements.advertisement.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.search.engine.backend.types.Sortable;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ScaledNumberField;
@@ -48,6 +50,7 @@ public class Advertisement implements TranslateHolder {
 
     @LastModifiedDate
     @Column(name = "updated")
+    @GenericField(sortable = Sortable.YES)
     private LocalDateTime updated;
 
     @Column(name = "ending")
@@ -75,7 +78,7 @@ public class Advertisement implements TranslateHolder {
     private AdvertisementStatus status;
 
     @Column(name = "price")
-    @ScaledNumberField
+    @ScaledNumberField(sortable = Sortable.YES)
     private BigDecimal price;
 
     @Column(name = "quantity")
@@ -86,6 +89,7 @@ public class Advertisement implements TranslateHolder {
     private AdvertisementType type;
 
     @Column(name = "rating")
+    @GenericField(sortable = Sortable.YES)
     private int rating;
 
     @ManyToOne
