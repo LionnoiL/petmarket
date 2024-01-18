@@ -269,6 +269,7 @@ public class AdvertisementController {
         return AdvertisementSearchDto.builder()
                 .advertisements(advertisementShortResponseDtos)
                 .category(category)
+                .searchTerm(searchTerm)
                 .build();
     }
 
