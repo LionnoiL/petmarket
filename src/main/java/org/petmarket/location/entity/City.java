@@ -1,11 +1,11 @@
 package org.petmarket.location.entity;
 
 import jakarta.persistence.*;
-import java.util.List;
 import lombok.*;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+
+import java.util.List;
 
 @Entity
 @Table(name = "cities")

@@ -10,7 +10,7 @@ import org.springframework.data.repository.query.Param;
 import java.time.LocalDateTime;
 
 public interface AdvertisementImageRepository extends JpaRepository<AdvertisementImage, Long> {
-    @Query( """
+    @Query("""
             SELECT ai FROM AdvertisementImage ai
             JOIN ai.advertisement a
             WHERE a.status = 'DRAFT'
