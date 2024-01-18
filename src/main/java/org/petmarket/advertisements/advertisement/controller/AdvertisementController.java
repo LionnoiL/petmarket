@@ -24,6 +24,7 @@ import org.petmarket.advertisements.advertisement.service.AdvertisementAccessChe
 import org.petmarket.advertisements.advertisement.service.AdvertisementService;
 import org.petmarket.advertisements.category.dto.AdvertisementCategoryResponseDto;
 import org.petmarket.advertisements.category.entity.AdvertisementCategory;
+import org.petmarket.advertisements.category.mapper.AdvertisementCategoryResponseTranslateMapper;
 import org.petmarket.advertisements.category.service.AdvertisementCategoryService;
 import org.petmarket.advertisements.images.dto.AdvertisementImageResponseDto;
 import org.petmarket.advertisements.images.entity.AdvertisementImage;
@@ -76,6 +77,7 @@ public class AdvertisementController {
     private final AdvertisementImageService advertisementImageService;
     private final AdvertisementResponseTranslateMapper advertisementMapper;
     private final AdvertisementImageMapper imageMapper;
+    private final AdvertisementCategoryResponseTranslateMapper categoryResponseTranslateMapper;
 
     @Operation(summary = "Get Advertisement by ID",
             description = """
@@ -260,7 +262,8 @@ public class AdvertisementController {
         );
 
         if (!advertisements.isEmpty()) {
-            category = categoryService.mapEntityToDto(advertisements.getContent().get(0).getCategory(), langCode);
+            category = categoryResponseTranslateMapper.mapEntityToDto(
+                    advertisements.getContent().get(0).getCategory(), language);
         }
 
         return AdvertisementSearchDto.builder()
@@ -285,8 +288,8 @@ public class AdvertisementController {
     ) {
         Language language = languageService.getByLangCode(langCode);
         Pageable pageable = PageRequest.of(page - 1, size);
-        Page<Advertisement> advertisements = advertisementService.getAuthorsAdvertisements(authorId,
-                currentAdvertisementId, pageable);
+        Page<Advertisement> advertisements = advertisementService
+                .getAuthorsAdvertisements(authorId, currentAdvertisementId, pageable);
         return advertisements
                 .map(adv -> advertisementMapper.mapEntityToShortDto(adv, language));
     }
