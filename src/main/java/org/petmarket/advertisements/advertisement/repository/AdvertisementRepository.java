@@ -56,6 +56,10 @@ public interface AdvertisementRepository extends AdvertisementRepositoryBasic {
     Page<Advertisement> findAllByCategoryInAndStatusOrderByCreatedDesc(
         List<AdvertisementCategory> categories, AdvertisementStatus status, Pageable pageable);
 
+    Page<Advertisement> findAllByAuthorIdAndStatusAndIdNotOrderByCreatedDesc(Long authorId, AdvertisementStatus status,
+                                                                             Long excludedAdvertisementId,
+                                                                             Pageable pageable);
+
     Page<Advertisement> findAllByStatusOrderByCreatedDesc(AdvertisementStatus status,
         Pageable pageable);
 }

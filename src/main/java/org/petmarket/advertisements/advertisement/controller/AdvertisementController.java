@@ -268,4 +268,26 @@ public class AdvertisementController {
                 .category(category)
                 .build();
     }
+
+    @Operation(summary = "Get Authors Advertisements",
+            description = """
+                        Excludes the current advertisement from the list of advertisements.
+                    """)
+    @ApiResponseSuccessful
+    @ApiResponseLanguageNotFound
+    @GetMapping("/author/{langCode}")
+    public Page<AdvertisementShortResponseDto> getAuthorsAdvertisements(
+            @ParameterLanguage @PathVariable String langCode,
+            @ParameterId @RequestParam Long authorId,
+            @ParameterId @RequestParam Long currentAdvertisementId,
+            @ParameterPageNumber @RequestParam(defaultValue = "1") @Positive int page,
+            @ParameterPageSize @RequestParam(defaultValue = "30") @Positive int size
+    ) {
+        Language language = languageService.getByLangCode(langCode);
+        Pageable pageable = PageRequest.of(page - 1, size);
+        Page<Advertisement> advertisements = advertisementService.getAuthorsAdvertisements(authorId,
+                currentAdvertisementId, pageable);
+        return advertisements
+                .map(adv -> advertisementMapper.mapEntityToShortDto(adv, language));
+    }
 }

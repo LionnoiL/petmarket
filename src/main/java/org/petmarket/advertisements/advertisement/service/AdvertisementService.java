@@ -317,6 +317,13 @@ public class AdvertisementService {
         }
     }
 
+    public Page<Advertisement> getAuthorsAdvertisements(Long authorId, Long excludedAdvertisementId,
+                                                        Pageable pageable) {
+        return advertisementRepository
+                .findAllByAuthorIdAndStatusAndIdNotOrderByCreatedDesc(
+                        authorId, AdvertisementStatus.ACTIVE, excludedAdvertisementId, pageable);
+    }
+
     public Page<Advertisement> search(String searchTerm, int page, int size, List<Long> breedsIds,
                                       List<Long> attributeIds, List<Long> cityIds, BigDecimal minPrice,
                                       BigDecimal maxPrice, AdvertisementSortOption sortOption, Long categoryId) {
