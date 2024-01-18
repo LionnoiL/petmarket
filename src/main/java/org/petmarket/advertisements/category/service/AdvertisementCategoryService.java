@@ -52,6 +52,11 @@ public class AdvertisementCategoryService {
         return categoryResponseTranslateMapper.mapEntityToDto(getCategory(id), language);
     }
 
+    public AdvertisementCategoryResponseDto mapEntityToDto(AdvertisementCategory category, String langCode) {
+        Language language = getLanguage(langCode);
+        return categoryResponseTranslateMapper.mapEntityToDto(category, language);
+    }
+
     public List<AdvertisementCategory> getByIds(List<Long> categoriesIds) {
         if (categoriesIds == null) {
             return Collections.emptyList();

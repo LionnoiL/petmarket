@@ -260,7 +260,7 @@ public class AdvertisementController {
         );
 
         if (!advertisements.isEmpty()) {
-            category = categoryService.findById(advertisements.getContent().get(0).getCategory().getId(), langCode);
+            category = categoryService.mapEntityToDto(advertisements.getContent().get(0).getCategory(), langCode);
         }
 
         return AdvertisementSearchDto.builder()

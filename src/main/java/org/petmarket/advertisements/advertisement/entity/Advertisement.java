@@ -94,7 +94,7 @@ public class Advertisement implements TranslateHolder {
 
     @ManyToOne
     @JoinColumn(name = "breed_id")
-    @IndexedEmbedded
+    @IndexedEmbedded(includeEmbeddedObjectId = true)
     private Breed breed;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "advertisement", fetch = FetchType.LAZY, orphanRemoval = true)
@@ -117,7 +117,7 @@ public class Advertisement implements TranslateHolder {
     @JoinTable(name = "attribute_values",
             joinColumns = @JoinColumn(name = "advertisement_id"),
             inverseJoinColumns = @JoinColumn(name = "attribute_id"))
-    @IndexedEmbedded
+    @IndexedEmbedded(includeEmbeddedObjectId = true)
     private List<Attribute> attributes = new ArrayList<>();
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "advertisement", fetch = FetchType.LAZY, orphanRemoval = true)
