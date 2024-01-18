@@ -22,7 +22,10 @@ public class HibernateSearchIndexBuild implements ApplicationListener<Applicatio
     @Transactional
     public void onApplicationEvent(ApplicationReadyEvent event) {
         SearchSession searchSession = Search.session(entityManager);
-        MassIndexer indexer = searchSession.massIndexer().idFetchSize(150).batchSizeToLoadObjects(25).threadsToLoadObjects(12);
+        MassIndexer indexer = searchSession.massIndexer()
+                .idFetchSize(150)
+                .batchSizeToLoadObjects(25)
+                .threadsToLoadObjects(12);
         try {
             indexer.startAndWait();
         } catch (InterruptedException e) {
