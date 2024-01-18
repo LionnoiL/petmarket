@@ -232,8 +232,8 @@ public class AdvertisementController {
 
     @Operation(summary = "Search advertisements",
             description = """
-                        Search for ads by city and search term.
-                        If the city is not specified, the search will be carried out throughout the country.
+                        Search for ads by search term, breeds, attributes, city's, price range, category
+                        and sorting option.
                         If the search term is not specified, all ads in the city will be displayed.
                     """)
     @ApiResponseSuccessful
@@ -249,11 +249,12 @@ public class AdvertisementController {
             @RequestParam(required = false) List<Long> cityIds,
             @RequestParam(required = false) BigDecimal minPrice,
             @RequestParam(required = false) BigDecimal maxPrice,
-            @RequestParam(required = false, defaultValue = "RATING_HIGHEST") AdvertisementSortOption sortOption) {
+            @RequestParam(required = false, defaultValue = "RATING_HIGHEST") AdvertisementSortOption sortOption,
+            @RequestParam(required = false) Long categoryId) {
         Language language = languageService.getByLangCode(langCode);
         AdvertisementCategoryResponseDto category = null;
         Page<Advertisement> advertisements = advertisementService.search(
-                searchTerm, page, size, breedIds, attributeIds, cityIds, minPrice, maxPrice, sortOption);
+                searchTerm, page, size, breedIds, attributeIds, cityIds, minPrice, maxPrice, sortOption, categoryId);
         Page<AdvertisementShortResponseDto> advertisementShortResponseDtos = advertisements.map(
                 adv -> advertisementMapper.mapEntityToShortDto(adv, language)
         );

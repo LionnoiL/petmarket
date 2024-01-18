@@ -319,23 +319,26 @@ public class AdvertisementService {
 
     public Page<Advertisement> search(String searchTerm, int page, int size, List<Long> breedsIds,
                                       List<Long> attributeIds, List<Long> cityIds, BigDecimal minPrice,
-                                      BigDecimal maxPrice, AdvertisementSortOption sortOption) {
+                                      BigDecimal maxPrice, AdvertisementSortOption sortOption, Long categoryId) {
         SearchSession searchSession = Search.session(entityManager);
         SearchScope<Advertisement> scope = searchSession.scope(Advertisement.class);
         Pageable pageable = PageRequest.of(page - 1, size);
-        Long categoryId = getCategoryIdFromSearch(searchTerm);
 
+        if (categoryId == null) {
+            categoryId = getCategoryIdFromSearch(searchTerm);
+        }
+
+        Long finalCategoryId = categoryId;
         SearchQuery<Advertisement> searchQuery = searchSession.search(Advertisement.class)
                 .where(f -> buildSearchQueryWithFilters(
-                        f, searchTerm, categoryId, breedsIds, attributeIds, cityIds, minPrice, maxPrice))
+                        f, searchTerm, finalCategoryId, breedsIds, attributeIds, cityIds, minPrice, maxPrice))
                 .sort(buildAdvertisementSort(scope, sortOption))
                 .toQuery();
 
-        long totalHits = searchQuery.fetchTotalHitCount();
         List<Advertisement> hits = searchQuery
                 .fetchHits((page - 1) * size, size);
 
-        return new PageImpl<>(hits, pageable, totalHits);
+        return new PageImpl<>(hits, pageable, searchQuery.fetchTotalHitCount());
     }
 
     private Long getCategoryIdFromSearch(String search) {
@@ -358,7 +361,7 @@ public class AdvertisementService {
         }
 
         return categoriesIdsCount.entrySet().stream()
-                .max(Map.Entry.comparingByValue()).get().getKey();
+                .max(Map.Entry.comparingByValue()).orElseThrow().getKey();
     }
 
     private SearchSort buildAdvertisementSort(SearchScope<Advertisement> scope, AdvertisementSortOption sortOption) {
@@ -381,8 +384,7 @@ public class AdvertisementService {
                                                                        BigDecimal minPrice, BigDecimal maxPrice) {
         BooleanPredicateClausesStep<?> queryStep = f.bool();
         if (categoryId != null) {
-            queryStep.must(
-                    f.terms().field("category.id").matchingAny(categoryId));
+            queryStep.must(f.terms().field("category.id").matchingAny(categoryId));
         }
         if (searchTerm != null && !searchTerm.isBlank()) {
             queryStep.must(buildSearchQuery(f, searchTerm));
