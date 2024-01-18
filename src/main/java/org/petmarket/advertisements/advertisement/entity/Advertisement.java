@@ -2,6 +2,11 @@ package org.petmarket.advertisements.advertisement.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.search.engine.backend.types.Sortable;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ScaledNumberField;
 import org.petmarket.advertisements.attributes.entity.Attribute;
 import org.petmarket.advertisements.category.entity.AdvertisementCategory;
 import org.petmarket.advertisements.images.entity.AdvertisementImage;
@@ -31,6 +36,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
+@Indexed
 public class Advertisement implements TranslateHolder {
 
     @Id
@@ -44,6 +50,7 @@ public class Advertisement implements TranslateHolder {
 
     @LastModifiedDate
     @Column(name = "updated")
+    @GenericField(sortable = Sortable.YES)
     private LocalDateTime updated;
 
     @Column(name = "ending")
@@ -51,6 +58,7 @@ public class Advertisement implements TranslateHolder {
 
     @ManyToOne
     @JoinColumn(name = "category_id")
+    @IndexedEmbedded(includeEmbeddedObjectId = true)
     private AdvertisementCategory category;
 
     @ManyToOne
@@ -62,6 +70,7 @@ public class Advertisement implements TranslateHolder {
 
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "location_id")
+    @IndexedEmbedded
     private Location location;
 
     @Column(name = "advertisement_status", nullable = false)
@@ -69,6 +78,7 @@ public class Advertisement implements TranslateHolder {
     private AdvertisementStatus status;
 
     @Column(name = "price")
+    @ScaledNumberField(sortable = Sortable.YES)
     private BigDecimal price;
 
     @Column(name = "quantity")
@@ -79,13 +89,16 @@ public class Advertisement implements TranslateHolder {
     private AdvertisementType type;
 
     @Column(name = "rating")
+    @GenericField(sortable = Sortable.YES)
     private int rating;
 
     @ManyToOne
     @JoinColumn(name = "breed_id")
+    @IndexedEmbedded(includeEmbeddedObjectId = true)
     private Breed breed;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "advertisement", fetch = FetchType.LAZY, orphanRemoval = true)
+    @IndexedEmbedded
     private Set<AdvertisementTranslate> translations;
 
     @ManyToMany
@@ -104,6 +117,7 @@ public class Advertisement implements TranslateHolder {
     @JoinTable(name = "attribute_values",
             joinColumns = @JoinColumn(name = "advertisement_id"),
             inverseJoinColumns = @JoinColumn(name = "attribute_id"))
+    @IndexedEmbedded(includeEmbeddedObjectId = true)
     private List<Attribute> attributes = new ArrayList<>();
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "advertisement", fetch = FetchType.LAZY, orphanRemoval = true)

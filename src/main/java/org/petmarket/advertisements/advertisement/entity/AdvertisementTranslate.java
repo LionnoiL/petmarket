@@ -2,6 +2,8 @@ package org.petmarket.advertisements.advertisement.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.petmarket.language.entity.Language;
 import org.petmarket.translate.LanguageHolder;
 
@@ -11,6 +13,7 @@ import org.petmarket.translate.LanguageHolder;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Indexed
 @Table(name = "advertisements_translation")
 public class AdvertisementTranslate implements LanguageHolder {
 
@@ -28,8 +31,10 @@ public class AdvertisementTranslate implements LanguageHolder {
     private Advertisement advertisement;
 
     @Column(name = "title")
+    @FullTextField
     private String title;
 
     @Column(name = "description")
+    @FullTextField
     private String description;
 }
