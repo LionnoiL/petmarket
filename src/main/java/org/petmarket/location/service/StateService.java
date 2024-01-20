@@ -62,6 +62,13 @@ public class StateService {
                 .toList();
     }
 
+    public List<StateResponseDto> findAll() {
+        return stateRepository.findAll()
+                .stream()
+                .map(stateMapper::mapEntityToDto)
+                .toList();
+    }
+
     private State getState(Long stateId) {
         return stateRepository.findById(stateId).orElseThrow(() -> {
             throw new ItemNotFoundException(STATE_NOT_FOUND_MESSAGE);

@@ -12,10 +12,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.petmarket.advertisements.advertisement.dto.AdvertisementDetailsResponseDto;
-import org.petmarket.advertisements.advertisement.dto.AdvertisementRequestDto;
-import org.petmarket.advertisements.advertisement.dto.AdvertisementSearchDto;
-import org.petmarket.advertisements.advertisement.dto.AdvertisementShortResponseDto;
+import org.petmarket.advertisements.advertisement.dto.*;
 import org.petmarket.advertisements.advertisement.entity.Advertisement;
 import org.petmarket.advertisements.advertisement.entity.AdvertisementSortOption;
 import org.petmarket.advertisements.advertisement.entity.AdvertisementStatus;
@@ -292,5 +289,17 @@ public class AdvertisementController {
                 .getAuthorsAdvertisements(authorId, currentAdvertisementId, pageable);
         return advertisements
                 .map(adv -> advertisementMapper.mapEntityToShortDto(adv, language));
+    }
+
+    @Operation(summary = "Get Advertisement Price Range",
+            description = """
+                        Get the minimum and maximum price of all advertisements.
+                    """)
+    @ApiResponseSuccessful
+    @GetMapping("/price-range")
+    public AdvertisementPriceRangeDto getAdvertisementPriceRangeByCategory(
+            @ParameterId @RequestParam Long categoryId) {
+        return advertisementService
+                .getAdvertisementPriceRangeByCategory(categoryId);
     }
 }
