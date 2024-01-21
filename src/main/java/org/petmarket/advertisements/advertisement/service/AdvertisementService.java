@@ -348,6 +348,20 @@ public class AdvertisementService {
         return new PageImpl<>(hits, pageable, searchQuery.fetchTotalHitCount());
     }
 
+    public Page<Advertisement> getSimilarAdvertisements(Long currentAdvertisementId, int size, int page) {
+        SearchSession searchSession = Search.session(entityManager);
+        Advertisement currentAdvertisement = getAdvertisement(currentAdvertisementId);
+        Pageable pageable = PageRequest.of(page - 1, size);
+
+        SearchQuery<Advertisement> searchQuery = searchSession.search(Advertisement.class)
+                .where(f -> buildSimilarQuery(f, currentAdvertisement))
+                .toQuery();
+        List<Advertisement> similarAdvertisements = searchQuery
+                .fetchHits((page - 1) * size, size);
+
+        return new PageImpl<>(similarAdvertisements, pageable, searchQuery.fetchTotalHitCount());
+    }
+
     private Long getCategoryIdFromSearch(String search) {
         if (search == null || search.isBlank()) {
             return null;
@@ -425,6 +439,23 @@ public class AdvertisementService {
                 .should(f.match().field("attributes.translations.title").boost(1.5F).matching(search).fuzzy(1))
                 .should(f.match().field("breed.translations.title").boost(1.0F).matching(search).fuzzy(1))
                 .should(f.match().field("location.city.name").boost(1.0F).matching(search).fuzzy(1));
+    }
+
+    private BooleanPredicateClausesStep<?> buildSimilarQuery(SearchPredicateFactory f, Advertisement advertisement) {
+        List<Long> attributesIds = new ArrayList<>();
+
+        for (Attribute attribute : advertisement.getAttributes()) {
+            attributesIds.add(attribute.getId());
+        }
+
+        return f.bool()
+                .mustNot(f.terms().field("id").matchingAny(advertisement.getId()))
+                .must(f.terms().field("category.id").matchingAny(advertisement.getCategory().getId()))
+                .must(f.terms().field("status").matchingAny(AdvertisementStatus.ACTIVE))
+                .should(f.match().field("breed.id").boost(2F).matching(advertisement.getBreed().getId()))
+                .should(f.terms().field("attributes.id").boost(1F).matchingAny(attributesIds))
+                .should(f.match().field("location.city.id").boost(2F)
+                        .matching(advertisement.getLocation().getCity().getId()));
     }
 
     private User getUserByEmail(String email) {

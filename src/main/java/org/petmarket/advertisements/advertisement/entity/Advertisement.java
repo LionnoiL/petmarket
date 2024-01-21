@@ -3,10 +3,7 @@ package org.petmarket.advertisements.advertisement.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ScaledNumberField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.*;
 import org.petmarket.advertisements.attributes.entity.Attribute;
 import org.petmarket.advertisements.category.entity.AdvertisementCategory;
 import org.petmarket.advertisements.images.entity.AdvertisementImage;
@@ -42,6 +39,7 @@ public class Advertisement implements TranslateHolder {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
+    @GenericField
     private Long id;
 
     @CreatedDate
@@ -75,6 +73,7 @@ public class Advertisement implements TranslateHolder {
 
     @Column(name = "advertisement_status", nullable = false)
     @Enumerated(EnumType.STRING)
+    @GenericField
     private AdvertisementStatus status;
 
     @Column(name = "price")

@@ -293,4 +293,25 @@ public class AdvertisementController {
         return advertisements
                 .map(adv -> advertisementMapper.mapEntityToShortDto(adv, language));
     }
+
+    @Operation(summary = "Get Similar Advertisements",
+            description = """
+                        Filters by category, sorts by breed, attributes and location.
+                        Excludes the current advertisement from the list of advertisements.
+                    """)
+    @ApiResponseSuccessful
+    @ApiResponseLanguageNotFound
+    @GetMapping("/similar/{langCode}")
+    public Page<AdvertisementShortResponseDto> getSimilarAdvertisements(
+            @ParameterLanguage @PathVariable String langCode,
+            @ParameterId @RequestParam Long currentAdvertisementId,
+            @ParameterPageNumber @RequestParam(defaultValue = "1") @Positive int page,
+            @ParameterPageSize @RequestParam(defaultValue = "30") @Positive int size
+    ) {
+        Language language = languageService.getByLangCode(langCode);
+        Page<Advertisement> advertisements = advertisementService
+                .getSimilarAdvertisements(currentAdvertisementId, size, page);
+        return advertisements
+                .map(adv -> advertisementMapper.mapEntityToShortDto(adv, language));
+    }
 }
