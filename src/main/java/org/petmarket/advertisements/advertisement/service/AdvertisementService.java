@@ -464,13 +464,23 @@ public class AdvertisementService {
             attributesIds.add(attribute.getId());
         }
 
-        return f.bool()
+        BooleanPredicateClausesStep<?> queryStep = f.bool()
                 .mustNot(f.terms().field("id").matchingAny(advertisement.getId()))
                 .must(f.terms().field("category.id").matchingAny(advertisement.getCategory().getId()))
-                .must(f.terms().field("status").matchingAny(AdvertisementStatus.ACTIVE))
-                .should(f.match().field("breed.id").matching(advertisement.getBreed().getId()))
-                .should(f.terms().field("attributes.id").matchingAny(attributesIds))
-                .should(f.match().field("location.city.id").matching(advertisement.getLocation().getCity().getId()));
+                .must(f.terms().field("status").matchingAny(AdvertisementStatus.ACTIVE));
+        if (advertisement.getBreed() != null) {
+            queryStep.should(f.match().field("breed.id").matching(advertisement.getBreed().getId()));
+        }
+        if (advertisement.getLocation() != null && advertisement.getLocation().getCity() != null &&
+                advertisement.getLocation().getCity().getId() != null) {
+            queryStep.should(f.match().field("location.city.id")
+                    .matching(advertisement.getLocation().getCity().getId()));
+        }
+        if (!attributesIds.isEmpty()) {
+            queryStep.should(f.terms().field("attributes.id").matchingAny(attributesIds));
+        }
+
+        return queryStep;
     }
 
     private User getUserByEmail(String email) {
