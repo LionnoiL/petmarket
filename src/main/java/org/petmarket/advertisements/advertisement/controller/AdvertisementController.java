@@ -12,15 +12,16 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.petmarket.advertisements.advertisement.dto.AdvertisementDetailsResponseDto;
-import org.petmarket.advertisements.advertisement.dto.AdvertisementRequestDto;
-import org.petmarket.advertisements.advertisement.dto.AdvertisementShortResponseDto;
+import org.petmarket.advertisements.advertisement.dto.*;
 import org.petmarket.advertisements.advertisement.entity.Advertisement;
+import org.petmarket.advertisements.advertisement.entity.AdvertisementSortOption;
 import org.petmarket.advertisements.advertisement.entity.AdvertisementStatus;
 import org.petmarket.advertisements.advertisement.mapper.AdvertisementResponseTranslateMapper;
 import org.petmarket.advertisements.advertisement.service.AdvertisementAccessCheckerService;
 import org.petmarket.advertisements.advertisement.service.AdvertisementService;
+import org.petmarket.advertisements.category.dto.AdvertisementCategoryResponseDto;
 import org.petmarket.advertisements.category.entity.AdvertisementCategory;
+import org.petmarket.advertisements.category.mapper.AdvertisementCategoryResponseTranslateMapper;
 import org.petmarket.advertisements.category.service.AdvertisementCategoryService;
 import org.petmarket.advertisements.images.dto.AdvertisementImageResponseDto;
 import org.petmarket.advertisements.images.entity.AdvertisementImage;
@@ -48,6 +49,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -72,6 +74,7 @@ public class AdvertisementController {
     private final AdvertisementImageService advertisementImageService;
     private final AdvertisementResponseTranslateMapper advertisementMapper;
     private final AdvertisementImageMapper imageMapper;
+    private final AdvertisementCategoryResponseTranslateMapper categoryResponseTranslateMapper;
 
     @Operation(summary = "Get Advertisement by ID",
             description = """
@@ -224,5 +227,97 @@ public class AdvertisementController {
         accessCheckerService.checkUpdateAccess(List.of(advertisement));
         Set<AdvertisementImage> advertisementImages = advertisementImageService.uploadImages(advertisement, images);
         return advertisementImages.stream().map(imageMapper::toDto).collect(Collectors.toSet());
+    }
+
+    @Operation(summary = "Search advertisements",
+            description = """
+                        Search for ads by search term, breeds, attributes, city's, price range, category
+                        and sorting option.
+                        If the search term is not specified, all ads in the city will be displayed.
+                    """)
+    @ApiResponseSuccessful
+    @ApiResponseNotFound
+    @GetMapping("/{langCode}/search")
+    public AdvertisementSearchDto searchAdvertisements(
+            @ParameterLanguage @PathVariable String langCode,
+            @ParameterPageNumber @RequestParam(defaultValue = "1") @Positive int page,
+            @ParameterPageSize @RequestParam(defaultValue = "30") @Positive int size,
+            @RequestParam(required = false) String searchTerm,
+            @RequestParam(required = false) List<Long> breedIds,
+            @RequestParam(required = false) List<Long> attributeIds,
+            @RequestParam(required = false) List<Long> cityIds,
+            @RequestParam(required = false) BigDecimal minPrice,
+            @RequestParam(required = false) BigDecimal maxPrice,
+            @RequestParam(required = false, defaultValue = "RATING_HIGHEST") AdvertisementSortOption sortOption,
+            @RequestParam(required = false) Long categoryId) {
+        Language language = languageService.getByLangCode(langCode);
+        AdvertisementCategoryResponseDto category = null;
+        Page<Advertisement> advertisements = advertisementService.search(
+                searchTerm, page, size, breedIds, attributeIds, cityIds, minPrice, maxPrice, sortOption, categoryId);
+        Page<AdvertisementShortResponseDto> advertisementShortResponseDtos = advertisements.map(
+                adv -> advertisementMapper.mapEntityToShortDto(adv, language)
+        );
+
+        if (!advertisements.isEmpty()) {
+            category = categoryResponseTranslateMapper.mapEntityToDto(
+                    advertisements.getContent().get(0).getCategory(), language);
+        }
+
+        return AdvertisementSearchDto.builder()
+                .advertisements(advertisementShortResponseDtos)
+                .category(category)
+                .searchTerm(searchTerm)
+                .build();
+    }
+
+    @Operation(summary = "Get Authors Advertisements",
+            description = """
+                        Excludes the current advertisement from the list of advertisements.
+                    """)
+    @ApiResponseSuccessful
+    @ApiResponseLanguageNotFound
+    @GetMapping("/author/{langCode}")
+    public Page<AdvertisementShortResponseDto> getAuthorsAdvertisements(
+            @ParameterLanguage @PathVariable String langCode,
+            @ParameterId @RequestParam Long authorId,
+            @ParameterId @RequestParam Long currentAdvertisementId,
+            @ParameterPageNumber @RequestParam(defaultValue = "1") @Positive int page,
+            @ParameterPageSize @RequestParam(defaultValue = "30") @Positive int size
+    ) {
+        Language language = languageService.getByLangCode(langCode);
+        Pageable pageable = PageRequest.of(page - 1, size);
+        Page<Advertisement> advertisements = advertisementService
+                .getAuthorsAdvertisements(authorId, currentAdvertisementId, pageable);
+        return advertisements
+                .map(adv -> advertisementMapper.mapEntityToShortDto(adv, language));
+    }
+
+    @Operation(summary = "Get Advertisement Price Range",
+            description = """
+                        Get the minimum and maximum price of all advertisements.
+                    """)
+    @ApiResponseSuccessful
+    @GetMapping("/price-range")
+    public AdvertisementPriceRangeDto getAdvertisementPriceRangeByCategory(
+            @ParameterId @RequestParam Long categoryId) {
+        return advertisementService
+                .getAdvertisementPriceRangeByCategory(categoryId);
+    }
+
+    @Operation(summary = "Get Similar Advertisements")
+    @ApiResponseSuccessful
+    @ApiResponseLanguageNotFound
+    @GetMapping("/similar/{langCode}")
+    public Page<AdvertisementShortResponseDto> getSimilarAdvertisements(
+            @ParameterLanguage @PathVariable String langCode,
+            @ParameterId @RequestParam Long currentAdvertisementId,
+            @ParameterPageNumber @RequestParam(defaultValue = "1") @Positive int page,
+            @ParameterPageSize @RequestParam(defaultValue = "30") @Positive int size
+    ) {
+        Language language = languageService.getByLangCode(langCode);
+        Page<Advertisement> advertisements = advertisementService
+                .getSimilarAdvertisements(currentAdvertisementId, size, page);
+        return advertisements
+                .map(adv -> advertisementMapper.mapEntityToShortDto(adv, language));
     }
 }

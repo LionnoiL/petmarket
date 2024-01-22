@@ -71,5 +71,4 @@ public class AttributeController {
         log.info("All Attributes were retrieved - {}.", dtos);
         return ResponseEntity.ok().body(dtos);
     }
-
 }

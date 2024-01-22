@@ -8,6 +8,7 @@ build/
 tmp/
 target/
 logs/*
+index/*
 
 ### STS ###
 .apt_generated
