@@ -15,6 +15,7 @@ import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.petmarket.advertisements.advertisement.dto.AdvertisementDetailsResponseDto;
+import org.petmarket.advertisements.advertisement.dto.AdvertisementPriceRangeDto;
 import org.petmarket.advertisements.advertisement.dto.AdvertisementRequestDto;
 import org.petmarket.advertisements.advertisement.entity.*;
 import org.petmarket.advertisements.advertisement.mapper.AdvertisementMapper;
@@ -346,6 +347,20 @@ public class AdvertisementService {
                 .fetchHits((page - 1) * size, size);
 
         return new PageImpl<>(hits, pageable, searchQuery.fetchTotalHitCount());
+    }
+
+    public AdvertisementPriceRangeDto getAdvertisementPriceRangeByCategory(Long categoryId) {
+        AdvertisementPriceRangeDto priceRange = advertisementRepository
+                .getAdvertisementPriceRangeByCategory(categoryId);
+
+        if (priceRange.getMaxPrice() == null) {
+            priceRange.setMaxPrice(BigDecimal.ZERO);
+        }
+        if (priceRange.getMinPrice() == null) {
+            priceRange.setMinPrice(BigDecimal.ZERO);
+        }
+
+        return priceRange;
     }
 
     public Page<Advertisement> getSimilarAdvertisements(Long currentAdvertisementId, int size, int page) {
