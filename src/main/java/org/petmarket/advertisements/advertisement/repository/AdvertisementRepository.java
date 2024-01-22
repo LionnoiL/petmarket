@@ -1,6 +1,8 @@
 package org.petmarket.advertisements.advertisement.repository;
 
 import java.util.List;
+
+import org.petmarket.advertisements.advertisement.dto.AdvertisementPriceRangeDto;
 import org.petmarket.advertisements.advertisement.entity.Advertisement;
 import org.petmarket.advertisements.advertisement.entity.AdvertisementStatus;
 import org.petmarket.advertisements.category.entity.AdvertisementCategory;
@@ -62,4 +64,14 @@ public interface AdvertisementRepository extends AdvertisementRepositoryBasic {
 
     Page<Advertisement> findAllByStatusOrderByCreatedDesc(AdvertisementStatus status,
         Pageable pageable);
+
+    @Query(
+        value = """
+            SELECT
+            new org.petmarket.advertisements.advertisement.dto.AdvertisementPriceRangeDto(MIN(a.price), MAX(a.price))
+            FROM Advertisement a
+            WHERE a.category.id = :categoryId
+            AND a.status = 'ACTIVE'
+            """)
+    AdvertisementPriceRangeDto getAdvertisementPriceRangeByCategory(@Param("categoryId") Long categoryId);
 }
