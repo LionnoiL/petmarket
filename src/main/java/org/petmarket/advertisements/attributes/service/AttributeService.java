@@ -59,15 +59,6 @@ public class AttributeService {
         return attributeTranslateMapper.mapEntityToDto(attributes, language);
     }
 
-    public Collection<AttributeResponseDto> getAll(String langCode) {
-        Language language = getLanguage(langCode);
-        List<Attribute> attributes = attributeRepository.findAll()
-            .stream()
-            .sorted(Comparator.comparing(a -> a.getSortValue()))
-            .toList();
-        return attributeTranslateMapper.mapEntityToDto(attributes, language);
-    }
-
     public List<Attribute> getByIds(List<Long> attributesIds) {
         if (attributesIds == null) {
             return Collections.emptyList();

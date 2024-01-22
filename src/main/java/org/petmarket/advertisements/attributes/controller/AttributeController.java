@@ -71,23 +71,4 @@ public class AttributeController {
         log.info("All Attributes were retrieved - {}.", dtos);
         return ResponseEntity.ok().body(dtos);
     }
-
-    @Operation(summary = "Get All Attributes", description = "Obtaining all attributes")
-    @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
-            @Content(
-                    mediaType = APPLICATION_JSON_VALUE,
-                    array = @ArraySchema(schema = @Schema(
-                            implementation = AttributeResponseDto.class))
-            )
-    })
-    @ApiResponseBadRequest
-    @ApiResponseNotFound
-    @GetMapping("/all/{langCode}")
-    public ResponseEntity<Collection<AttributeResponseDto>> getAll(
-            @ParameterLanguage @PathVariable String langCode) {
-        log.info("Received request to get all Attributes");
-        Collection<AttributeResponseDto> dtos = attributeService.getAll(langCode);
-        log.info("All Attributes were retrieved - {}.", dtos);
-        return ResponseEntity.ok().body(dtos);
-    }
 }
