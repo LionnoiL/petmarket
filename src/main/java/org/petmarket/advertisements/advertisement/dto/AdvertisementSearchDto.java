@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 @NoArgsConstructor
 public class AdvertisementSearchDto {
 
+    private String searchTerm;
     private AdvertisementCategoryResponseDto category;
     private Page<AdvertisementShortResponseDto> advertisements;
 }
