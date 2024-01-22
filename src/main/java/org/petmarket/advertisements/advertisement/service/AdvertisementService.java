@@ -355,6 +355,7 @@ public class AdvertisementService {
 
         SearchQuery<Advertisement> searchQuery = searchSession.search(Advertisement.class)
                 .where(f -> buildSimilarQuery(f, currentAdvertisement))
+                .sort(f -> f.field("updated").desc())
                 .toQuery();
         List<Advertisement> similarAdvertisements = searchQuery
                 .fetchHits((page - 1) * size, size);
@@ -452,10 +453,9 @@ public class AdvertisementService {
                 .mustNot(f.terms().field("id").matchingAny(advertisement.getId()))
                 .must(f.terms().field("category.id").matchingAny(advertisement.getCategory().getId()))
                 .must(f.terms().field("status").matchingAny(AdvertisementStatus.ACTIVE))
-                .should(f.match().field("breed.id").boost(2F).matching(advertisement.getBreed().getId()))
-                .should(f.terms().field("attributes.id").boost(1F).matchingAny(attributesIds))
-                .should(f.match().field("location.city.id").boost(2F)
-                        .matching(advertisement.getLocation().getCity().getId()));
+                .should(f.match().field("breed.id").matching(advertisement.getBreed().getId()))
+                .should(f.terms().field("attributes.id").matchingAny(attributesIds))
+                .should(f.match().field("location.city.id").matching(advertisement.getLocation().getCity().getId()));
     }
 
     private User getUserByEmail(String email) {

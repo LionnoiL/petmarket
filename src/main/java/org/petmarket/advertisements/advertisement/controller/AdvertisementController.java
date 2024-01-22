@@ -297,8 +297,8 @@ public class AdvertisementController {
 
     @Operation(summary = "Get Similar Advertisements",
             description = """
-                        Filters by category, sorts by breed, attributes and location.
-                        Excludes the current advertisement from the list of advertisements.
+                        Filters by category, attributes, location, breed and sorts by updated time.
+                        Excludes the current advertisement.
                     """)
     @ApiResponseSuccessful
     @ApiResponseLanguageNotFound
