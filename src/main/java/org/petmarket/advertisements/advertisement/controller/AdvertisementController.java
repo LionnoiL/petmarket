@@ -303,4 +303,21 @@ public class AdvertisementController {
         return advertisementService
                 .getAdvertisementPriceRangeByCategory(categoryId);
     }
+
+    @Operation(summary = "Get Similar Advertisements")
+    @ApiResponseSuccessful
+    @ApiResponseLanguageNotFound
+    @GetMapping("/similar/{langCode}")
+    public Page<AdvertisementShortResponseDto> getSimilarAdvertisements(
+            @ParameterLanguage @PathVariable String langCode,
+            @ParameterId @RequestParam Long currentAdvertisementId,
+            @ParameterPageNumber @RequestParam(defaultValue = "1") @Positive int page,
+            @ParameterPageSize @RequestParam(defaultValue = "30") @Positive int size
+    ) {
+        Language language = languageService.getByLangCode(langCode);
+        Page<Advertisement> advertisements = advertisementService
+                .getSimilarAdvertisements(currentAdvertisementId, size, page);
+        return advertisements
+                .map(adv -> advertisementMapper.mapEntityToShortDto(adv, language));
+    }
 }
