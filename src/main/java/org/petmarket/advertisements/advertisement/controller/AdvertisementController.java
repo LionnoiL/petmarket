@@ -304,11 +304,7 @@ public class AdvertisementController {
                 .getAdvertisementPriceRangeByCategory(categoryId);
     }
 
-    @Operation(summary = "Get Similar Advertisements",
-            description = """
-                        Filters by category, attributes, location, breed and sorts by updated time.
-                        Excludes the current advertisement.
-                    """)
+    @Operation(summary = "Get Similar Advertisements")
     @ApiResponseSuccessful
     @ApiResponseLanguageNotFound
     @GetMapping("/similar/{langCode}")
