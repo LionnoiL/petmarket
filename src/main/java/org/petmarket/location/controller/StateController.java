@@ -126,22 +126,4 @@ public class StateController {
         log.info("the State with name - {} was retrieved - {}.", name, dto);
         return dto;
     }
-
-    @Operation(summary = "Get All States", description = "Obtaining all states")
-    @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
-            @Content(
-                    mediaType = APPLICATION_JSON_VALUE,
-                    array = @ArraySchema(schema = @Schema(
-                            implementation = StateResponseDto.class))
-            )
-    })
-    @ApiResponseBadRequest
-    @ApiResponseNotFound
-    @GetMapping("/all")
-    public List<StateResponseDto> getAll() {
-        log.info("Received request to get all States");
-        List<StateResponseDto> dtos = stateService.findAll();
-        log.info("All States were retrieved - {}.", dtos);
-        return dtos;
-    }
 }
