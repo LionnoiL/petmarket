@@ -8,6 +8,7 @@ import org.petmarket.advertisements.attributes.entity.AttributeType;
 
 import java.time.LocalDate;
 
+@EqualsAndHashCode(of = {"id"})
 @Setter
 @Getter
 @Builder
