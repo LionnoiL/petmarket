@@ -108,6 +108,7 @@ public class BreedServiceImpl implements BreedService {
 
     @Override
     public List<BreedResponseDto> getAllByCategory(String langCode, Long categoryId) {
+        Language language = checkedLang(langCode);
         List<Breed> allBreeds;
         if (categoryId != null) {
             allBreeds = findAllByBreedCategoryId(categoryId);
@@ -115,11 +116,7 @@ public class BreedServiceImpl implements BreedService {
             allBreeds = breedRepository.findAll();
         }
         return allBreeds.stream()
-                .map(breed -> {
-                    breed.setCategory(breed.getCategory());
-                    return breed;
-                })
-                .map(b -> breedMapper.toDto(b, checkedLang(langCode)))
+                .map(b -> breedMapper.toDto(b, language))
                 .toList();
     }
 

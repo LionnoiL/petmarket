@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
+@EqualsAndHashCode(of = {"id"})
 @Table(name = "attribute_groups")
 @Getter
 @Setter

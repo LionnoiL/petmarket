@@ -8,6 +8,7 @@ import org.petmarket.advertisements.advertisement.entity.Advertisement;
 import org.petmarket.advertisements.advertisement.entity.AdvertisementTranslate;
 import org.petmarket.advertisements.attributes.entity.Attribute;
 import org.petmarket.advertisements.attributes.mapper.AttributeTranslateMapper;
+import org.petmarket.advertisements.attributes.service.AttributeService;
 import org.petmarket.advertisements.category.mapper.AdvertisementCategoryResponseTranslateMapper;
 import org.petmarket.breeds.mapper.BreedMapper;
 import org.petmarket.delivery.mapper.DeliveryResponseTranslateMapper;
@@ -21,7 +22,6 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 @Component
 public class AdvertisementResponseTranslateMapper {
 
+    private final AttributeService attributeService;
     private final OptionsService optionsService;
     private final TranslationService translationService;
     private final AdvertisementMapper mapper;
@@ -57,7 +58,7 @@ public class AdvertisementResponseTranslateMapper {
         dto.setBreed(breedMapper.toDto(entity.getBreed(), language));
 
         List<Attribute> allAttributes = entity.getAttributes();
-        List<Attribute> favoriteAttributes = getFavoriteAttributes(allAttributes);
+        List<Attribute> favoriteAttributes = attributeService.getFavoriteAttributes(allAttributes);
 
         List<Attribute> nonFavoriteAttributes = new ArrayList<>(allAttributes);
         nonFavoriteAttributes.removeAll(favoriteAttributes);
@@ -93,7 +94,7 @@ public class AdvertisementResponseTranslateMapper {
         dto.setLangCode(language.getLangCode());
 
         List<Attribute> allAttributes = entity.getAttributes();
-        List<Attribute> favoriteAttributes = getFavoriteAttributes(allAttributes);
+        List<Attribute> favoriteAttributes = attributeService.getFavoriteAttributes(allAttributes);
 
         List<Attribute> nonFavoriteAttributes = new ArrayList<>(allAttributes);
         nonFavoriteAttributes.removeAll(favoriteAttributes);
@@ -110,19 +111,6 @@ public class AdvertisementResponseTranslateMapper {
         }
         return advertisements.stream()
                 .map(p -> mapEntityToShortDto(p, language))
-                .toList();
-    }
-
-    private List<Attribute> getFavoriteAttributes(List<Attribute> attributes) {
-        List<Long> specificList = optionsService.getFavoriteAttributesGroupIds();
-        return attributes.stream()
-                .filter(attribute -> specificList.stream()
-                        .anyMatch(favoriteId -> Objects.equals(favoriteId, attribute.getGroup().getId())))
-                .sorted((a1, a2) -> {
-                    int indexA1 = specificList.indexOf(a1.getGroup().getId());
-                    int indexA2 = specificList.indexOf(a2.getGroup().getId());
-                    return Integer.compare(indexA1, indexA2);
-                })
                 .toList();
     }
 }

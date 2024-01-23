@@ -1,17 +1,6 @@
 package org.petmarket.advertisements.attributes.service;
 
-import static org.petmarket.utils.MessageUtils.ATTRIBUTE_GROUP_NOT_FOUND;
-import static org.petmarket.utils.MessageUtils.ATTRIBUTE_NOT_FOUND;
-import static org.petmarket.utils.MessageUtils.LANGUAGE_IS_PRESENT_IN_LIST;
-import static org.petmarket.utils.MessageUtils.LANGUAGE_NOT_FOUND;
-import static org.petmarket.utils.MessageUtils.NO_TRANSLATION;
-
 import jakarta.transaction.Transactional;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.advertisements.attributes.dto.AttributeRequestDto;
@@ -23,6 +12,7 @@ import org.petmarket.advertisements.attributes.mapper.AttributeMapper;
 import org.petmarket.advertisements.attributes.mapper.AttributeTranslateMapper;
 import org.petmarket.advertisements.attributes.repository.AttributeGroupRepository;
 import org.petmarket.advertisements.attributes.repository.AttributeRepository;
+import org.petmarket.advertisements.category.entity.AdvertisementCategory;
 import org.petmarket.errorhandling.ItemNotFoundException;
 import org.petmarket.language.entity.Language;
 import org.petmarket.language.repository.LanguageRepository;
@@ -31,6 +21,10 @@ import org.petmarket.translate.TranslateException;
 import org.petmarket.utils.ErrorUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
+
+import java.util.*;
+
+import static org.petmarket.utils.MessageUtils.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -53,9 +47,9 @@ public class AttributeService {
         Language language = getLanguage(langCode);
         AttributeGroup group = getGroup(id);
         List<Attribute> attributes = group.getAttributes()
-            .stream()
-            .sorted(Comparator.comparing(a -> a.getSortValue()))
-            .toList();
+                .stream()
+                .sorted(Comparator.comparing(a -> a.getSortValue()))
+                .toList();
         return attributeTranslateMapper.mapEntityToDto(attributes, language);
     }
 
@@ -68,7 +62,7 @@ public class AttributeService {
 
     @Transactional
     public AttributeResponseDto addAttribute(AttributeRequestDto request,
-        BindingResult bindingResult) {
+                                             BindingResult bindingResult) {
         ErrorUtils.checkItemNotCreatedException(bindingResult);
 
         Language defaultSiteLanguage = optionsService.getDefaultSiteLanguage();
@@ -78,11 +72,11 @@ public class AttributeService {
         attribute.setGroup(group);
         attribute.setTranslations(new HashSet<>());
         AttributeTranslate translation = AttributeTranslate.builder()
-            .id(null)
-            .attribute(attribute)
-            .title(request.getTitle())
-            .language(defaultSiteLanguage)
-            .build();
+                .id(null)
+                .attribute(attribute)
+                .title(request.getTitle())
+                .language(defaultSiteLanguage)
+                .build();
         addTranslation(attribute, translation);
 
         attributeRepository.save(attribute);
@@ -93,7 +87,7 @@ public class AttributeService {
 
     @Transactional
     public AttributeResponseDto updateAttribute(Long id, String langCode,
-        AttributeRequestDto request, BindingResult bindingResult) {
+                                                AttributeRequestDto request, BindingResult bindingResult) {
         ErrorUtils.checkItemNotUpdatedException(bindingResult);
 
         AttributeGroup group = getGroup(request.getGroupId());
@@ -126,6 +120,23 @@ public class AttributeService {
         attributeRepository.delete(attribute);
     }
 
+    public List<Attribute> getAttributesForFilter(AdvertisementCategory category) {
+        return attributeRepository.findAllAttributesInFilterByCategoryId(category.getId());
+    }
+
+    public List<Attribute> getFavoriteAttributes(List<Attribute> attributes) {
+        List<Long> specificList = optionsService.getFavoriteAttributesGroupIds();
+        return attributes.stream()
+                .filter(attribute -> specificList.stream()
+                        .anyMatch(favoriteId -> Objects.equals(favoriteId, attribute.getGroup().getId())))
+                .sorted((a1, a2) -> {
+                    int indexA1 = specificList.indexOf(a1.getGroup().getId());
+                    int indexA2 = specificList.indexOf(a2.getGroup().getId());
+                    return Integer.compare(indexA1, indexA2);
+                })
+                .toList();
+    }
+
     private Language getLanguage(String langCode) {
         return languageRepository.findByLangCodeAndEnableIsTrue(langCode).orElseThrow(() -> {
             throw new ItemNotFoundException(LANGUAGE_NOT_FOUND);
@@ -146,8 +157,8 @@ public class AttributeService {
 
     private AttributeTranslate getTranslation(Attribute attribute, Language language) {
         return attribute.getTranslations().stream()
-            .filter(t -> t.getLanguage().equals(language))
-            .findFirst().orElseThrow(() -> new TranslateException(NO_TRANSLATION));
+                .filter(t -> t.getLanguage().equals(language))
+                .findFirst().orElseThrow(() -> new TranslateException(NO_TRANSLATION));
     }
 
     private void addTranslation(Attribute attribute, AttributeTranslate translation) {
@@ -160,7 +171,7 @@ public class AttributeService {
 
     private boolean checkLanguage(Attribute group, Language language) {
         return group.getTranslations()
-            .stream()
-            .anyMatch(t -> t.getLanguage().equals(language));
+                .stream()
+                .anyMatch(t -> t.getLanguage().equals(language));
     }
 }
