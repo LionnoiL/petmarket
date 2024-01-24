@@ -2,8 +2,8 @@ package org.petmarket.breeds.mapper;
 
 import org.mapstruct.*;
 import org.petmarket.advertisements.category.mapper.AdvCategoryMapper;
+import org.petmarket.breeds.dto.BreedFilterDto;
 import org.petmarket.breeds.dto.BreedResponseDto;
-import org.petmarket.breeds.dto.BreedShortResponseDto;
 import org.petmarket.breeds.entity.Breed;
 import org.petmarket.breeds.entity.BreedTranslation;
 import org.petmarket.config.MapperConfig;
@@ -27,7 +27,7 @@ public abstract class BreedMapper {
     @Mapping(target = "category", source = "category")
     public abstract BreedResponseDto toDto(Breed entity, @Context Language langCode);
 
-    public abstract BreedShortResponseDto toDto(BreedResponseDto fromDto);
+    public abstract BreedFilterDto toDto(BreedFilterDto fromDto, @Context Language langCode);
 
     @AfterMapping
     public void getTranslations(Breed entity, @Context Language langCode) {
