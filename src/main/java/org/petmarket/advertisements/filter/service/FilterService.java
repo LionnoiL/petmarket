@@ -13,6 +13,9 @@ import org.petmarket.breeds.dto.BreedShortResponseDto;
 import org.petmarket.breeds.mapper.BreedMapper;
 import org.petmarket.breeds.service.BreedService;
 import org.petmarket.language.entity.Language;
+import org.petmarket.location.dto.CityResponseDto;
+import org.petmarket.location.mapper.CityMapper;
+import org.petmarket.location.service.CityService;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -26,14 +29,19 @@ public class FilterService {
     private final AdvertisementService advertisementService;
     private final BreedService breedService;
     private final AttributeService attributeService;
+    private final CityService cityService;
     private final BreedMapper breedMapper;
     private final AttributeShortMapper attributeShortMapper;
+    private final CityMapper cityMapper;
 
     public FilterDto getLeftSideBarFilter(Language language, AdvertisementCategory category) {
 
         AdvertisementPriceRangeDto range = advertisementService.getAdvertisementPriceRangeByCategory(category.getId());
         List<BreedShortResponseDto> breeds = breedService.getAllBreedsByAdvertisementsAndCategory(language, category)
                 .stream().map(breedMapper::toDto).toList();
+        List<CityResponseDto> cities = cityService.getAllCitiesByAdvertisementsAndCategory(category)
+                .stream().map(cityMapper::mapEntityToDto).toList();
+
         List<Attribute> allAttributes = attributeService.getAttributesForFilter(category);
         List<Attribute> favoriteAttributes = attributeService.getFavoriteAttributes(allAttributes);
         List<Attribute> nonFavoriteAttributes = new ArrayList<>(allAttributes);
@@ -46,6 +54,7 @@ public class FilterService {
                 .breeds(breeds)
                 .favoriteAttributes(attributeShortMapper.fromAttributes(favoriteAttributes, language))
                 .attributes(attributeShortMapper.fromAttributes(nonFavoriteAttributes, language))
+                .cities(cities)
                 .build();
     }
 }

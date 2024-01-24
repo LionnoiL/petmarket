@@ -5,6 +5,7 @@ import org.petmarket.advertisements.advertisement.entity.Advertisement;
 import org.petmarket.advertisements.advertisement.entity.AdvertisementStatus;
 import org.petmarket.advertisements.category.entity.AdvertisementCategory;
 import org.petmarket.breeds.entity.Breed;
+import org.petmarket.location.entity.City;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
@@ -68,11 +69,11 @@ public interface AdvertisementRepository extends AdvertisementRepositoryBasic {
 
     @Query(
             value = """
-                    SELECT
-                    new org.petmarket.advertisements.advertisement.dto.AdvertisementPriceRangeDto(MIN(a.price), MAX(a.price))
-                    FROM Advertisement a
-                    WHERE a.category.id = :categoryId
-                    AND a.status = 'ACTIVE'
+              SELECT
+              new org.petmarket.advertisements.advertisement.dto.AdvertisementPriceRangeDto(MIN(a.price), MAX(a.price))
+              FROM Advertisement a
+              WHERE a.category.id = :categoryId
+              AND a.status = 'ACTIVE'
                     """)
     AdvertisementPriceRangeDto getAdvertisementPriceRangeByCategory(@Param("categoryId") Long categoryId);
 
@@ -83,4 +84,13 @@ public interface AdvertisementRepository extends AdvertisementRepositoryBasic {
             WHERE adv.category = :category AND adv.status = 'ACTIVE'
             """)
     List<Breed> findAllBreedsByCategoryId(@Param("category") AdvertisementCategory category);
+
+    @Query(value = """
+            SELECT DISTINCT c
+            FROM Advertisement adv
+            JOIN adv.location l
+            JOIN l.city c
+            WHERE adv.category = :category AND adv.status = 'ACTIVE'
+            """)
+    List<City> findAllCitiesByCategoryId(@Param("category") AdvertisementCategory category);
 }

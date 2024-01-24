@@ -5,6 +5,7 @@ import lombok.*;
 import org.petmarket.advertisements.advertisement.dto.AdvertisementPriceRangeDto;
 import org.petmarket.advertisements.attributes.dto.AttributeGroupShortResponseDto;
 import org.petmarket.breeds.dto.BreedShortResponseDto;
+import org.petmarket.location.dto.CityResponseDto;
 
 import java.util.List;
 
@@ -25,4 +26,5 @@ public class FilterDto {
     @JsonProperty("favorite_attributes")
     private List<AttributeGroupShortResponseDto> favoriteAttributes;
     private List<AttributeGroupShortResponseDto> attributes;
+    private List<CityResponseDto> cities;
 }
