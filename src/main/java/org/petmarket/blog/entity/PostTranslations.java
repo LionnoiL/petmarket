@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.petmarket.language.entity.Language;
 import org.petmarket.translate.LanguageHolder;
 
@@ -15,6 +17,7 @@ import org.petmarket.translate.LanguageHolder;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Indexed
 public class PostTranslations implements LanguageHolder {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,11 +27,14 @@ public class PostTranslations implements LanguageHolder {
     private Language language;
     @NotNull
     @Column(name = "title")
+    @FullTextField
     private String title;
     @Column(name = "short_Text")
+    @FullTextField
     private String shortText;
     @NotNull
     @Column(name = "text")
+    @FullTextField
     private String description;
     @ManyToOne
     @JoinColumn(name = "owner_id", nullable = false)
