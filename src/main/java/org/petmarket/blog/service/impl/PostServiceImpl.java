@@ -163,9 +163,9 @@ public class PostServiceImpl implements PostService {
     @Override
     public Page<BlogPostResponseDto> search(String langCode, String query, int page, int size) {
         Pageable pageable = Pageable.ofSize(size).withPage(page - 1);
-        //add sort
         if (query == null || query.isEmpty()) {
-            List<BlogPostResponseDto> all = getAll(pageable, langCode);
+            List<BlogPostResponseDto> all = new ArrayList<>(getAll(pageable, langCode));
+            all.sort((o1, o2) -> o2.getUpdated().compareTo(o1.getUpdated()));
             return new PageImpl<>(all, pageable, all.size());
         }
 
@@ -178,6 +178,7 @@ public class PostServiceImpl implements PostService {
                                 "categories.translations.title",
                                 "categories.translations.description")
                         .matching(query).fuzzy(1))
+                .sort(f -> f.field("updated").desc())
                 .fetchHits((page - 1) * size, size);
         List<BlogPostResponseDto> postDtos = posts.stream()
                 .map(post -> postMapper.toDto(post, checkedLang(langCode))).toList();

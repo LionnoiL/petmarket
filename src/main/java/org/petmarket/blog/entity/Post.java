@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.search.engine.backend.types.Sortable;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.petmarket.users.entity.User;
@@ -33,6 +35,7 @@ public class Post {
     private LocalDateTime created;
     @LastModifiedDate
     @Column(name = "updated")
+    @GenericField(sortable = Sortable.YES)
     private LocalDateTime updated;
 
     @Column(name = "reading_minutes")
