@@ -3,6 +3,8 @@ package org.petmarket.location.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.petmarket.advertisements.advertisement.repository.AdvertisementRepository;
+import org.petmarket.advertisements.category.entity.AdvertisementCategory;
 import org.petmarket.errorhandling.ItemNotFoundException;
 import org.petmarket.location.dto.CityRequestDto;
 import org.petmarket.location.dto.CityResponseDto;
@@ -32,6 +34,7 @@ public class CityService {
     private final CityRepository cityRepository;
     private final StateRepository stateRepository;
     private final DistrictRepository districtRepository;
+    private final AdvertisementRepository advertisementRepository;
     private final CityMapper cityMapper;
     private final TransliterateUtils transliterateUtils;
 
@@ -120,6 +123,10 @@ public class CityService {
         cityRepository.save(city);
 
         return cityMapper.mapEntityToDto(city);
+    }
+
+    public List<City> getAllCitiesByAdvertisementsAndCategory(AdvertisementCategory category) {
+        return advertisementRepository.findAllCitiesByCategoryId(category);
     }
 
     private void fillDistrict(CityRequestDto request, City city) {
