@@ -1,7 +1,10 @@
 package org.petmarket.blog.service.impl;
 
+import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.petmarket.blog.dto.posts.BlogPostRequestDto;
 import org.petmarket.blog.dto.posts.BlogPostResponseDto;
 import org.petmarket.blog.dto.posts.BlogPostTranslationRequestDto;
@@ -17,6 +20,8 @@ import org.petmarket.language.service.LanguageService;
 import org.petmarket.options.service.OptionsService;
 import org.petmarket.users.service.UserService;
 import org.petmarket.utils.TransliterateUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -35,6 +40,7 @@ public class PostServiceImpl implements PostService {
     private final OptionsService optionsService;
     private final LanguageService languageService;
     private final TransliterateUtils transliterateUtils;
+    private final EntityManager entityManager;
 
     @Transactional
     @Override
@@ -152,6 +158,31 @@ public class PostServiceImpl implements PostService {
     @Override
     public BlogPostResponseDto save(BlogPostRequestDto requestDto) {
         return null;
+    }
+
+    @Override
+    public Page<BlogPostResponseDto> search(String langCode, String query, int page, int size) {
+        Pageable pageable = Pageable.ofSize(size).withPage(page - 1);
+        //add sort
+        if (query == null || query.isEmpty()) {
+            List<BlogPostResponseDto> all = getAll(pageable, langCode);
+            return new PageImpl<>(all, pageable, all.size());
+        }
+
+        SearchSession searchSession = Search.session(entityManager);
+        List<Post> posts = searchSession.search(Post.class)
+                .where(f -> f.match()
+                        .fields("translations.title",
+                                "translations.description",
+                                "translations.shortText",
+                                "categories.translations.title",
+                                "categories.translations.description")
+                        .matching(query).fuzzy(1))
+                .fetchHits((page - 1) * size, size);
+        List<BlogPostResponseDto> postDtos = posts.stream()
+                .map(post -> postMapper.toDto(post, checkedLang(langCode))).toList();
+
+        return new PageImpl<>(postDtos, pageable, postDtos.size());
     }
 
     private String truncateStringTo500Characters(String input) {
