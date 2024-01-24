@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.petmarket.advertisements.advertisement.repository.AdvertisementRepository;
 import org.petmarket.advertisements.category.entity.AdvertisementCategory;
 import org.petmarket.advertisements.category.service.AdvertisementCategoryService;
+import org.petmarket.breeds.dto.BreedFilterDto;
 import org.petmarket.breeds.dto.BreedRequestDto;
 import org.petmarket.breeds.dto.BreedResponseDto;
 import org.petmarket.breeds.entity.Breed;
@@ -124,10 +125,15 @@ public class BreedServiceImpl implements BreedService {
     }
 
     @Override
-    public List<BreedResponseDto> getAllBreedsByAdvertisementsAndCategory(Language language,
-                                                                          AdvertisementCategory category) {
-        List<Breed> breeds = advertisementRepository.findAllBreedsByCategoryId(category);
-        return breeds.stream().map(b -> breedMapper.toDto(b, language)).toList();
+    public List<BreedFilterDto> getAllBreedsByAdvertisementsAndCategory(Language language,
+                                                                        AdvertisementCategory category) {
+        List<Object[]> breedsWithCounts = advertisementRepository.findAllBreedsByCategoryId(category);
+        return breedsWithCounts.stream().map(
+                l -> {
+                    BreedResponseDto dto = breedMapper.toDto((Breed) l[0], language);
+                    return new BreedFilterDto(dto.getId(), dto.getTitle(), (Long) l[1]);
+                }
+        ).toList();
     }
 
     private BreedTranslation createTranslation(BreedRequestDto requestDto, Language language, Breed breed) {

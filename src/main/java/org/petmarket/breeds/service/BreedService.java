@@ -1,6 +1,7 @@
 package org.petmarket.breeds.service;
 
 import org.petmarket.advertisements.category.entity.AdvertisementCategory;
+import org.petmarket.breeds.dto.BreedFilterDto;
 import org.petmarket.breeds.dto.BreedRequestDto;
 import org.petmarket.breeds.dto.BreedResponseDto;
 import org.petmarket.breeds.entity.Breed;
@@ -19,7 +20,7 @@ public interface BreedService {
 
     List<BreedResponseDto> getAllByCategory(String langCode, Long categoryId);
 
-    List<BreedResponseDto> getAllBreedsByAdvertisementsAndCategory(Language language, AdvertisementCategory category);
+    List<BreedFilterDto> getAllBreedsByAdvertisementsAndCategory(Language language, AdvertisementCategory category);
 
     BreedResponseDto update(Long breedId, String langCode, BreedRequestDto requestDto);
 

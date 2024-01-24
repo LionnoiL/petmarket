@@ -4,7 +4,6 @@ import org.petmarket.advertisements.advertisement.dto.AdvertisementPriceRangeDto
 import org.petmarket.advertisements.advertisement.entity.Advertisement;
 import org.petmarket.advertisements.advertisement.entity.AdvertisementStatus;
 import org.petmarket.advertisements.category.entity.AdvertisementCategory;
-import org.petmarket.breeds.entity.Breed;
 import org.petmarket.location.entity.City;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -78,12 +77,13 @@ public interface AdvertisementRepository extends AdvertisementRepositoryBasic {
     AdvertisementPriceRangeDto getAdvertisementPriceRangeByCategory(@Param("categoryId") Long categoryId);
 
     @Query(value = """
-            SELECT DISTINCT b
-            FROM Advertisement adv
-            JOIN adv.breed b
-            WHERE adv.category = :category AND adv.status = 'ACTIVE'
+            SELECT b, COUNT(adv.id)
+              FROM Advertisement adv
+              JOIN adv.breed b
+              WHERE adv.category = :category AND adv.status = 'ACTIVE'
+              GROUP BY b
             """)
-    List<Breed> findAllBreedsByCategoryId(@Param("category") AdvertisementCategory category);
+    List<Object[]> findAllBreedsByCategoryId(@Param("category") AdvertisementCategory category);
 
     @Query(value = """
             SELECT DISTINCT c

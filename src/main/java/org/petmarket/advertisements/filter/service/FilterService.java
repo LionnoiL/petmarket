@@ -9,7 +9,7 @@ import org.petmarket.advertisements.attributes.mapper.AttributeShortMapper;
 import org.petmarket.advertisements.attributes.service.AttributeService;
 import org.petmarket.advertisements.category.entity.AdvertisementCategory;
 import org.petmarket.advertisements.filter.dto.FilterDto;
-import org.petmarket.breeds.dto.BreedShortResponseDto;
+import org.petmarket.breeds.dto.BreedFilterDto;
 import org.petmarket.breeds.mapper.BreedMapper;
 import org.petmarket.breeds.service.BreedService;
 import org.petmarket.language.entity.Language;
@@ -37,8 +37,7 @@ public class FilterService {
     public FilterDto getLeftSideBarFilter(Language language, AdvertisementCategory category) {
 
         AdvertisementPriceRangeDto range = advertisementService.getAdvertisementPriceRangeByCategory(category.getId());
-        List<BreedShortResponseDto> breeds = breedService.getAllBreedsByAdvertisementsAndCategory(language, category)
-                .stream().map(breedMapper::toDto).toList();
+        List<BreedFilterDto> breeds = breedService.getAllBreedsByAdvertisementsAndCategory(language, category);
         List<CityResponseDto> cities = cityService.getAllCitiesByAdvertisementsAndCategory(category)
                 .stream().map(cityMapper::mapEntityToDto).toList();
 
