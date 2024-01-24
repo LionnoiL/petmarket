@@ -2,6 +2,8 @@ package org.petmarket.breeds.service.impl;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.petmarket.advertisements.advertisement.repository.AdvertisementRepository;
+import org.petmarket.advertisements.category.entity.AdvertisementCategory;
 import org.petmarket.advertisements.category.service.AdvertisementCategoryService;
 import org.petmarket.breeds.dto.BreedRequestDto;
 import org.petmarket.breeds.dto.BreedResponseDto;
@@ -24,6 +26,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BreedServiceImpl implements BreedService {
     private final BreedRepository breedRepository;
+    private final AdvertisementRepository advertisementRepository;
     private final BreedMapper breedMapper;
     private final OptionsService optionsService;
     private final LanguageService languageService;
@@ -118,6 +121,13 @@ public class BreedServiceImpl implements BreedService {
         return allBreeds.stream()
                 .map(b -> breedMapper.toDto(b, language))
                 .toList();
+    }
+
+    @Override
+    public List<BreedResponseDto> getAllBreedsByAdvertisementsAndCategory(Language language,
+                                                                          AdvertisementCategory category) {
+        List<Breed> breeds = advertisementRepository.findAllBreedsByCategoryId(category);
+        return breeds.stream().map(b -> breedMapper.toDto(b, language)).toList();
     }
 
     private BreedTranslation createTranslation(BreedRequestDto requestDto, Language language, Breed breed) {

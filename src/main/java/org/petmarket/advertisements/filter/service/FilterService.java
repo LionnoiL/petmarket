@@ -32,7 +32,7 @@ public class FilterService {
     public FilterDto getLeftSideBarFilter(Language language, AdvertisementCategory category) {
 
         AdvertisementPriceRangeDto range = advertisementService.getAdvertisementPriceRangeByCategory(category.getId());
-        List<BreedShortResponseDto> breeds = breedService.getAllByCategory(language.getLangCode(), category.getId())
+        List<BreedShortResponseDto> breeds = breedService.getAllBreedsByAdvertisementsAndCategory(language, category)
                 .stream().map(breedMapper::toDto).toList();
         List<Attribute> allAttributes = attributeService.getAttributesForFilter(category);
         List<Attribute> favoriteAttributes = attributeService.getFavoriteAttributes(allAttributes);
