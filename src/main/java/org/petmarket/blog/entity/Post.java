@@ -53,6 +53,12 @@ public class Post {
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "post", cascade = CascadeType.REMOVE)
     private List<BlogComment> comments = new ArrayList<>();
 
+    @ManyToMany
+    @JoinTable(name = "posts_attributes",
+            joinColumns = @JoinColumn(name = "attribute_id"),
+            inverseJoinColumns = @JoinColumn(name = "post_id"))
+    private List<BlogAttribute> attributes = new ArrayList<>();
+
     public enum Status {
         PUBLISHED, DRAFT
     }
