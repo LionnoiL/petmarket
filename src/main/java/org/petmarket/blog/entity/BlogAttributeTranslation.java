@@ -12,7 +12,7 @@ import org.petmarket.translate.LanguageHolder;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "blog_attribute_translation")
-public class BlogAttributeTranslate implements LanguageHolder {
+public class BlogAttributeTranslation implements LanguageHolder {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)

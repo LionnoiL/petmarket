@@ -98,6 +98,11 @@ public class CategoryServiceImpl implements CategoryService {
         );
     }
 
+    @Override
+    public List<BlogCategory> getBlogCategories(List<Long> categoryIds) {
+        return categoryRepository.findAllById(categoryIds);
+    }
+
     @Transactional
     @Override
     public BlogPostCategoryResponseDto addTranslation(Long categoryId,

@@ -8,6 +8,7 @@ import org.petmarket.blog.dto.posts.BlogPostTranslationRequestDto;
 import org.petmarket.blog.entity.*;
 import org.petmarket.blog.mapper.BlogPostMapper;
 import org.petmarket.blog.repository.PostRepository;
+import org.petmarket.blog.service.AttributeService;
 import org.petmarket.blog.service.CategoryService;
 import org.petmarket.blog.service.PostService;
 import org.petmarket.errorhandling.ItemNotFoundException;
@@ -35,6 +36,7 @@ public class PostServiceImpl implements PostService {
     private final OptionsService optionsService;
     private final LanguageService languageService;
     private final TransliterateUtils transliterateUtils;
+    private final AttributeService attributeService;
 
     @Transactional
     @Override
@@ -71,6 +73,9 @@ public class PostServiceImpl implements PostService {
                 translation.setShortText(truncateStringTo500Characters(requestDto.getText()));
             }
         }
+        post.setCategories(categoryService.getBlogCategories(requestDto.getCategoriesIds()));
+        //TODO
+        post.setReadingMinutes(getReadingMinutes(requestDto.getText()));
         postRepository.save(post);
         return postMapper.toDto(post, checkedLang(langCode));
     }

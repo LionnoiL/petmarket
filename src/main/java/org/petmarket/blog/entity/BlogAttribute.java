@@ -25,7 +25,7 @@ public class BlogAttribute implements TranslateHolder {
     private int sortValue;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "attribute", fetch = FetchType.LAZY, orphanRemoval = true)
-    private List<BlogAttributeTranslate> translations = new ArrayList<>();
+    private List<BlogAttributeTranslation> translations = new ArrayList<>();
 
     @ManyToMany(mappedBy = "attributes")
     private List<Post> posts = new ArrayList<>();
