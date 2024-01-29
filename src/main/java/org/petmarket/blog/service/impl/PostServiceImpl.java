@@ -74,7 +74,7 @@ public class PostServiceImpl implements PostService {
             }
         }
         post.setCategories(categoryService.getBlogCategories(requestDto.getCategoriesIds()));
-        //TODO
+        post.setAttributes(attributeService.getBlogAttributes(requestDto.getAttributesIds()));
         post.setReadingMinutes(getReadingMinutes(requestDto.getText()));
         postRepository.save(post);
         return postMapper.toDto(post, checkedLang(langCode));
@@ -92,8 +92,7 @@ public class PostServiceImpl implements PostService {
     public BlogPostResponseDto savePost(BlogPostRequestDto requestDto,
                                         Authentication authentication) {
         Post post = createPost(requestDto, authentication);
-        postRepository.save(post);
-        return postMapper.toDto(post, optionsService.getDefaultSiteLanguage());
+        return postMapper.toDto(postRepository.save(post), optionsService.getDefaultSiteLanguage());
     }
 
     @Transactional
@@ -197,9 +196,8 @@ public class PostServiceImpl implements PostService {
         postTranslations.add(translation);
 
         post.setUser(userService.findByUsername(authentication.getName()));
-        post.setCategories(requestDto.getCategoriesIds().stream()
-                .map(categoryService::getBlogCategory)
-                .toList());
+        post.setCategories(categoryService.getBlogCategories(requestDto.getCategoriesIds()));
+        post.setAttributes(attributeService.getBlogAttributes(requestDto.getAttributesIds()));
         post.setTranslations(postTranslations);
         post.setStatus(Post.Status.DRAFT);
         post.setReadingMinutes(getReadingMinutes(requestDto.getText()));

@@ -55,8 +55,8 @@ public class Post {
 
     @ManyToMany
     @JoinTable(name = "posts_attributes",
-            joinColumns = @JoinColumn(name = "attribute_id"),
-            inverseJoinColumns = @JoinColumn(name = "post_id"))
+            joinColumns = @JoinColumn(name = "post_id"),
+            inverseJoinColumns = @JoinColumn(name = "attribute_id"))
     private List<BlogAttribute> attributes = new ArrayList<>();
 
     public enum Status {
