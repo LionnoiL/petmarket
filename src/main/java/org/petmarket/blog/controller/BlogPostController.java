@@ -92,4 +92,26 @@ public class BlogPostController {
             @RequestParam(required = false) String searchQuery) {
         return postService.search(langCode, searchQuery, page, size);
     }
+
+    @Operation(
+            summary = "Get all blog posts by language code and attribute (if specified)"
+    )
+    @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
+            @Content(
+                    mediaType = APPLICATION_JSON_VALUE,
+                    array = @ArraySchema(schema = @Schema(
+                            implementation = BlogPostResponseDto.class))
+            )
+    })
+    @ApiResponseBadRequest
+    @ApiResponseNotFound
+    @GetMapping("/attribute/{langCode}")
+    public List<BlogPostResponseDto> getPostsByAttributeId(
+            @ParameterPageNumber @RequestParam(defaultValue = "1") @Positive int page,
+            @ParameterPageSize @RequestParam(defaultValue = "12") @Positive int size,
+            @ParameterLanguage @PathVariable String langCode,
+            @ParameterId @RequestParam(required = false) @Positive Long attributeId) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        return postService.getPostsByAttributeId(langCode, attributeId, pageable);
+    }
 }

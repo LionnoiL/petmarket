@@ -24,6 +24,8 @@ public interface PostService extends AbstractService<BlogPostResponseDto, BlogPo
                                                Long categoryId,
                                                Pageable pageable);
 
+    List<BlogPostResponseDto> getPostsByAttributeId(String langCode, Long attributeId, Pageable pageable);
+
     BlogPostResponseDto updateStatus(Long postId, Post.Status status);
 
     Page<BlogPostResponseDto> search(String langCode, String query, int page, int size);

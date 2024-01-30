@@ -190,6 +190,18 @@ public class PostServiceImpl implements PostService {
         return new PageImpl<>(postDtos, pageable, postDtos.size());
     }
 
+    public List<BlogPostResponseDto> getPostsByAttributeId(String langCode, Long attributeId, Pageable pageable) {
+        if (attributeId == null) {
+            return getAll(pageable, langCode);
+        }
+
+        return postRepository
+                .findPostsByAttributeId(attributeId, pageable)
+                .stream()
+                .map(post -> postMapper.toDto(post, checkedLang(langCode)))
+                .toList();
+    }
+
     private String truncateStringTo500Characters(String input) {
         if (input.length() <= 495) {
             return input;
