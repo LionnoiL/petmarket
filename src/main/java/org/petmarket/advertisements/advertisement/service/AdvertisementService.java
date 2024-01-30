@@ -30,6 +30,7 @@ import org.petmarket.breeds.repository.BreedRepository;
 import org.petmarket.delivery.entity.Delivery;
 import org.petmarket.delivery.repository.DeliveryRepository;
 import org.petmarket.errorhandling.BadRequestException;
+import org.petmarket.errorhandling.ItemNotCreatedException;
 import org.petmarket.errorhandling.ItemNotFoundException;
 import org.petmarket.language.entity.Language;
 import org.petmarket.language.repository.LanguageRepository;
@@ -233,10 +234,11 @@ public class AdvertisementService {
         Breed breed = null;
         if (request.getBreedId() != null) {
             breed = breedRepository.findById(request.getBreedId()).orElseThrow(
-                    () -> {
-                        throw new ItemNotFoundException(BREED_NOT_FOUND);
-                    }
+                    () -> new ItemNotFoundException(BREED_NOT_FOUND)
             );
+            if (advertisement.getCategory() != null && !advertisement.getCategory().equals(breed.getCategory())) {
+                throw new ItemNotCreatedException("The breed category does not match the current ad category");
+            }
         }
         advertisement.setBreed(breed);
     }
@@ -245,9 +247,7 @@ public class AdvertisementService {
         Location location = null;
         if (request.getCityId() != null) {
             City city = cityRepository.findById(request.getCityId()).orElseThrow(
-                    () -> {
-                        throw new ItemNotFoundException(CITY_NOT_FOUND);
-                    }
+                    () -> new ItemNotFoundException(CITY_NOT_FOUND)
             );
             location = Location.builder()
                     .city(city)

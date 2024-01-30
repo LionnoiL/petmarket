@@ -14,6 +14,7 @@ import org.petmarket.utils.annotations.parametrs.*;
 import org.petmarket.utils.annotations.responses.ApiResponseBadRequest;
 import org.petmarket.utils.annotations.responses.ApiResponseNotFound;
 import org.petmarket.utils.annotations.responses.ApiResponseSuccessful;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -69,5 +70,26 @@ public class BlogPostController {
         Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), "created");
         Pageable pageable = PageRequest.of(page - 1, size, sort);
         return postService.getAllByCategory(langCode, categoryId, pageable);
+    }
+
+    @Operation(
+            summary = "Search blog posts by language code and search query"
+    )
+    @ApiResponse(responseCode = "200", description = SUCCESSFULLY_OPERATION, content = {
+            @Content(
+                    mediaType = APPLICATION_JSON_VALUE,
+                    array = @ArraySchema(schema = @Schema(
+                            implementation = BlogPostResponseDto.class))
+            )
+    })
+    @ApiResponseBadRequest
+    @ApiResponseNotFound
+    @GetMapping("/search/{langCode}")
+    public Page<BlogPostResponseDto> search(
+            @ParameterPageNumber @RequestParam(defaultValue = "1") @Positive int page,
+            @ParameterPageSize @RequestParam(defaultValue = "12") @Positive int size,
+            @ParameterLanguage @PathVariable String langCode,
+            @RequestParam(required = false) String searchQuery) {
+        return postService.search(langCode, searchQuery, page, size);
     }
 }

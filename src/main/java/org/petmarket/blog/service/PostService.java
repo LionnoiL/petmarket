@@ -4,6 +4,7 @@ import org.petmarket.blog.dto.posts.BlogPostRequestDto;
 import org.petmarket.blog.dto.posts.BlogPostResponseDto;
 import org.petmarket.blog.dto.posts.BlogPostTranslationRequestDto;
 import org.petmarket.blog.entity.Post;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 
@@ -24,4 +25,6 @@ public interface PostService extends AbstractService<BlogPostResponseDto, BlogPo
                                                Pageable pageable);
 
     BlogPostResponseDto updateStatus(Long postId, Post.Status status);
+
+    Page<BlogPostResponseDto> search(String langCode, String query, int page, int size);
 }
