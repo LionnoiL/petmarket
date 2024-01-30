@@ -33,14 +33,15 @@ public class AttributeServiceImpl implements AttributeService {
                 .sortValue(blogPostAttributeRequestDto.getSortValue())
                 .build();
         BlogAttribute saved = attributeRepository.save(attribute);
+        Language language = checkedLang(langCode);
         BlogAttributeTranslation translation = BlogAttributeTranslation.builder()
                 .title(blogPostAttributeRequestDto.getTitle())
-                .language(checkedLang(langCode))
+                .language(language)
                 .attribute(saved)
                 .build();
         saved.setTranslations(List.of(translation));
 
-        return mapper.toDto(saved, checkedLang(langCode));
+        return mapper.toDto(saved, language);
     }
 
     @Transactional
@@ -72,15 +73,17 @@ public class AttributeServiceImpl implements AttributeService {
 
     @Override
     public BlogPostAttributeResponseDto get(Long id, String langCode) {
+        Language language = checkedLang(langCode);
         return mapper.toDto(attributeRepository.findById(id)
                 .orElseThrow(() -> new ItemNotFoundException("Can't find Blog Attribute with id: " + id)),
-                checkedLang(langCode));
+                language);
     }
 
     @Override
     public List<BlogPostAttributeResponseDto> getAll(Pageable pageable, String langCode) {
+        Language language = checkedLang(langCode);
         return attributeRepository.findAll(pageable).stream()
-                .map(attribute -> mapper.toDto(attribute, checkedLang(langCode)))
+                .map(attribute -> mapper.toDto(attribute, language))
                 .toList();
     }
 

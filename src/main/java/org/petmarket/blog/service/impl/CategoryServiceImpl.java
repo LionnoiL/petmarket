@@ -49,8 +49,9 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public List<BlogPostCategoryResponseDto> getAll(Pageable pageable, String langCode) {
+        Language language = checkedLang(langCode);
         return categoryRepository.findAll(pageable).stream()
-                .map(c -> mapper.toDto(c, checkedLang(langCode)))
+                .map(c -> mapper.toDto(c, language))
                 .toList();
     }
 
@@ -67,13 +68,14 @@ public class CategoryServiceImpl implements CategoryService {
                                                   BlogPostCategoryRequestDto requestDto) {
 
         BlogCategory category = getBlogCategory(categoryId);
+        Language language = checkedLang(langCode);
 
         boolean isLangCodeExist = category.getTranslations().stream()
-                .anyMatch(t -> t.getLanguage().getLangCode().equals(checkedLang(langCode).getLangCode()));
+                .anyMatch(t -> t.getLanguage().getLangCode().equals(language.getLangCode()));
 
         if (isLangCodeExist) {
             List<CategoryTranslation> translations = category.getTranslations().stream()
-                    .filter(t -> t.getLanguage().getLangCode().equals(checkedLang(langCode).getLangCode()))
+                    .filter(t -> t.getLanguage().getLangCode().equals(language.getLangCode()))
                     .toList();
 
             for (CategoryTranslation translation : translations) {
@@ -88,7 +90,7 @@ public class CategoryServiceImpl implements CategoryService {
                     + ". Create translation first");
         }
 
-        return mapper.toDto(category, checkedLang(langCode));
+        return mapper.toDto(category, language);
     }
 
     @Override
@@ -110,16 +112,17 @@ public class CategoryServiceImpl implements CategoryService {
                                                       BlogPostCategoryRequestDto requestDto) {
         BlogCategory category = getBlogCategory(categoryId);
         List<CategoryTranslation> translations = category.getTranslations();
+        Language language = checkedLang(langCode);
         if (translations.stream()
                 .anyMatch(t -> t.getLanguage().getLangCode()
-                        .equals(checkedLang(langCode).getLangCode()))) {
+                        .equals(language.getLangCode()))) {
             throw new ItemNotUpdatedException(langCode + " translation is already exist");
         } else {
             translations.add(createTranslation(requestDto, langCode, category));
             category.setTranslations(translations);
             categoryRepository.save(category);
         }
-        return mapper.toDto(category, checkedLang(langCode));
+        return mapper.toDto(category, language);
     }
 
     private CategoryTranslation createTranslation(BlogPostCategoryRequestDto requestDto,
