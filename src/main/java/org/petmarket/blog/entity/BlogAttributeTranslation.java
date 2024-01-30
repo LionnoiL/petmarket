@@ -6,6 +6,7 @@ import org.petmarket.language.entity.Language;
 import org.petmarket.translate.LanguageHolder;
 
 @Entity
+@EqualsAndHashCode(of = {"id"})
 @Getter
 @Setter
 @Builder
