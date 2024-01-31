@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import org.petmarket.blog.dto.attribute.BlogPostAttributeResponseDto;
 import org.petmarket.blog.dto.category.BlogPostCategoryResponseDto;
 import org.petmarket.blog.dto.comment.BlogPostCommentResponse;
 import org.petmarket.blog.entity.Post;
@@ -46,5 +47,5 @@ public class BlogPostResponseDto {
     private String alias;
     private List<BlogPostCategoryResponseDto> categories;
     private List<BlogPostCommentResponse> comments;
-
+    private List<BlogPostAttributeResponseDto> attributes;
 }

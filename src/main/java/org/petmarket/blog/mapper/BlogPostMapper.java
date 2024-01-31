@@ -15,7 +15,8 @@ import java.util.stream.Collectors;
         TranslationService.class,
         CategoryMapper.class,
         BlogCommentMapper.class,
-        OptionsService.class})
+        OptionsService.class,
+        BlogAttributeMapper.class})
 public abstract class BlogPostMapper {
     private PostTranslations translated;
     @Autowired

@@ -11,6 +11,7 @@ import org.petmarket.blog.dto.posts.BlogPostTranslationRequestDto;
 import org.petmarket.blog.entity.*;
 import org.petmarket.blog.mapper.BlogPostMapper;
 import org.petmarket.blog.repository.PostRepository;
+import org.petmarket.blog.service.AttributeService;
 import org.petmarket.blog.service.CategoryService;
 import org.petmarket.blog.service.PostService;
 import org.petmarket.errorhandling.ItemNotFoundException;
@@ -40,6 +41,7 @@ public class PostServiceImpl implements PostService {
     private final OptionsService optionsService;
     private final LanguageService languageService;
     private final TransliterateUtils transliterateUtils;
+    private final AttributeService attributeService;
     private final EntityManager entityManager;
 
     @Transactional
@@ -54,9 +56,9 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public List<BlogPostResponseDto> getAll(Pageable pageable, String langCode) {
-
+        Language language = checkedLang(langCode);
         return postRepository.findAll(pageable).stream()
-                .map(post -> postMapper.toDto(post, checkedLang(langCode)))
+                .map(post -> postMapper.toDto(post, language))
                 .toList();
     }
 
@@ -70,15 +72,19 @@ public class PostServiceImpl implements PostService {
     @Override
     public BlogPostResponseDto updateById(Long id, String langCode, BlogPostRequestDto requestDto) {
         Post post = findById(id);
+        Language language = checkedLang(langCode);
         for (PostTranslations translation : post.getTranslations()) {
-            if (translation.getLanguage().getLangCode().equals(checkedLang(langCode).getLangCode())) {
+            if (translation.getLanguage().getLangCode().equals(language.getLangCode())) {
                 translation.setTitle(requestDto.getTitle());
                 translation.setDescription(requestDto.getText());
                 translation.setShortText(truncateStringTo500Characters(requestDto.getText()));
             }
         }
+        post.setCategories(categoryService.getBlogCategories(requestDto.getCategoriesIds()));
+        post.setAttributes(attributeService.getBlogAttributes(requestDto.getAttributesIds()));
+        post.setReadingMinutes(getReadingMinutes(requestDto.getText()));
         postRepository.save(post);
-        return postMapper.toDto(post, checkedLang(langCode));
+        return postMapper.toDto(post, language);
     }
 
     @Override
@@ -93,8 +99,7 @@ public class PostServiceImpl implements PostService {
     public BlogPostResponseDto savePost(BlogPostRequestDto requestDto,
                                         Authentication authentication) {
         Post post = createPost(requestDto, authentication);
-        postRepository.save(post);
-        return postMapper.toDto(post, optionsService.getDefaultSiteLanguage());
+        return postMapper.toDto(postRepository.save(post), optionsService.getDefaultSiteLanguage());
     }
 
     @Transactional
@@ -104,9 +109,10 @@ public class PostServiceImpl implements PostService {
                                               BlogPostTranslationRequestDto requestDto) {
         Post post = findById(postId);
         List<PostTranslations> translations = post.getTranslations();
+        Language language = checkedLang(langCode);
         if (translations.stream()
                 .anyMatch(t -> t.getLanguage().getLangCode()
-                        .equals(checkedLang(langCode).getLangCode()))) {
+                        .equals(language.getLangCode()))) {
             throw new ItemNotUpdatedException(langCode + " translation already exist");
         } else {
             PostTranslations translation = PostTranslations.builder()
@@ -120,7 +126,7 @@ public class PostServiceImpl implements PostService {
             post.setTranslations(translations);
             postRepository.save(post);
         }
-        return postMapper.toDto(post, checkedLang(langCode));
+        return postMapper.toDto(post, language);
     }
 
     @Override
@@ -133,15 +139,13 @@ public class PostServiceImpl implements PostService {
         } else {
             allPosts = postRepository.findAll(pageable).getContent();
         }
+        Language language = checkedLang(langCode);
         return allPosts.stream()
                 .filter(post -> post.getStatus().equals(Post.Status.PUBLISHED))
-                .map(post -> {
-                    post.setComments(post.getComments().stream()
-                            .filter(blogComment -> blogComment.getStatus().equals(CommentStatus.APPROVED))
-                            .toList());
-                    return post;
-                })
-                .map(post -> postMapper.toDto(post, checkedLang(langCode)))
+                .peek(post -> post.setComments(post.getComments().stream()
+                        .filter(blogComment -> blogComment.getStatus().equals(CommentStatus.APPROVED))
+                        .toList()))
+                .map(post -> postMapper.toDto(post, language))
                 .toList();
     }
 
@@ -180,10 +184,23 @@ public class PostServiceImpl implements PostService {
                         .matching(query).fuzzy(1))
                 .sort(f -> f.field("updated").desc())
                 .fetchHits((page - 1) * size, size);
+        Language language = checkedLang(langCode);
         List<BlogPostResponseDto> postDtos = posts.stream()
-                .map(post -> postMapper.toDto(post, checkedLang(langCode))).toList();
+                .map(post -> postMapper.toDto(post, language)).toList();
 
         return new PageImpl<>(postDtos, pageable, postDtos.size());
+    }
+
+    public List<BlogPostResponseDto> getPostsByAttributeId(String langCode, Long attributeId, Pageable pageable) {
+        if (attributeId == null) {
+            return getAll(pageable, langCode);
+        }
+
+        return postRepository
+                .findPostsByAttributeId(attributeId, pageable)
+                .stream()
+                .map(post -> postMapper.toDto(post, checkedLang(langCode)))
+                .toList();
     }
 
     private String truncateStringTo500Characters(String input) {
@@ -224,9 +241,8 @@ public class PostServiceImpl implements PostService {
         postTranslations.add(translation);
 
         post.setUser(userService.findByUsername(authentication.getName()));
-        post.setCategories(requestDto.getCategoriesIds().stream()
-                .map(categoryService::getBlogCategory)
-                .toList());
+        post.setCategories(categoryService.getBlogCategories(requestDto.getCategoriesIds()));
+        post.setAttributes(attributeService.getBlogAttributes(requestDto.getAttributesIds()));
         post.setTranslations(postTranslations);
         post.setStatus(Post.Status.DRAFT);
         post.setReadingMinutes(getReadingMinutes(requestDto.getText()));

@@ -17,4 +17,6 @@ public class BlogPostRequestDto {
     private String text;
     @Schema(example = "[1]", description = "List of blog posts related categories")
     private List<Long> categoriesIds;
+    @Schema(example = "[1]", description = "List of blog posts related attributes")
+    private List<Long> attributesIds;
 }
