@@ -70,6 +70,10 @@ public class AdvertisementRequestDto {
     @JsonProperty("breed_id")
     private Long breedId;
 
+    @Schema(example = "бажано дзвонити після 19-00")
+    @JsonProperty("additional_information")
+    private String additionalInformation;
+
     @ArraySchema(schema = @Schema(type = "integer", format = "int64", example = "1"), uniqueItems = true)
     @JsonProperty("attributes_ids")
     private List<Long> attributesIds;
