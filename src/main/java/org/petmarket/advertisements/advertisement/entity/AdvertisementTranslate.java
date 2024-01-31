@@ -37,4 +37,7 @@ public class AdvertisementTranslate implements LanguageHolder {
     @Column(name = "description")
     @FullTextField
     private String description;
+
+    @Column(name = "additional_information")
+    private String additionalInformation;
 }

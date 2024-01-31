@@ -50,6 +50,7 @@ public class AdvertisementResponseTranslateMapper {
         );
         AdvertisementDetailsResponseDto dto = mapper.mapEntityToDto(entity);
         dto.setTitle(translation.getTitle());
+        dto.setAdditionalInformation(translation.getAdditionalInformation());
         dto.setDescription(translation.getDescription());
         dto.setLangCode(language.getLangCode());
         dto.setCategory(categoryMapper.mapEntityToDto(entity.getCategory(), language));

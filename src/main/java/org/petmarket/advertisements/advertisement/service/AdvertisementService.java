@@ -212,6 +212,7 @@ public class AdvertisementService {
                 .advertisement(advertisement)
                 .title(request.getTitle())
                 .description(request.getDescription())
+                .additionalInformation(request.getAdditionalInformation())
                 .language(defaultSiteLanguage)
                 .build();
         addTranslation(advertisement, translation);
