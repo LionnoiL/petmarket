@@ -49,4 +49,14 @@ public class CartController {
         log.info("Received request to add item to Cart");
         return cartService.addItemsToCart(items);
     }
+
+    @Operation(summary = "Clear cart for current user", description = "Clear all items from the cart for current user")
+    @ApiResponseSuccessful
+    @ApiResponseNotFound
+    @ApiResponseUnauthorized
+    @PreAuthorize("isAuthenticated()")
+    @DeleteMapping("/items")
+    public CartResponseDto clearCart() {
+        return cartService.clearCart();
+    }
 }

@@ -16,6 +16,7 @@ import org.petmarket.users.entity.User;
 import org.petmarket.users.service.UserService;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.petmarket.utils.MessageUtils.USER_NOT_FOUND;
@@ -35,7 +36,7 @@ public class CartService {
         if (user == null) {
             throw new ItemNotFoundException(USER_NOT_FOUND);
         }
-        return cartMapper.mapEntityToDto(user.getCart());
+        return cartMapper.mapEntityToDto(getCart(user));
     }
 
     @Transactional
@@ -44,7 +45,7 @@ public class CartService {
         if (user == null) {
             throw new ItemNotFoundException(USER_NOT_FOUND);
         }
-        Cart cart = user.getCart();
+        Cart cart = getCart(user);
         for (CartItemRequestDto item : items) {
             Advertisement advertisement = advertisementService.getAdvertisement(item.getAdvertisementId());
             CartItem foundItem = cart.getItemByAdvertisement(advertisement);
@@ -61,7 +62,33 @@ public class CartService {
                 foundItem.setQuantity(foundItem.getQuantity() + item.getQuantity());
             }
         }
+        cart.setUpdated(LocalDateTime.now());
         cartRepository.save(cart);
         return cartMapper.mapEntityToDto(cart);
+    }
+
+    @Transactional
+    public CartResponseDto clearCart() {
+        User user = userService.getCurrentUser();
+        if (user == null) {
+            throw new ItemNotFoundException(USER_NOT_FOUND);
+        }
+        Cart cart = getCart(user);
+        cart.getItems().clear();
+        cart.setUpdated(LocalDateTime.now());
+        cartRepository.save(cart);
+        return cartMapper.mapEntityToDto(cart);
+    }
+
+    private Cart getCart(User user) {
+        Cart cart = user.getCart();
+        if (cart == null){
+            cart = new Cart();
+            cart.setUser(user);
+        }
+        if (cart.getItems().isEmpty()){
+            cart.setCreated(LocalDateTime.now());
+        }
+        return cart;
     }
 }

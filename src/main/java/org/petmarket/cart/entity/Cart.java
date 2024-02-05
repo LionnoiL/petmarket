@@ -4,9 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.petmarket.advertisements.advertisement.entity.Advertisement;
 import org.petmarket.users.entity.User;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -19,7 +16,6 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
-@EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor
 @AllArgsConstructor
 public class Cart {
@@ -33,11 +29,9 @@ public class Cart {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @CreatedDate
     @Column(name = "created")
     private LocalDateTime created;
 
-    @LastModifiedDate
     @Column(name = "updated")
     private LocalDateTime updated;
 
