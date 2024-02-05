@@ -30,6 +30,10 @@ public class CartService {
     private final AdvertisementService advertisementService;
     private final CartMapper cartMapper;
 
+    private static void deleteCartItemByAdvertisementId(Long advertisementId, Cart cart) {
+        cart.getItems().removeIf(item -> item.getAdvertisement().getId().equals(advertisementId));
+    }
+
     public CartResponseDto getCurrentUserCart() {
         User user = getUser();
         return cartMapper.mapEntityToDto(getCart(user));
@@ -42,7 +46,7 @@ public class CartService {
         for (CartItemRequestDto item : items) {
             Advertisement advertisement = advertisementService.getAdvertisement(
                 item.getAdvertisementId());
-            CartItem foundItem = cart.getItemByAdvertisement(advertisement);
+            CartItem foundItem = cart.getItemByAdvertisementId(item.getAdvertisementId());
             if (foundItem == null) {
                 foundItem = CartItem.builder()
                     .cart(cart)
@@ -75,7 +79,23 @@ public class CartService {
     public CartResponseDto deleteItemFromCart(Long advertisementId) {
         User user = getUser();
         Cart cart = getCart(user);
-        cart.getItems().removeIf(item -> item.getAdvertisement().getId().equals(advertisementId));
+        deleteCartItemByAdvertisementId(advertisementId, cart);
+        cart.setUpdated(LocalDateTime.now());
+        cartRepository.save(cart);
+        return cartMapper.mapEntityToDto(cart);
+    }
+
+    @Transactional
+    public CartResponseDto changeItemQuantity(Long advertisementId, int quantity) {
+        User user = getUser();
+        Cart cart = getCart(user);
+        if (quantity == 0) {
+            deleteCartItemByAdvertisementId(advertisementId, cart);
+        } else {
+            CartItem cartItem = cart.getItemByAdvertisementId(advertisementId);
+            cartItem.setQuantity(quantity);
+        }
+        cart.setUpdated(LocalDateTime.now());
         cartRepository.save(cart);
         return cartMapper.mapEntityToDto(cart);
     }

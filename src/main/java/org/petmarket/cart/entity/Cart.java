@@ -1,14 +1,27 @@
 package org.petmarket.cart.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
-import org.petmarket.advertisements.advertisement.entity.Advertisement;
-import org.petmarket.users.entity.User;
-
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.petmarket.users.entity.User;
 
 @Entity
 @EqualsAndHashCode(of = {"id"})
@@ -46,13 +59,16 @@ public class Cart {
 
     public BigDecimal getTotalSum() {
         return items.stream()
-                .map(CartItem::getCartItemSum)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+            .map(CartItem::getCartItemSum)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    public CartItem getItemByAdvertisement(Advertisement advertisement) {
+    public CartItem getItemByAdvertisementId(Long advertisementId) {
+        if (advertisementId == null) {
+            return null;
+        }
         return this.getItems().stream()
-                .filter(item -> item.getAdvertisement().equals(advertisement))
-                .findAny().orElse(null);
+            .filter(item -> item.getAdvertisement().getId().equals(advertisementId))
+            .findAny().orElse(null);
     }
 }
