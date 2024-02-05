@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -214,7 +213,6 @@ public class AttributeServiceImplTest {
         // Arrange
         String langCode = "en";
         Pageable pageable = Pageable.unpaged();
-
 
         when(attributeRepository.findAll(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(new BlogAttribute())));
         when(languageService.getByLangCode(anyString())).thenReturn(new Language());
