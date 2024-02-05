@@ -31,19 +31,13 @@ public class CartService {
     private final CartMapper cartMapper;
 
     public CartResponseDto getCurrentUserCart() {
-        User user = userService.getCurrentUser();
-        if (user == null) {
-            throw new ItemNotFoundException(USER_NOT_FOUND);
-        }
+        User user = getUser();
         return cartMapper.mapEntityToDto(getCart(user));
     }
 
     @Transactional
     public CartResponseDto addItemsToCart(List<CartItemRequestDto> items) {
-        User user = userService.getCurrentUser();
-        if (user == null) {
-            throw new ItemNotFoundException(USER_NOT_FOUND);
-        }
+        User user = getUser();
         Cart cart = getCart(user);
         for (CartItemRequestDto item : items) {
             Advertisement advertisement = advertisementService.getAdvertisement(
@@ -69,15 +63,29 @@ public class CartService {
 
     @Transactional
     public CartResponseDto clearCart() {
-        User user = userService.getCurrentUser();
-        if (user == null) {
-            throw new ItemNotFoundException(USER_NOT_FOUND);
-        }
+        User user = getUser();
         Cart cart = getCart(user);
         cart.getItems().clear();
         cart.setUpdated(LocalDateTime.now());
         cartRepository.save(cart);
         return cartMapper.mapEntityToDto(cart);
+    }
+
+    @Transactional
+    public CartResponseDto deleteItemFromCart(Long advertisementId) {
+        User user = getUser();
+        Cart cart = getCart(user);
+        cart.getItems().removeIf(item -> item.getAdvertisement().getId().equals(advertisementId));
+        cartRepository.save(cart);
+        return cartMapper.mapEntityToDto(cart);
+    }
+
+    private User getUser() {
+        User user = userService.getCurrentUser();
+        if (user == null) {
+            throw new ItemNotFoundException(USER_NOT_FOUND);
+        }
+        return user;
     }
 
     private Cart getCart(User user) {
