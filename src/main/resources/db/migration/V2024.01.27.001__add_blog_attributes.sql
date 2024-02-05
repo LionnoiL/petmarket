@@ -5,7 +5,7 @@ CREATE TABLE blog_attributes (
 
 CREATE TABLE blog_attribute_translation (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    lang_code VARCHAR(10) NOT NULL,
+    lang_code VARCHAR(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
     owner_id BIGINT NOT NULL,
     title VARCHAR(250),
 
