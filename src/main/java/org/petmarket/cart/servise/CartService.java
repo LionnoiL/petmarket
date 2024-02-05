@@ -85,6 +85,7 @@ public class CartService {
         if (cart == null){
             cart = new Cart();
             cart.setUser(user);
+            cartRepository.save(cart);
         }
         if (cart.getItems().isEmpty()){
             cart.setCreated(LocalDateTime.now());
