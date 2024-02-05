@@ -23,9 +23,17 @@ public class CartResponseDto {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updated;
 
+    @JsonProperty("total_quantity")
+    @Schema(example = "1")
+    private int totalQuantity;
+
     @JsonProperty("total_sum")
     @Schema(example = "13500")
     private BigDecimal totalSum;
 
-    List<CartItemResponseDto> items;
+    @JsonProperty("total_number_of_positions")
+    @Schema(example = "1")
+    private int totalNumberPositions;
+
+    private List<CartItemResponseDto> items;
 }

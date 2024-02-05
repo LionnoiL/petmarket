@@ -38,6 +38,12 @@ public class Cart {
     @OneToMany(mappedBy = "cart", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CartItem> items = new ArrayList<>();
 
+    public int getTotalQuantity() {
+        return items.stream()
+            .mapToInt(CartItem::getQuantity)
+            .sum();
+    }
+
     public BigDecimal getTotalSum() {
         return items.stream()
                 .map(CartItem::getCartItemSum)

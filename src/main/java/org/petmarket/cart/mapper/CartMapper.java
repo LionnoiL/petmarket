@@ -10,5 +10,7 @@ import org.petmarket.config.MapperConfig;
 public interface CartMapper {
 
     @Mapping(target = "totalSum", expression = "java(entity.getTotalSum())")
+    @Mapping(target = "totalNumberPositions", expression = "java(entity.getItems().size())")
+    @Mapping(target = "totalQuantity", expression = "java(entity.getTotalQuantity())")
     CartResponseDto mapEntityToDto(Cart entity);
 }

@@ -1,6 +1,10 @@
 package org.petmarket.cart.servise;
 
+import static org.petmarket.utils.MessageUtils.USER_NOT_FOUND;
+
 import jakarta.transaction.Transactional;
+import java.time.LocalDateTime;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.advertisements.advertisement.entity.Advertisement;
@@ -15,11 +19,6 @@ import org.petmarket.errorhandling.ItemNotFoundException;
 import org.petmarket.users.entity.User;
 import org.petmarket.users.service.UserService;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
-import java.util.List;
-
-import static org.petmarket.utils.MessageUtils.USER_NOT_FOUND;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -47,16 +46,17 @@ public class CartService {
         }
         Cart cart = getCart(user);
         for (CartItemRequestDto item : items) {
-            Advertisement advertisement = advertisementService.getAdvertisement(item.getAdvertisementId());
+            Advertisement advertisement = advertisementService.getAdvertisement(
+                item.getAdvertisementId());
             CartItem foundItem = cart.getItemByAdvertisement(advertisement);
             if (foundItem == null) {
                 foundItem = CartItem.builder()
-                        .cart(cart)
-                        .advertisement(advertisement)
-                        .title(item.getTitle())
-                        .quantity(item.getQuantity())
-                        .price(advertisement.getPrice())
-                        .build();
+                    .cart(cart)
+                    .advertisement(advertisement)
+                    .title(item.getTitle())
+                    .quantity(item.getQuantity())
+                    .price(advertisement.getPrice())
+                    .build();
                 cart.getItems().add(foundItem);
             } else {
                 foundItem.setQuantity(foundItem.getQuantity() + item.getQuantity());
@@ -82,12 +82,12 @@ public class CartService {
 
     private Cart getCart(User user) {
         Cart cart = user.getCart();
-        if (cart == null){
+        if (cart == null) {
             cart = new Cart();
             cart.setUser(user);
             cartRepository.save(cart);
         }
-        if (cart.getItems().isEmpty()){
+        if (cart.getItems().isEmpty()) {
             cart.setCreated(LocalDateTime.now());
         }
         return cart;
