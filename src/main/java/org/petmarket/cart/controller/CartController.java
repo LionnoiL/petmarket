@@ -74,6 +74,7 @@ public class CartController {
     @Operation(summary = "Delete item from the cart",
         description = "Delete item from the cart by advertisement id")
     @ApiResponseSuccessful
+    @ApiResponseBadRequest
     @ApiResponseNotFound
     @ApiResponseUnauthorized
     @PreAuthorize("isAuthenticated()")
