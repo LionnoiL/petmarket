@@ -2,6 +2,7 @@ package org.petmarket.cart.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.petmarket.advertisements.advertisement.entity.Advertisement;
 import org.petmarket.users.entity.User;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -47,5 +48,11 @@ public class Cart {
         return items.stream()
                 .map(CartItem::getCartItemSum)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    public CartItem getItemByAdvertisement(Advertisement advertisement) {
+        return this.getItems().stream()
+                .filter(item -> item.getAdvertisement().equals(advertisement))
+                .findAny().orElse(null);
     }
 }

@@ -2,6 +2,7 @@ package org.petmarket.cart.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -23,6 +24,7 @@ public class CartResponseDto {
     private LocalDateTime updated;
 
     @JsonProperty("total_sum")
+    @Schema(example = "13500")
     private BigDecimal totalSum;
 
     List<CartItemResponseDto> items;
