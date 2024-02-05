@@ -37,4 +37,8 @@ public class CartItem {
 
     @Column(name = "advertisement_title")
     private String title;
+
+    public BigDecimal getCartItemSum() {
+        return this.price.multiply(BigDecimal.valueOf(this.quantity));
+    }
 }

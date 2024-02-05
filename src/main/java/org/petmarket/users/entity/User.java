@@ -3,6 +3,7 @@ package org.petmarket.users.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import lombok.*;
+import org.petmarket.cart.entity.Cart;
 import org.petmarket.language.entity.Language;
 import org.petmarket.location.entity.Location;
 import org.springframework.data.annotation.CreatedDate;
@@ -101,6 +102,9 @@ public class User {
     private List<Role> roles;
     @Column(name = "last_activity")
     private LocalDateTime lastActivity;
+
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY ,cascade = CascadeType.ALL, orphanRemoval = true)
+    private Cart cart;
 
     @Override
     public String toString() {
