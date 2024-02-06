@@ -1,30 +1,15 @@
 package org.petmarket.cart.entity;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import lombok.*;
+import org.petmarket.users.entity.User;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.petmarket.users.entity.User;
 
 @Entity
-@EqualsAndHashCode(of = {"id"})
 @Table(name = "cart")
 @Getter
 @Setter
@@ -53,14 +38,14 @@ public class Cart {
 
     public int getTotalQuantity() {
         return items.stream()
-            .mapToInt(CartItem::getQuantity)
-            .sum();
+                .mapToInt(CartItem::getQuantity)
+                .sum();
     }
 
     public BigDecimal getTotalSum() {
         return items.stream()
-            .map(CartItem::getCartItemSum)
-            .reduce(BigDecimal.ZERO, BigDecimal::add);
+                .map(CartItem::getCartItemSum)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     public CartItem getItemByAdvertisementId(Long advertisementId) {
@@ -68,7 +53,26 @@ public class Cart {
             return null;
         }
         return this.getItems().stream()
-            .filter(item -> item.getAdvertisement().getId().equals(advertisementId))
-            .findAny().orElse(null);
+                .filter(item -> item.getAdvertisement().getId().equals(advertisementId))
+                .findAny().orElse(null);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        Cart cart = (Cart) o;
+
+        return id.equals(cart.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
     }
 }

@@ -13,12 +13,12 @@ import org.petmarket.cart.entity.CartItem;
 import org.petmarket.cart.mapper.CartMapper;
 import org.petmarket.cart.repository.CartRepository;
 import org.petmarket.errorhandling.ItemNotFoundException;
+import org.petmarket.language.entity.Language;
 import org.petmarket.users.entity.User;
 import org.petmarket.users.service.UserService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
 
 import static org.petmarket.utils.MessageUtils.USER_NOT_FOUND;
@@ -43,16 +43,11 @@ public class CartService {
         return cartMapper.mapEntityToDto(getCart(user));
     }
 
-    public CartForCheckoutResponseDto getUserCartForCheckout() {
+    public CartForCheckoutResponseDto getUserCartForCheckout(Language language) {
         User user = getUser();
         Cart cart = getCart(user);
-
-        List<HashMap<User, List<Advertisement>>> checkoutCart = cartCheckoutService.splitCartByUser(cart);
-
-        CartForCheckoutResponseDto responseDto = cartMapper.mapEntityToCheckoutDto(cart);
-        return responseDto;
+        return cartCheckoutService.getUserCartForCheckout(cart, language);
     }
-
 
     @Transactional
     public CartResponseDto addItemsToCart(List<CartItemRequestDto> items) {
@@ -132,6 +127,7 @@ public class CartService {
         }
         if (cart.getItems().isEmpty()) {
             cart.setCreated(LocalDateTime.now());
+            cart.setUpdated(cart.getCreated());
         }
         return cart;
     }

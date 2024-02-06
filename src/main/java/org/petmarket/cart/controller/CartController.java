@@ -10,6 +10,9 @@ import org.petmarket.cart.dto.CartForCheckoutResponseDto;
 import org.petmarket.cart.dto.CartItemRequestDto;
 import org.petmarket.cart.dto.CartResponseDto;
 import org.petmarket.cart.servise.CartService;
+import org.petmarket.language.entity.Language;
+import org.petmarket.language.service.LanguageService;
+import org.petmarket.utils.annotations.parametrs.ParameterLanguage;
 import org.petmarket.utils.annotations.responses.ApiResponseBadRequest;
 import org.petmarket.utils.annotations.responses.ApiResponseNotFound;
 import org.petmarket.utils.annotations.responses.ApiResponseSuccessful;
@@ -30,6 +33,7 @@ import java.util.List;
 public class CartController {
 
     private final CartService cartService;
+    private final LanguageService languageService;
 
     @Operation(summary = "Get cart for current user")
     @ApiResponseSuccessful
@@ -47,14 +51,15 @@ public class CartController {
     @ApiResponseNotFound
     @ApiResponseUnauthorized
     @PreAuthorize("isAuthenticated()")
-    @GetMapping("/checkout")
-    public CartForCheckoutResponseDto getUserCartForCheckout() {
+    @GetMapping("/checkout/{langCode}")
+    public CartForCheckoutResponseDto getUserCartForCheckout(@ParameterLanguage @PathVariable String langCode) {
         log.info("Received request to get Cart for checkout");
-        return cartService.getUserCartForCheckout();
+        Language language = languageService.getByLangCode(langCode);
+        return cartService.getUserCartForCheckout(language);
     }
 
     @Operation(summary = "Put items into the cart",
-        description = "Put items into the cart for current user")
+            description = "Put items into the cart for current user")
     @ApiResponseSuccessful
     @ApiResponseNotFound
     @ApiResponseUnauthorized
@@ -66,7 +71,7 @@ public class CartController {
     }
 
     @Operation(summary = "Clear cart for current user",
-        description = "Clear all items from the cart for current user")
+            description = "Clear all items from the cart for current user")
     @ApiResponseSuccessful
     @ApiResponseNotFound
     @ApiResponseUnauthorized
@@ -77,7 +82,7 @@ public class CartController {
     }
 
     @Operation(summary = "Delete item from the cart",
-        description = "Delete item from the cart by advertisement id")
+            description = "Delete item from the cart by advertisement id")
     @ApiResponseSuccessful
     @ApiResponseBadRequest
     @ApiResponseNotFound
@@ -89,7 +94,7 @@ public class CartController {
     }
 
     @Operation(summary = "Set item quantity in cart",
-        description = "If the quantity equals 0, the item will be deleted.")
+            description = "If the quantity equals 0, the item will be deleted.")
     @ApiResponseSuccessful
     @ApiResponseBadRequest
     @ApiResponseNotFound
@@ -97,8 +102,8 @@ public class CartController {
     @PreAuthorize("isAuthenticated()")
     @PutMapping("/items/{advertisementId}")
     public CartResponseDto changeItemQuantity(
-        @PathVariable Long advertisementId,
-        @RequestParam @Min(0) int quantity
+            @PathVariable Long advertisementId,
+            @RequestParam @Min(0) int quantity
     ) {
         return cartService.changeItemQuantity(advertisementId, quantity);
     }
