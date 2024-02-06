@@ -58,6 +58,16 @@ public class MediaController {
         mediaService.deleteMedia(id);
     }
 
+    @Operation(summary = "Rename media")
+    @ApiResponseSuccessful
+    @ApiResponseUnauthorized
+    @ApiResponseForbidden
+    @ApiResponseNotFound
+    @PutMapping("/{id}")
+    public MediaResponseDto renameMedia(@PathVariable Long id, @RequestParam String name) {
+        return mediaService.renameMedia(id, name);
+    }
+
     @Operation(summary = "Search media")
     @ApiResponseSuccessful
     @ApiResponseUnauthorized

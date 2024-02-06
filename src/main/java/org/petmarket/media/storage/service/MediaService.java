@@ -98,6 +98,15 @@ public class MediaService {
                 PageRequest.of(page, size), mediaList.size());
     }
 
+    public MediaResponseDto renameMedia(Long id, String name) {
+        Media media = mediaRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Media with id " + id + " not found"));
+        String mediaId = media.getName().split(" ")[0];
+        media.setName(mediaId + " " + name);
+        mediaRepository.save(media);
+        return mediaMapper.toMediaResponseDto(media);
+    }
+
     private String generateName(String originalFilename, Long id) {
         if (originalFilename == null) {
             return id + " ";

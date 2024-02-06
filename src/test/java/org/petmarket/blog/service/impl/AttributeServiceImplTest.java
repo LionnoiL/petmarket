@@ -215,7 +215,6 @@ public class AttributeServiceImplTest {
         String langCode = "en";
         Pageable pageable = Pageable.unpaged();
 
-
         when(attributeRepository.findAll(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(new BlogAttribute())));
         when(languageService.getByLangCode(anyString())).thenReturn(new Language());
         when(mapper.toDto(any(BlogAttribute.class), any(Language.class)))
