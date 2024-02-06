@@ -91,7 +91,7 @@ public class MediaService {
     public Page<MediaResponseDto> searchMedia(String name, int page, int size) {
         SearchSession searchSession = Search.session(entityManager);
         List<Media> mediaList = searchSession.search(Media.class)
-                .where(f -> f.match().field("name").matching(name).fuzzy(3))
+                .where(f -> f.match().field("name").matching(name).fuzzy(2))
                 .fetchHits(size * page, size);
 
         return new PageImpl<>(mediaList.stream().map(mediaMapper::toMediaResponseDto).toList(),
