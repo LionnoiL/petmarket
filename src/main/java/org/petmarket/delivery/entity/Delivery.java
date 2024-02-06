@@ -8,6 +8,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "deliveries")
+@EqualsAndHashCode(of = {"id"})
 @Getter
 @Setter
 @Builder

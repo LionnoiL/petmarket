@@ -4,9 +4,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.petmarket.cart.dto.CartForCheckoutResponseDto;
 import org.petmarket.cart.dto.CartItemRequestDto;
 import org.petmarket.cart.dto.CartResponseDto;
 import org.petmarket.cart.servise.CartService;
@@ -16,15 +16,9 @@ import org.petmarket.utils.annotations.responses.ApiResponseSuccessful;
 import org.petmarket.utils.annotations.responses.ApiResponseUnauthorized;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Tag(name = "Cart")
 @Slf4j
@@ -46,6 +40,17 @@ public class CartController {
     public CartResponseDto getUserCart() {
         log.info("Received request to get Cart");
         return cartService.getCurrentUserCart();
+    }
+
+    @Operation(summary = "Get the current user's shopping cart for checkout")
+    @ApiResponseSuccessful
+    @ApiResponseNotFound
+    @ApiResponseUnauthorized
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/checkout")
+    public CartForCheckoutResponseDto getUserCartForCheckout() {
+        log.info("Received request to get Cart for checkout");
+        return cartService.getUserCartForCheckout();
     }
 
     @Operation(summary = "Put items into the cart",

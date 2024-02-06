@@ -1,14 +1,11 @@
 package org.petmarket.cart.servise;
 
-import static org.petmarket.utils.MessageUtils.USER_NOT_FOUND;
-
 import jakarta.transaction.Transactional;
-import java.time.LocalDateTime;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.advertisements.advertisement.entity.Advertisement;
 import org.petmarket.advertisements.advertisement.service.AdvertisementService;
+import org.petmarket.cart.dto.CartForCheckoutResponseDto;
 import org.petmarket.cart.dto.CartItemRequestDto;
 import org.petmarket.cart.dto.CartResponseDto;
 import org.petmarket.cart.entity.Cart;
@@ -20,12 +17,19 @@ import org.petmarket.users.entity.User;
 import org.petmarket.users.service.UserService;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.List;
+
+import static org.petmarket.utils.MessageUtils.USER_NOT_FOUND;
+
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class CartService {
 
     private final CartRepository cartRepository;
+    private final CartCheckoutService cartCheckoutService;
     private final UserService userService;
     private final AdvertisementService advertisementService;
     private final CartMapper cartMapper;
@@ -39,22 +43,33 @@ public class CartService {
         return cartMapper.mapEntityToDto(getCart(user));
     }
 
+    public CartForCheckoutResponseDto getUserCartForCheckout() {
+        User user = getUser();
+        Cart cart = getCart(user);
+
+        List<HashMap<User, List<Advertisement>>> checkoutCart = cartCheckoutService.splitCartByUser(cart);
+
+        CartForCheckoutResponseDto responseDto = cartMapper.mapEntityToCheckoutDto(cart);
+        return responseDto;
+    }
+
+
     @Transactional
     public CartResponseDto addItemsToCart(List<CartItemRequestDto> items) {
         User user = getUser();
         Cart cart = getCart(user);
         for (CartItemRequestDto item : items) {
             Advertisement advertisement = advertisementService.getAdvertisement(
-                item.getAdvertisementId());
+                    item.getAdvertisementId());
             CartItem foundItem = cart.getItemByAdvertisementId(item.getAdvertisementId());
             if (foundItem == null) {
                 foundItem = CartItem.builder()
-                    .cart(cart)
-                    .advertisement(advertisement)
-                    .title(item.getTitle())
-                    .quantity(item.getQuantity())
-                    .price(advertisement.getPrice())
-                    .build();
+                        .cart(cart)
+                        .advertisement(advertisement)
+                        .title(item.getTitle())
+                        .quantity(item.getQuantity())
+                        .price(advertisement.getPrice())
+                        .build();
                 cart.getItems().add(foundItem);
             } else {
                 foundItem.setQuantity(foundItem.getQuantity() + item.getQuantity());
