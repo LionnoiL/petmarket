@@ -103,7 +103,9 @@ public class CartService {
             deleteCartItemByAdvertisementId(advertisementId, cart);
         } else {
             CartItem cartItem = cart.getItemByAdvertisementId(advertisementId);
-            cartItem.setQuantity(quantity);
+            if (cartItem != null) {
+                cartItem.setQuantity(quantity);
+            }
         }
         cart.setUpdated(LocalDateTime.now());
         cartRepository.save(cart);
