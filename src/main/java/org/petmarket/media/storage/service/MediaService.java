@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
+import org.petmarket.errorhandling.ItemNotFoundException;
 import org.petmarket.files.FileStorageName;
 import org.petmarket.images.ImageService;
 import org.petmarket.media.storage.dto.MediaResponseDto;
@@ -85,7 +86,7 @@ public class MediaService {
     @Transactional
     public void deleteMedia(Long id) {
         Media media = mediaRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Media with id " + id + " not found"));
+                .orElseThrow(() -> new ItemNotFoundException("Media with id " + id + " not found"));
         imageService.deleteImage(catalogName, media.getUrl());
         imageService.deleteImage(catalogName, media.getUrlSmall());
         mediaRepository.deleteById(id);
