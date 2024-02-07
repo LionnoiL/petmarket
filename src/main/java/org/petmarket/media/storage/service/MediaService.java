@@ -71,13 +71,7 @@ public class MediaService {
                     .build();
             mediaRepository.save(media);
 
-            MediaResponseDto mediaResponseDto = MediaResponseDto.builder()
-                    .id(media.getId())
-                    .url(media.getUrl())
-                    .urlSmall(media.getUrlSmall())
-                    .build();
-
-            result.add(mediaResponseDto);
+            result.add(mediaMapper.toMediaResponseDto(media));
         }
 
         return result;
