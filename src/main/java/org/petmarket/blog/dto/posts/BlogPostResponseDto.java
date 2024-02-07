@@ -45,6 +45,10 @@ public class BlogPostResponseDto {
     private LocalDateTime updated;
     @Schema(example = "/dogliad-za-vivcharkou", description = "Код перекладу")
     private String alias;
+    @Schema(example = "https://s3-test-3433.s3.eu-north-1.amazonaws.com/advertisements/media-storage/627_L3W60_b.webp",
+            description = "Link to preview image")
+    @JsonProperty("preview_url")
+    private String previewUrl;
     private List<BlogPostCategoryResponseDto> categories;
     private List<BlogPostCommentResponse> comments;
     private List<BlogPostAttributeResponseDto> attributes;

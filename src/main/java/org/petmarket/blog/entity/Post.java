@@ -48,6 +48,10 @@ public class Post {
     @NotNull
     @Enumerated(EnumType.STRING)
     private Status status;
+
+    @Column(name = "preview_url")
+    private String previewUrl;
+
     @ManyToMany
     @JoinTable(name = "post_categories",
             joinColumns = @JoinColumn(name = "post_id"),
