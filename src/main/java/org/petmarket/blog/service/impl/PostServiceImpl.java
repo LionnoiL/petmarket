@@ -83,6 +83,7 @@ public class PostServiceImpl implements PostService {
         post.setCategories(categoryService.getBlogCategories(requestDto.getCategoriesIds()));
         post.setAttributes(attributeService.getBlogAttributes(requestDto.getAttributesIds()));
         post.setReadingMinutes(getReadingMinutes(requestDto.getText()));
+        post.setPreviewUrl(requestDto.getPreviewUrl());
         postRepository.save(post);
         return postMapper.toDto(post, language);
     }
@@ -247,6 +248,7 @@ public class PostServiceImpl implements PostService {
         post.setStatus(Post.Status.DRAFT);
         post.setReadingMinutes(getReadingMinutes(requestDto.getText()));
         post.setAlias(transliterateUtils.getAlias(Post.class.getSimpleName(), translation.getTitle()));
+        post.setPreviewUrl(requestDto.getPreviewUrl());
         return post;
     }
 

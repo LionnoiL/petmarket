@@ -28,6 +28,7 @@ public abstract class BlogPostMapper {
     @Mapping(target = "firstName", source = "user.firstName")
     @Mapping(target = "lastName", source = "user.lastName")
     @Mapping(source = "comments", target = "comments")
+    @Mapping(source = "previewUrl", target = "previewUrl")
     public abstract BlogPostResponseDto toDto(Post post, @Context Language language);
 
     @AfterMapping

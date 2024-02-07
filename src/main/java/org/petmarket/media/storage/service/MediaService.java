@@ -2,6 +2,7 @@ package org.petmarket.media.storage.service;
 
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.petmarket.files.FileStorageName;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -41,8 +43,9 @@ public class MediaService {
     private final EntityManager entityManager;
     private final MediaMapper mediaMapper;
 
-    public Page<MediaResponseDto> getAllMedia(int page, int size) {
-        return mediaRepository.findAllMediaResponse(PageRequest.of(page, size));
+    public Page<MediaResponseDto> getAllMedia(int page, int size, String sortDirection) {
+        return mediaRepository.findAllMediaResponse(PageRequest.of(page, size,
+                Sort.by(Sort.Direction.fromString(sortDirection), "updated")));
     }
 
     @Transactional
@@ -88,10 +91,11 @@ public class MediaService {
         mediaRepository.deleteById(id);
     }
 
-    public Page<MediaResponseDto> searchMedia(String name, int page, int size) {
+    public Page<MediaResponseDto> searchMedia(String name, int page, int size, String sortDirection) {
         SearchSession searchSession = Search.session(entityManager);
         List<Media> mediaList = searchSession.search(Media.class)
                 .where(f -> f.match().field("name").matching(name).fuzzy(2))
+                .sort(f -> f.field("updated").order(SortOrder.valueOf(sortDirection)))
                 .fetchHits(size * page, size);
 
         return new PageImpl<>(mediaList.stream().map(mediaMapper::toMediaResponseDto).toList(),

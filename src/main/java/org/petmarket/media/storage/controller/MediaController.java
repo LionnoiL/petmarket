@@ -8,6 +8,7 @@ import org.petmarket.media.storage.dto.MediaResponseDto;
 import org.petmarket.media.storage.service.MediaService;
 import org.petmarket.utils.annotations.parametrs.ParameterPageNumber;
 import org.petmarket.utils.annotations.parametrs.ParameterPageSize;
+import org.petmarket.utils.annotations.parametrs.ParameterPageSort;
 import org.petmarket.utils.annotations.responses.ApiResponseForbidden;
 import org.petmarket.utils.annotations.responses.ApiResponseNotFound;
 import org.petmarket.utils.annotations.responses.ApiResponseSuccessful;
@@ -35,8 +36,9 @@ public class MediaController {
     @GetMapping
     public Page<MediaResponseDto> getAllMedia(
             @ParameterPageNumber @RequestParam(defaultValue = "1") @Positive int page,
-            @ParameterPageSize @RequestParam(defaultValue = "12") @Positive int size) {
-        return mediaService.getAllMedia(page - 1, size);
+            @ParameterPageSize @RequestParam(defaultValue = "12") @Positive int size,
+            @ParameterPageSort @RequestParam(defaultValue = "ASC") String sortDirection) {
+        return mediaService.getAllMedia(page - 1, size, sortDirection);
     }
 
     @Operation(summary = "Upload media")
@@ -76,7 +78,8 @@ public class MediaController {
     public Page<MediaResponseDto> searchMedia(
             @ParameterPageNumber @RequestParam(defaultValue = "1") @Positive int page,
             @ParameterPageSize @RequestParam(defaultValue = "12") @Positive int size,
+            @ParameterPageSort @RequestParam(defaultValue = "ASC") String sortDirection,
             @RequestParam String searchTerm) {
-        return mediaService.searchMedia(searchTerm, page - 1, size);
+        return mediaService.searchMedia(searchTerm, page - 1, size, sortDirection);
     }
 }
