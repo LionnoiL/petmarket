@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface MediaRepository extends JpaRepository<Media, Long> {
     @Query("""
-            SELECT new org.petmarket.media.storage.dto.MediaResponseDto(m.id, m.name, m.url, m.urlSmall)
+            SELECT new org.petmarket.media.storage.dto.MediaResponseDto(m.id, m.name, m.url)
             FROM Media m
             """)
     Page<MediaResponseDto> findAllMediaResponse(Pageable pageable);

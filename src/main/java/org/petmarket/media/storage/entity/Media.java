@@ -40,9 +40,6 @@ public class Media {
     @Column(name = "url_big", nullable = false)
     private String url;
 
-    @Column(name = "url_small", nullable = false)
-    private String urlSmall;
-
     @CreatedDate
     @Column(name = "created")
     private LocalDateTime created;

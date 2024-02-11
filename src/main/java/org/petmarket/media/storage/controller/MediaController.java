@@ -46,8 +46,9 @@ public class MediaController {
     @ApiResponseUnauthorized
     @ApiResponseForbidden
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public List<MediaResponseDto> uploadMedia(@RequestParam("images") List<MultipartFile> images) {
-        return mediaService.uploadMedia(images);
+    public List<MediaResponseDto> uploadMedia(@RequestParam("images") List<MultipartFile> images,
+                                              @RequestParam(value = "isSmall", required = false) boolean isSmall) {
+        return mediaService.uploadMedia(images, isSmall);
     }
 
     @Operation(summary = "Delete media")
