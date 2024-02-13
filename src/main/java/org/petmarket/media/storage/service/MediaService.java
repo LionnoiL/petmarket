@@ -6,6 +6,7 @@ import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.petmarket.errorhandling.ItemNotFoundException;
+import org.petmarket.files.FileStorageName;
 import org.petmarket.images.ImageService;
 import org.petmarket.media.storage.dto.MediaResponseDto;
 import org.petmarket.media.storage.entity.Media;
@@ -49,31 +50,31 @@ public class MediaService {
     }
 
     @Transactional
-    public List<MediaResponseDto> uploadMedia(List<MultipartFile> images, boolean isSmall) {
+    public List<MediaResponseDto> uploadMedia(List<MultipartFile> images) {
         if (images.size() + mediaRepository.count() > maxImagesCount) {
             throw new IllegalArgumentException("the number of images in the media storage should not exceed "
                     + maxImagesCount);
         }
 
-        List<Media> mediaList = new ArrayList<>();
+        List<MediaResponseDto> result = new ArrayList<>();
 
         for (MultipartFile file : images) {
             Long id = generateId();
+            FileStorageName storageNameBig = imageService
+                    .convertAndSendImage(catalogName, id, file, bigImageWidth, bigImageHeight, "b");
+            FileStorageName storageNameSmall = imageService
+                    .convertAndSendImage(catalogName, id, file, smallImageWidth, smallImageHeight, "s");
             Media media = Media.builder()
                     .name(generateName(file.getOriginalFilename(), id))
-                    .url(imageService
-                            .convertAndSendImage(catalogName, id, file,
-                                    isSmall ? smallImageWidth : bigImageWidth,
-                                    isSmall ? smallImageHeight : bigImageHeight,
-                                    isSmall ? "s" : "b")
-                            .getFullName())
+                    .url(storageNameBig.getFullName())
+                    .urlSmall(storageNameSmall.getFullName())
                     .build();
-            mediaList.add(media);
+            mediaRepository.save(media);
+
+            result.add(mediaMapper.toMediaResponseDto(media));
         }
 
-        mediaRepository.saveAll(mediaList);
-
-        return mediaMapper.toMediaResponseDto(mediaList);
+        return result;
     }
 
     @Transactional
@@ -81,6 +82,7 @@ public class MediaService {
         Media media = mediaRepository.findById(id)
                 .orElseThrow(() -> new ItemNotFoundException("Media with id " + id + " not found"));
         imageService.deleteImage(catalogName, media.getUrl());
+        imageService.deleteImage(catalogName, media.getUrlSmall());
         mediaRepository.deleteById(id);
     }
 
@@ -91,7 +93,8 @@ public class MediaService {
                 .sort(f -> f.field("updated").order(SortOrder.valueOf(sortDirection)))
                 .fetchHits(size * page, size);
 
-        return new PageImpl<>(mediaMapper.toMediaResponseDto(mediaList), PageRequest.of(page, size), mediaList.size());
+        return new PageImpl<>(mediaList.stream().map(mediaMapper::toMediaResponseDto).toList(),
+                PageRequest.of(page, size), mediaList.size());
     }
 
     public MediaResponseDto renameMedia(Long id, String name) {
