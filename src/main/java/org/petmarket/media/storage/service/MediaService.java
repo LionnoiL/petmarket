@@ -6,7 +6,6 @@ import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.petmarket.errorhandling.ItemNotFoundException;
-import org.petmarket.files.FileStorageName;
 import org.petmarket.images.ImageService;
 import org.petmarket.media.storage.dto.MediaResponseDto;
 import org.petmarket.media.storage.entity.Media;
@@ -21,6 +20,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,10 +34,6 @@ public class MediaService {
     private String catalogName;
     @Value("${advertisement.media-storage.max-count}")
     private int maxImagesCount;
-    @Value("${advertisement.images.big.width}")
-    private int bigImageWidth;
-    @Value("${advertisement.images.big.height}")
-    private int bigImageHeight;
     @Value("${advertisement.images.small.width}")
     private int smallImageWidth;
     @Value("${advertisement.images.small.height}")
@@ -56,25 +55,44 @@ public class MediaService {
                     + maxImagesCount);
         }
 
-        List<MediaResponseDto> result = new ArrayList<>();
+        List<Media> mediaList = new ArrayList<>();
 
         for (MultipartFile file : images) {
+            Dimension dimension;
+
+            try {
+                dimension = getImageDimension(file);
+            } catch (IOException e) {
+                throw new IllegalArgumentException("Failed to get image dimensions", e);
+            }
+
             Long id = generateId();
-            FileStorageName storageNameBig = imageService
-                    .convertAndSendImage(catalogName, id, file, bigImageWidth, bigImageHeight, "b");
-            FileStorageName storageNameSmall = imageService
-                    .convertAndSendImage(catalogName, id, file, smallImageWidth, smallImageHeight, "s");
             Media media = Media.builder()
                     .name(generateName(file.getOriginalFilename(), id))
-                    .url(storageNameBig.getFullName())
-                    .urlSmall(storageNameSmall.getFullName())
+                    .url(imageService
+                            .convertAndSendImage(catalogName, id, file, dimension.width, dimension.height, "b")
+                            .getFullName())
+                    .urlSmall(imageService
+                            .convertAndSendImage(catalogName, id, file, smallImageWidth, smallImageHeight, "s")
+                            .getFullName())
                     .build();
-            mediaRepository.save(media);
-
-            result.add(mediaMapper.toMediaResponseDto(media));
+            mediaList.add(media);
         }
 
-        return result;
+        mediaRepository.saveAll(mediaList);
+        return mediaMapper.toMediaResponseDto(mediaList);
+    }
+
+    public Dimension getImageDimension(MultipartFile file) throws IOException {
+        BufferedImage img = ImageIO.read(file.getInputStream());
+
+        if (img != null) {
+            int width = img.getWidth();
+            int height = img.getHeight();
+            return new Dimension(width, height);
+        }
+
+        throw new IllegalArgumentException("The file does not contain a valid image.");
     }
 
     @Transactional
@@ -93,8 +111,7 @@ public class MediaService {
                 .sort(f -> f.field("updated").order(SortOrder.valueOf(sortDirection)))
                 .fetchHits(size * page, size);
 
-        return new PageImpl<>(mediaList.stream().map(mediaMapper::toMediaResponseDto).toList(),
-                PageRequest.of(page, size), mediaList.size());
+        return new PageImpl<>(mediaMapper.toMediaResponseDto(mediaList), PageRequest.of(page, size), mediaList.size());
     }
 
     public MediaResponseDto renameMedia(Long id, String name) {
