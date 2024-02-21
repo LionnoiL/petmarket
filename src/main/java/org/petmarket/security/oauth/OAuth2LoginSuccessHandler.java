@@ -8,10 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.petmarket.errorhandling.ItemNotFoundException;
 import org.petmarket.security.jwt.JwtResponseDto;
 import org.petmarket.security.jwt.JwtTokenProvider;
-import org.petmarket.users.entity.LoginProvider;
-import org.petmarket.users.entity.Role;
-import org.petmarket.users.entity.User;
-import org.petmarket.users.entity.UserStatus;
+import org.petmarket.users.entity.*;
 import org.petmarket.users.repository.RoleRepository;
 import org.petmarket.users.repository.UserRepository;
 import org.petmarket.users.service.UserService;
@@ -84,6 +81,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
                 user.setLastName(names[1]);
                 user.setLoginProvider(LoginProvider.FACEBOOK);
             }
+            user.setUserType(UserType.USER);
 
             userRepository.save(user);
 
