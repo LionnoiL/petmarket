@@ -22,7 +22,7 @@ public abstract class UserMapper {
 
     @AfterMapping
     public void addMainPhoneToDto(@MappingTarget IPhones responseDto) {
-        Optional<UserPhoneDto> mainPhone = responseDto.getPhones().stream().filter(p -> p.getMain()).findFirst();
+        Optional<UserPhoneDto> mainPhone = responseDto.getPhones().stream().filter(UserPhoneDto::getMain).findFirst();
         if (mainPhone.isPresent()) {
             responseDto.setMainPhone(mainPhone.get().getPhoneNumber());
         } else {
@@ -34,7 +34,7 @@ public abstract class UserMapper {
 
     @Mapping(target = "shortName", expression =
             """
-              java(entity.getFirstName() + (entity.getLastName() != null && !entity.getLastName().isEmpty() ? " " + 
+              java(entity.getFirstName() + (entity.getLastName() != null && !entity.getLastName().isEmpty() ? " " +
               entity.getLastName().charAt(0) + "." : ""))
             """)
     public abstract AuthorShortResponseDto mapEntityToAuthorShortDto(User entity);
