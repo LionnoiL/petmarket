@@ -1,37 +1,19 @@
 package org.petmarket.users.entity;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
-import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.petmarket.cart.entity.Cart;
 import org.petmarket.language.entity.Language;
 import org.petmarket.location.entity.Location;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -76,9 +58,6 @@ public class User {
     @Column(name = "email")
     private String email;
 
-    @Column(name = "phone")
-    private String phone;
-
     @Column(name = "password")
     private String password;
 
@@ -116,25 +95,32 @@ public class User {
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_roles",
-        joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
-        inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "id")})
+            joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
+            inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "id")})
     private List<Role> roles;
+
     @Column(name = "last_activity")
     private LocalDateTime lastActivity;
 
     @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private Cart cart;
 
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "user_phones",
+            joinColumns = @JoinColumn(name = "owner_id"),
+            inverseJoinColumns = @JoinColumn(name = "id"))
+    private List<UserPhone> phones = new ArrayList<>();
+
     @Override
     public String toString() {
         return "User{" +
-            "id=" + id +
-            ", created=" + created +
-            ", updated=" + updated +
-            ", last activity=" + lastActivity +
-            ", status=" + status +
-            ", username='" + username + '\'' +
-            ", email='" + email + '\'' +
-            '}';
+                "id=" + id +
+                ", created=" + created +
+                ", updated=" + updated +
+                ", last activity=" + lastActivity +
+                ", status=" + status +
+                ", username='" + username + '\'' +
+                ", email='" + email + '\'' +
+                '}';
     }
 }
