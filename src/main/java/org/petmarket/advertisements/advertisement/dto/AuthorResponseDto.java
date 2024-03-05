@@ -2,17 +2,16 @@ package org.petmarket.advertisements.advertisement.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.*;
+import lombok.Data;
+import org.petmarket.users.dto.UserPhoneDto;
 import org.petmarket.users.entity.UserType;
+import org.petmarket.users.mapper.IPhones;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
-@Setter
-@Getter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class AuthorResponseDto {
+@Data
+public class AuthorResponseDto implements IPhones {
 
     private long id;
 
@@ -23,7 +22,8 @@ public class AuthorResponseDto {
     private String lastName;
 
     private String email;
-    private String phone;
+    private String mainPhone;
+    private Set<UserPhoneDto> phones;
     private String site;
     private int rating;
 

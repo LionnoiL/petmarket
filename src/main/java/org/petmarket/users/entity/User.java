@@ -3,6 +3,7 @@ package org.petmarket.users.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import lombok.*;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.petmarket.cart.entity.Cart;
 import org.petmarket.language.entity.Language;
 import org.petmarket.location.entity.Location;
@@ -11,9 +12,9 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -105,11 +106,9 @@ public class User {
     @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private Cart cart;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "user_phones",
-            joinColumns = @JoinColumn(name = "owner_id"),
-            inverseJoinColumns = @JoinColumn(name = "id"))
-    private List<UserPhone> phones = new ArrayList<>();
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.LAZY, orphanRemoval = true)
+    @IndexedEmbedded
+    private Set<UserPhone> phones;
 
     @Override
     public String toString() {

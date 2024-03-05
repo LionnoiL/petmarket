@@ -27,5 +27,5 @@ public class UserPhone {
     private String phoneNumber;
 
     @Column(name = "is_main")
-    private boolean isMain;
+    private Boolean main;
 }
