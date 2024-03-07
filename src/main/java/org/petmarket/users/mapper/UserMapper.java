@@ -21,7 +21,7 @@ public abstract class UserMapper {
     public abstract UserResponseDto mapEntityToDto(User entity);
 
     @AfterMapping
-    public void addMainPhoneToDto(@MappingTarget IPhones responseDto) {
+    public void addMainPhoneToDto(@MappingTarget UserResponseDto responseDto) {
         Optional<UserPhoneDto> mainPhone = responseDto.getPhones().stream().filter(UserPhoneDto::getMain).findFirst();
         if (mainPhone.isPresent()) {
             responseDto.setMainPhone(mainPhone.get().getPhoneNumber());

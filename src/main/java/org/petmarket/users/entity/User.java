@@ -3,7 +3,6 @@ package org.petmarket.users.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import lombok.*;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.petmarket.cart.entity.Cart;
 import org.petmarket.language.entity.Language;
 import org.petmarket.location.entity.Location;
@@ -107,7 +106,6 @@ public class User {
     private Cart cart;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.LAZY, orphanRemoval = true)
-    @IndexedEmbedded
     private Set<UserPhone> phones;
 
     @Override

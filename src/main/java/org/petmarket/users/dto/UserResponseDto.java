@@ -6,7 +6,6 @@ import lombok.Data;
 import org.petmarket.users.entity.Role;
 import org.petmarket.users.entity.UserStatus;
 import org.petmarket.users.entity.UserType;
-import org.petmarket.users.mapper.IPhones;
 
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -14,7 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 @Data
-public class UserResponseDto implements IPhones {
+public class UserResponseDto {
 
     private long id;
 

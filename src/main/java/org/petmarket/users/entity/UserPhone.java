@@ -2,7 +2,6 @@ package org.petmarket.users.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 @Entity
 @Getter
@@ -10,7 +9,6 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Indexed
 @Table(name = "user_phones")
 public class UserPhone {
 
