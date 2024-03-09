@@ -2,6 +2,7 @@ package org.petmarket.users.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
+import java.util.HashSet;
 import lombok.*;
 import org.petmarket.cart.entity.Cart;
 import org.petmarket.language.entity.Language;
@@ -106,7 +107,7 @@ public class User {
     private Cart cart;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.LAZY, orphanRemoval = true)
-    private Set<UserPhone> phones;
+    private Set<UserPhone> phones = new HashSet<>();
 
     @Override
     public String toString() {

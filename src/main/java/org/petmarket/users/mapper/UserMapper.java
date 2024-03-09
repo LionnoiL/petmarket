@@ -22,6 +22,11 @@ public abstract class UserMapper {
 
     @AfterMapping
     public void addMainPhoneToDto(@MappingTarget UserResponseDto responseDto) {
+        if (responseDto.getPhones() == null) {
+            responseDto.setMainPhone("");
+            return;
+        }
+
         Optional<UserPhoneDto> mainPhone = responseDto.getPhones().stream().filter(UserPhoneDto::getMain).findFirst();
         if (mainPhone.isPresent()) {
             responseDto.setMainPhone(mainPhone.get().getPhoneNumber());
