@@ -31,6 +31,7 @@ public class UserResponseDto {
     @JsonProperty("last_name")
     private String lastName;
 
+    private String patronymic;
     private String email;
     private String mainPhone;
     private Set<UserPhoneDto> phones;
