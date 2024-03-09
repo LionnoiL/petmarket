@@ -3,6 +3,7 @@ package org.petmarket.users.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.petmarket.errorhandling.AccessDeniedException;
 import org.petmarket.errorhandling.ItemNotFoundException;
 import org.petmarket.files.FileStorageName;
 import org.petmarket.images.ImageService;
@@ -16,6 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+
+import static org.petmarket.utils.MessageUtils.ACCESS_DENIED;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -83,5 +86,14 @@ public class UserService {
         user.setUserAvatarUrl(storage.getFullName());
         userRepository.save(user);
         imageService.deleteImage(catalogName, oldAvatarUrl);
+    }
+
+    public void checkAccess(User chekedUser) {
+        if (!isCurrentUserAdmin()) {
+            User user = getCurrentUser();
+            if (user == null || !user.equals(chekedUser)) {
+                throw new AccessDeniedException(String.format(ACCESS_DENIED, "user", chekedUser.getId()));
+            }
+        }
     }
 }

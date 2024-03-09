@@ -45,4 +45,5 @@ public final class MessageUtils {
     public static final String NO_TRANSLATION = "No translation";
     public static final String PARENT_CATEGORY_CANNOT_IN_LIST = "The parent category id cannot be in the list " +
             "of identifiers";
+    public static final String ACCESS_DENIED = "Access denied to %s with id %d";
 }

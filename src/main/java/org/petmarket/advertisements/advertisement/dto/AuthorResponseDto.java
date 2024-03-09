@@ -2,16 +2,12 @@ package org.petmarket.advertisements.advertisement.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.*;
+import lombok.Data;
 import org.petmarket.users.entity.UserType;
 
 import java.time.LocalDateTime;
 
-@Setter
-@Getter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@Data
 public class AuthorResponseDto {
 
     private long id;
@@ -23,8 +19,6 @@ public class AuthorResponseDto {
     private String lastName;
 
     private String email;
-    private String phone;
-    private String site;
     private int rating;
 
     @JsonProperty("reviews_count")

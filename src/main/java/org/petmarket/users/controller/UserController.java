@@ -103,9 +103,11 @@ public class UserController {
                     )
             }
     )
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{userId}")
     public UserResponseDto getUser(@PathVariable Long userId) {
         User user = userService.findById(userId);
+        userService.checkAccess(user);
         return userMapper.mapEntityToDto(user);
     }
 
