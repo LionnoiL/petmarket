@@ -68,6 +68,15 @@ public class User {
     @Column(name = "site")
     private String site;
 
+    @Column(name = "facebook_link")
+    private String facebookLink;
+
+    @Column(name = "instagram_link")
+    private String instagramLink;
+
+    @Column(name = "twitter_link")
+    private String twitterLink;
+
     @Min(0)
     @Column(name = "rating")
     private int rating;
