@@ -2,6 +2,7 @@ package org.petmarket.users.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
+import java.time.LocalDate;
 import java.util.HashSet;
 import lombok.*;
 import org.petmarket.cart.entity.Cart;
@@ -58,6 +59,9 @@ public class User {
 
     @Column(name = "patronymic")
     private String patronymic;
+
+    @Column(name = "birthday")
+    private LocalDate birthday;
 
     @Column(name = "email")
     private String email;
