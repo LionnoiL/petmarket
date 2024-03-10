@@ -1,5 +1,6 @@
 package org.petmarket.users.mapper;
 
+import java.time.LocalDate;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -33,6 +34,17 @@ public abstract class UserMapper {
         } else {
             responseDto.setMainPhone("");
         }
+    }
+
+    @AfterMapping
+    public void addBirthdayParts(@MappingTarget UserResponseDto responseDto) {
+        LocalDate birthday = responseDto.getBirthday();
+        if (birthday == null) {
+            return;
+        }
+        responseDto.setBirthdayDay(birthday.getDayOfMonth());
+        responseDto.setBirthdayMonth(birthday.getMonthValue());
+        responseDto.setBirthdayYear(birthday.getYear());
     }
 
     public abstract AuthorResponseDto mapEntityToAuthorDto(User entity);
