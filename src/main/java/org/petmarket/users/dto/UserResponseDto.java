@@ -44,6 +44,15 @@ public class UserResponseDto {
     @JsonProperty("user_avatar_url")
     private String userAvatarUrl;
 
+    @JsonProperty("facebook_link")
+    private String facebookLink;
+
+    @JsonProperty("instagram_link")
+    private String instagramLink;
+
+    @JsonProperty("twitter_link")
+    private String twitterLink;
+
     //TODO location, language
 
     private List<Role> roles;
