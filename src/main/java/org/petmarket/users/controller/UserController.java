@@ -11,13 +11,17 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.errorhandling.ErrorResponse;
+import org.petmarket.security.front.FrontTokenRequestDto;
+import org.petmarket.security.front.FrontTokenService;
 import org.petmarket.users.dto.ResetPasswordRequestDto;
+import org.petmarket.users.dto.UserContactsResponseDto;
 import org.petmarket.users.dto.UserResponseDto;
 import org.petmarket.users.entity.User;
 import org.petmarket.users.mapper.UserMapper;
 import org.petmarket.users.service.UserAuthService;
 import org.petmarket.users.service.UserService;
 import org.petmarket.utils.annotations.responses.ApiResponseBadRequest;
+import org.petmarket.utils.annotations.responses.ApiResponseNotFound;
 import org.petmarket.utils.annotations.responses.ApiResponseSuccessful;
 import org.petmarket.utils.annotations.responses.ApiResponseUnauthorized;
 import org.springframework.http.HttpStatus;
@@ -42,6 +46,7 @@ public class UserController {
 
     private final UserService userService;
     private final UserAuthService userAuthService;
+    private final FrontTokenService frontTokenService;
     private final UserMapper userMapper;
 
     @Operation(summary = "Send request to reset user password")
@@ -121,5 +126,20 @@ public class UserController {
         User user = userService.getCurrentUser();
         userService.uploadImage(user, image);
         return userMapper.mapEntityToDto(user);
+    }
+
+    @Operation(summary = "Get user contacts")
+    @ApiResponseSuccessful
+    @ApiResponseBadRequest
+    @ApiResponseUnauthorized
+    @ApiResponseNotFound
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/{userId}/contacts")
+    public UserContactsResponseDto getContacts(@PathVariable Long userId,
+                                               @RequestBody @Valid FrontTokenRequestDto tokenRequestDto) {
+        log.info("Received request to get users contacts");
+        frontTokenService.checkToken(tokenRequestDto);
+        User user = userService.findById(userId);
+        return userService.getContacts(user);
     }
 }

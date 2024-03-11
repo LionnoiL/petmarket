@@ -100,6 +100,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return buildExceptionBody(exception, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(BadFrontendTokenException.class)
+    private ResponseEntity<Object> handleException(BadFrontendTokenException exception) {
+        return buildExceptionBody(exception, HttpStatus.BAD_REQUEST);
+    }
+
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotReadable(
             HttpMessageNotReadableException exception,
