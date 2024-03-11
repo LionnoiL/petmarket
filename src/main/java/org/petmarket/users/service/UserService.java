@@ -10,6 +10,7 @@ import org.petmarket.images.ImageService;
 import org.petmarket.pages.dto.SitePageResponseDto;
 import org.petmarket.security.jwt.JwtUser;
 import org.petmarket.users.dto.UserContactsResponseDto;
+import org.petmarket.users.dto.UserResponseDto;
 import org.petmarket.users.dto.UserUpdateRequestDto;
 import org.petmarket.users.entity.User;
 import org.petmarket.users.entity.UserPhone;
@@ -134,7 +135,8 @@ public class UserService {
     }
 
     @Transactional
-    public SitePageResponseDto updateUser(User user, UserUpdateRequestDto request) {
+    public UserResponseDto updateUser(User user, UserUpdateRequestDto request,
+        MultipartFile image) {
         return null;
     }
 }

@@ -1,7 +1,6 @@
 package org.petmarket.users.controller;
 
 import static org.petmarket.utils.MessageUtils.NOT_FOUND;
-import static org.petmarket.utils.MessageUtils.REQUEST_BODY_IS_MANDATORY;
 import static org.petmarket.utils.MessageUtils.SERVER_ERROR;
 import static org.petmarket.utils.MessageUtils.SUCCESSFULLY_OPERATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -14,12 +13,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.errorhandling.ErrorResponse;
-import org.petmarket.pages.dto.SitePageResponseDto;
 import org.petmarket.security.front.FrontTokenRequestDto;
 import org.petmarket.security.front.FrontTokenService;
 import org.petmarket.users.dto.ResetPasswordRequestDto;
@@ -50,6 +47,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -168,15 +166,16 @@ public class UserController {
     @ApiResponseForbidden
     @ApiResponseNotFound
     @PreAuthorize("isAuthenticated()")
-    @PutMapping("/{userId}")
-    public SitePageResponseDto updateUser(
+    @PutMapping(value = "/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public UserResponseDto updateUser(
         @ParameterId @PathVariable @Positive Long userId,
-        @RequestBody @Valid @NotNull(message = REQUEST_BODY_IS_MANDATORY) final UserUpdateRequestDto request,
+        @RequestPart("image") MultipartFile image,
+        @RequestPart("request") @Valid UserUpdateRequestDto request,
         BindingResult bindingResult) {
         ErrorUtils.checkItemNotUpdatedException(bindingResult);
         log.debug("Received request to update User - {} with id {}.", request, userId);
         User user = userService.findById(userId);
         userService.checkAccess(user);
-        return userService.updateUser(user, request);
+        return userService.updateUser(user, request, image);
     }
 }
