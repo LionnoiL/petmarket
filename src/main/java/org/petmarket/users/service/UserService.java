@@ -8,7 +8,9 @@ import org.petmarket.errorhandling.ItemNotFoundException;
 import org.petmarket.files.FileStorageName;
 import org.petmarket.images.ImageService;
 import org.petmarket.security.jwt.JwtUser;
+import org.petmarket.users.dto.UserContactsResponseDto;
 import org.petmarket.users.entity.User;
+import org.petmarket.users.entity.UserPhone;
 import org.petmarket.users.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -17,6 +19,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 
 import static org.petmarket.utils.MessageUtils.ACCESS_DENIED;
 
@@ -25,15 +30,14 @@ import static org.petmarket.utils.MessageUtils.ACCESS_DENIED;
 @Service
 public class UserService {
 
+    private final UserRepository userRepository;
+    private final ImageService imageService;
     @Value("${aws.s3.catalog.users}")
     private String catalogName;
     @Value("${users.images.avatar.width}")
     private int imageWidth;
     @Value("${users.images.avatar.height}")
     private int imageHeight;
-
-    private final UserRepository userRepository;
-    private final ImageService imageService;
 
     public static Long getCurrentUserId() {
         JwtUser principal = (JwtUser) SecurityContextHolder.getContext().getAuthentication()
@@ -95,5 +99,35 @@ public class UserService {
                 throw new AccessDeniedException(String.format(ACCESS_DENIED, "user", chekedUser.getId()));
             }
         }
+    }
+
+    public UserContactsResponseDto getContacts(User user) {
+        UserContactsResponseDto contacts = new UserContactsResponseDto();
+        if (user == null) {
+            return contacts;
+        }
+
+        contacts.setUserId(user.getId());
+        contacts.setEmail(user.getEmail());
+        contacts.setInstagramLink(user.getInstagramLink());
+        contacts.setTwitterLink(user.getTwitterLink());
+        contacts.setFacebookLink(user.getFacebookLink());
+
+        Set<UserPhone> phones = user.getPhones();
+        Set<String> phonesDto = new HashSet<>();
+        if (phones != null) {
+            for (UserPhone userPhone : phones) {
+                phonesDto.add(userPhone.getPhoneNumber());
+            }
+
+            Optional<UserPhone> mainPhone = phones.stream().filter(UserPhone::getMain).findFirst();
+            if (mainPhone.isPresent()) {
+                contacts.setMainPhone(mainPhone.get().getPhoneNumber());
+            } else {
+                contacts.setMainPhone("");
+            }
+        }
+        contacts.setPhones(phonesDto);
+        return contacts;
     }
 }
