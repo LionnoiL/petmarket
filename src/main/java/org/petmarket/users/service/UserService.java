@@ -7,8 +7,10 @@ import org.petmarket.errorhandling.AccessDeniedException;
 import org.petmarket.errorhandling.ItemNotFoundException;
 import org.petmarket.files.FileStorageName;
 import org.petmarket.images.ImageService;
+import org.petmarket.pages.dto.SitePageResponseDto;
 import org.petmarket.security.jwt.JwtUser;
 import org.petmarket.users.dto.UserContactsResponseDto;
+import org.petmarket.users.dto.UserUpdateRequestDto;
 import org.petmarket.users.entity.User;
 import org.petmarket.users.entity.UserPhone;
 import org.petmarket.users.repository.UserRepository;
@@ -129,5 +131,10 @@ public class UserService {
         }
         contacts.setPhones(phonesDto);
         return contacts;
+    }
+
+    @Transactional
+    public SitePageResponseDto updateUser(User user, UserUpdateRequestDto request) {
+        return null;
     }
 }
