@@ -3,12 +3,12 @@ package org.petmarket.users.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.LocalDate;
 import lombok.Data;
 import org.petmarket.users.entity.Role;
 import org.petmarket.users.entity.UserStatus;
 import org.petmarket.users.entity.UserType;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
@@ -61,6 +61,8 @@ public class UserResponseDto {
     private int birthdayDay;
     private int birthdayMonth;
     private int birthdayYear;
+
+    private String about;
 
     //TODO location, language
 
