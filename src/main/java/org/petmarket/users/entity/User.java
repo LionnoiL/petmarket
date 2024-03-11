@@ -2,8 +2,6 @@ package org.petmarket.users.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
-import java.time.LocalDate;
-import java.util.HashSet;
 import lombok.*;
 import org.petmarket.cart.entity.Cart;
 import org.petmarket.language.entity.Language;
@@ -12,8 +10,10 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -109,6 +109,9 @@ public class User {
 
     @Column(name = "user_avatar_url")
     private String userAvatarUrl;
+
+    @Column(name = "about")
+    private String about;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_roles",
