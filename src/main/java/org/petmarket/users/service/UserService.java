@@ -9,9 +9,11 @@ import org.petmarket.files.FileStorageName;
 import org.petmarket.images.ImageService;
 import org.petmarket.security.jwt.JwtUser;
 import org.petmarket.users.dto.UserContactsResponseDto;
+import org.petmarket.users.dto.UserUpdateRequestDto;
 import org.petmarket.users.entity.User;
 import org.petmarket.users.entity.UserPhone;
 import org.petmarket.users.repository.UserRepository;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -129,5 +132,34 @@ public class UserService {
         }
         contacts.setPhones(phonesDto);
         return contacts;
+    }
+
+    @Transactional
+    public User updateUser(User user, UserUpdateRequestDto request) {
+        BeanUtils.copyProperties(request, user);
+        user.setPhones(mergePhones(user, request));
+        userRepository.save(user);
+        return user;
+    }
+
+    private Set<UserPhone> mergePhones(User user, UserUpdateRequestDto request) {
+        Set<String> newPhones = request.getPhones();
+        String mainPhone = request.getMainPhone();
+        if (mainPhone != null && !mainPhone.isBlank()) {
+            newPhones.add(mainPhone);
+        }
+        Set<UserPhone> phones = user.getPhones();
+
+        phones.removeIf(phone -> !newPhones.contains(phone.getPhoneNumber()));
+
+        newPhones.stream()
+                .filter(phoneNumber -> phones.stream().noneMatch(phone -> phone.getPhoneNumber().equals(phoneNumber)))
+                .forEach(phoneNumber -> phones.add(UserPhone.builder()
+                        .user(user)
+                        .phoneNumber(phoneNumber)
+                        .build()));
+
+        phones.stream().forEach(phone -> phone.setMain(Objects.equals(phone.getPhoneNumber(), request.getMainPhone())));
+        return phones;
     }
 }

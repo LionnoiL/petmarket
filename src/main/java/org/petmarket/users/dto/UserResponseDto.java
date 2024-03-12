@@ -2,6 +2,7 @@ package org.petmarket.users.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.petmarket.users.entity.Role;
@@ -15,6 +16,8 @@ import java.util.List;
 import java.util.Set;
 
 @Data
+@JsonPropertyOrder({"id", "user_type", "created", "updated", "lastActivity", "status", "roles", "firstName", "lastName",
+        "patronymic", "email", "mainPhone", "phones", "rating", "reviewsCount", "userAvatarUrl", "site"})
 public class UserResponseDto {
 
     private long id;
