@@ -145,7 +145,7 @@ public class UserService {
     private Set<UserPhone> mergePhones(User user, UserUpdateRequestDto request) {
         Set<String> newPhones = request.getPhones();
         String mainPhone = request.getMainPhone();
-        if (mainPhone != null || !mainPhone.isEmpty()) {
+        if (mainPhone != null && !mainPhone.isBlank()) {
             newPhones.add(mainPhone);
         }
         Set<UserPhone> phones = user.getPhones();
