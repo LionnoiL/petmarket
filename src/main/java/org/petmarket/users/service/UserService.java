@@ -130,4 +130,9 @@ public class UserService {
         contacts.setPhones(phonesDto);
         return contacts;
     }
+
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new ItemNotFoundException("User not found by email: " + email));
+    }
 }

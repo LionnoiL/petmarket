@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.petmarket.errorhandling.ErrorResponse;
 import org.petmarket.security.front.FrontTokenRequestDto;
 import org.petmarket.security.front.FrontTokenService;
+import org.petmarket.users.dto.UpdatePasswordRequestDto;
 import org.petmarket.users.dto.ResetPasswordRequestDto;
 import org.petmarket.users.dto.UserContactsResponseDto;
 import org.petmarket.users.dto.UserResponseDto;
@@ -141,5 +142,18 @@ public class UserController {
         frontTokenService.checkToken(tokenRequestDto);
         User user = userService.findById(userId);
         return userService.getContacts(user);
+    }
+
+    @Operation(summary = "Update user password")
+    @ApiResponseSuccessful
+    @ApiResponseBadRequest
+    @ApiResponseUnauthorized
+    @ApiResponseNotFound
+    @PreAuthorize("isAuthenticated()")
+    @PutMapping("/update-password")
+    public void updatePassword(@RequestBody @Valid UpdatePasswordRequestDto updatePasswordRequestDto) {
+        userService.checkAccess(userService.findByEmail(updatePasswordRequestDto.getEmail()));
+        userAuthService.updatePassword(updatePasswordRequestDto);
+        log.info("Password changed for user with email: " + updatePasswordRequestDto.getEmail());
     }
 }

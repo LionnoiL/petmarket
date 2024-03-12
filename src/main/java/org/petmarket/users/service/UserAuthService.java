@@ -13,6 +13,7 @@ import org.petmarket.security.jwt.JwtResponseDto;
 import org.petmarket.security.jwt.JwtTokenProvider;
 import org.petmarket.security.jwt.JwtUser;
 import org.petmarket.users.dto.ResetPasswordRequestDto;
+import org.petmarket.users.dto.UpdatePasswordRequestDto;
 import org.petmarket.users.dto.UserRequestDto;
 import org.petmarket.users.dto.UserResponseDto;
 import org.petmarket.users.entity.*;
@@ -32,6 +33,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
+
 import java.util.*;
 
 import static org.petmarket.utils.MessageUtils.*;
@@ -168,8 +170,20 @@ public class UserAuthService {
 
         Map<String, Object> fields = new HashMap<>();
         fields.put("message", "Ви успішно змінили пароль.");
-        fields.put("link", constructUrlForResetPasswordEmailMessage(user));
 
         emailService.send(NotificationType.CHANGE_PASSWORD, fields, user);
+    }
+
+    public void updatePassword(UpdatePasswordRequestDto updatePasswordDto) {
+        User user = userRepository.findByEmail(updatePasswordDto.getEmail()).orElseThrow(
+                () -> new ItemNotFoundException(USER_NOT_FOUND)
+        );
+        user.setPassword(passwordEncoder.encode(updatePasswordDto.getNewPassword()));
+        userRepository.save(user);
+
+        Map<String, Object> fields = new HashMap<>();
+        fields.put("message", "Ви успішно змінили пароль.");
+
+        emailService.send(NotificationType.UPDATE_PASSWORD, fields, user);
     }
 }
