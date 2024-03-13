@@ -174,7 +174,7 @@ public class UserController {
     @PreAuthorize("isAuthenticated()")
     @PutMapping("/update-password")
     public void updatePassword(@RequestBody @Valid UpdatePasswordRequestDto updatePasswordRequestDto) {
-        userService.checkAccess(userService.findByEmail(updatePasswordRequestDto.getEmail()));
+        userService.checkAccess(userService.findByUsername(updatePasswordRequestDto.getEmail()));
         userAuthService.updatePassword(updatePasswordRequestDto);
         log.info("Password changed for user with email: " + updatePasswordRequestDto.getEmail());
     }

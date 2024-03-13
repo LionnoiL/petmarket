@@ -162,9 +162,4 @@ public class UserService {
         phones.stream().forEach(phone -> phone.setMain(Objects.equals(phone.getPhoneNumber(), request.getMainPhone())));
         return phones;
     }
-
-    public User findByEmail(String email) {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new ItemNotFoundException("User not found by email: " + email));
-    }
 }
