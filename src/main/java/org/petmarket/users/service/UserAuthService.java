@@ -13,7 +13,6 @@ import org.petmarket.security.jwt.JwtResponseDto;
 import org.petmarket.security.jwt.JwtTokenProvider;
 import org.petmarket.security.jwt.JwtUser;
 import org.petmarket.users.dto.ResetPasswordRequestDto;
-import org.petmarket.users.dto.UpdatePasswordRequestDto;
 import org.petmarket.users.dto.UserRequestDto;
 import org.petmarket.users.dto.UserResponseDto;
 import org.petmarket.users.entity.*;
@@ -174,11 +173,8 @@ public class UserAuthService {
         emailService.send(NotificationType.CHANGE_PASSWORD, fields, user);
     }
 
-    public void updatePassword(UpdatePasswordRequestDto updatePasswordDto) {
-        User user = userRepository.findByEmail(updatePasswordDto.getEmail()).orElseThrow(
-                () -> new ItemNotFoundException(USER_NOT_FOUND)
-        );
-        user.setPassword(passwordEncoder.encode(updatePasswordDto.getNewPassword()));
+    public void updatePassword(User user, String newPassword) {
+        user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
 
         Map<String, Object> fields = new HashMap<>();
