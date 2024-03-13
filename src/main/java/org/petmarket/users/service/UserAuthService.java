@@ -182,7 +182,6 @@ public class UserAuthService {
         userRepository.save(user);
 
         Map<String, Object> fields = new HashMap<>();
-        fields.put("message", "Ви успішно змінили пароль.");
 
         emailService.send(NotificationType.UPDATE_PASSWORD, fields, user);
     }
