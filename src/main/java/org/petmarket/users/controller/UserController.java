@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.petmarket.errorhandling.ErrorResponse;
 import org.petmarket.security.front.FrontTokenRequestDto;
 import org.petmarket.security.front.FrontTokenService;
+import org.petmarket.users.dto.UpdatePasswordRequestDto;
 import org.petmarket.users.dto.ResetPasswordRequestDto;
 import org.petmarket.users.dto.UserContactsResponseDto;
 import org.petmarket.users.dto.UserResponseDto;
@@ -163,5 +164,19 @@ public class UserController {
         User user = userService.findById(userId);
         userService.checkAccess(user);
         return userMapper.mapEntityToDto(userService.updateUser(user, request));
+    }
+
+    @Operation(summary = "Update user password")
+    @ApiResponseSuccessful
+    @ApiResponseBadRequest
+    @ApiResponseUnauthorized
+    @ApiResponseNotFound
+    @PreAuthorize("isAuthenticated()")
+    @PutMapping("/update-password")
+    public void updatePassword(@RequestBody @Valid UpdatePasswordRequestDto updatePasswordRequestDto) {
+        User user = userService.findByUsername(updatePasswordRequestDto.getEmail());
+        userService.checkAccess(user);
+        userAuthService.updatePassword(user, updatePasswordRequestDto.getNewPassword());
+        log.info("Password changed for user with email: " + updatePasswordRequestDto.getEmail());
     }
 }

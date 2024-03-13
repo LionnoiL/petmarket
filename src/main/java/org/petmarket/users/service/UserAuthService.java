@@ -32,6 +32,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
+
 import java.util.*;
 
 import static org.petmarket.utils.MessageUtils.*;
@@ -168,8 +169,16 @@ public class UserAuthService {
 
         Map<String, Object> fields = new HashMap<>();
         fields.put("message", "Ви успішно змінили пароль.");
-        fields.put("link", constructUrlForResetPasswordEmailMessage(user));
 
         emailService.send(NotificationType.CHANGE_PASSWORD, fields, user);
+    }
+
+    public void updatePassword(User user, String newPassword) {
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        Map<String, Object> fields = new HashMap<>();
+
+        emailService.send(NotificationType.UPDATE_PASSWORD, fields, user);
     }
 }

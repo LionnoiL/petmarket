@@ -50,7 +50,7 @@ public class EmailService implements NotificationService {
                     fields,
                     user
             );
-            case CHANGE_PASSWORD -> sendEmailMessage(
+            case CHANGE_PASSWORD, UPDATE_PASSWORD -> sendEmailMessage(
                     translationService.getTranslate(TranslationMessages.PASSWORD_CHANGED_SUCCESSFULLY, userLangCode),
                     templateName,
                     fields,
@@ -76,6 +76,7 @@ public class EmailService implements NotificationService {
         switch (type) {
             case RESET_PASSWORD -> result.append("reset-password.html");
             case CHANGE_PASSWORD -> result.append("reset-password-successfully.html");
+            case UPDATE_PASSWORD -> result.append("update-password-successfully.html");
             default -> log.info("no template assigned for to {}", type);
         }
         return result.toString();
