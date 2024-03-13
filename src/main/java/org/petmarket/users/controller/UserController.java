@@ -8,6 +8,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.errorhandling.ErrorResponse;
@@ -17,14 +19,14 @@ import org.petmarket.users.dto.UpdatePasswordRequestDto;
 import org.petmarket.users.dto.ResetPasswordRequestDto;
 import org.petmarket.users.dto.UserContactsResponseDto;
 import org.petmarket.users.dto.UserResponseDto;
+import org.petmarket.users.dto.UserUpdateRequestDto;
 import org.petmarket.users.entity.User;
 import org.petmarket.users.mapper.UserMapper;
 import org.petmarket.users.service.UserAuthService;
 import org.petmarket.users.service.UserService;
-import org.petmarket.utils.annotations.responses.ApiResponseBadRequest;
-import org.petmarket.utils.annotations.responses.ApiResponseNotFound;
-import org.petmarket.utils.annotations.responses.ApiResponseSuccessful;
-import org.petmarket.utils.annotations.responses.ApiResponseUnauthorized;
+import org.petmarket.utils.ErrorUtils;
+import org.petmarket.utils.annotations.parametrs.ParameterId;
+import org.petmarket.utils.annotations.responses.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -84,8 +86,9 @@ public class UserController {
             })
     })
     @PostMapping("/reset-password")
-    public ResponseEntity<Void> resetPassword(@RequestBody @Valid ResetPasswordRequestDto requestDto,
-                                              BindingResult bindingResult) {
+    public ResponseEntity<Void> resetPassword(
+            @RequestBody @Valid ResetPasswordRequestDto requestDto,
+            BindingResult bindingResult) {
         log.info("Received request to reset user password with Verification code.");
         userAuthService.resetPassword(requestDto, bindingResult);
         log.info("Password reset");
@@ -142,6 +145,25 @@ public class UserController {
         frontTokenService.checkToken(tokenRequestDto);
         User user = userService.findById(userId);
         return userService.getContacts(user);
+    }
+
+    @Operation(summary = "Update User by ID")
+    @ApiResponseSuccessful
+    @ApiResponseBadRequest
+    @ApiResponseUnauthorized
+    @ApiResponseForbidden
+    @ApiResponseNotFound
+    @PreAuthorize("isAuthenticated()")
+    @PutMapping("/{userId}")
+    public UserResponseDto updateUser(
+            @ParameterId @PathVariable @Positive Long userId,
+            @RequestBody @Valid @NotNull(message = REQUEST_BODY_IS_MANDATORY) final UserUpdateRequestDto request,
+            BindingResult bindingResult) {
+        ErrorUtils.checkItemNotUpdatedException(bindingResult);
+        log.debug("Received request to update User - {} with id {}.", request, userId);
+        User user = userService.findById(userId);
+        userService.checkAccess(user);
+        return userMapper.mapEntityToDto(userService.updateUser(user, request));
     }
 
     @Operation(summary = "Update user password")
