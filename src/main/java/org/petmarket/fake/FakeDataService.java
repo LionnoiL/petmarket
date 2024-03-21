@@ -156,7 +156,7 @@ public class FakeDataService {
 
     public BigDecimal getRandomPrice() {
         double randomValue = Math.random() * (5000 - 500) + 500;
-        BigDecimal result = BigDecimal.valueOf(randomValue).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal result = BigDecimal.valueOf(randomValue).setScale(0, RoundingMode.HALF_UP);
         return result;
     }
 
