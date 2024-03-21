@@ -3,6 +3,7 @@ package org.petmarket.location.repository;
 import org.petmarket.location.entity.City;
 import org.petmarket.location.entity.State;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -16,4 +17,7 @@ public interface CityRepository extends CityRepositoryBasic {
     Optional<City> findByKoatuuCode(String koatuu);
 
     List<City> findByStateAndNameContainingOrderByName(State state, String name);
+
+    @Query(value = "SELECT * FROM cities ORDER BY RAND() LIMIT 1", nativeQuery = true)
+    City findRandomEntity();
 }

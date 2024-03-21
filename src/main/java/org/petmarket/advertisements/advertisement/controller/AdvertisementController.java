@@ -109,7 +109,7 @@ public class AdvertisementController {
             BindingResult bindingResult, Authentication authentication) {
         log.info("Received request to create Delivery - {}.", request);
         AdvertisementDetailsResponseDto responseDto = advertisementService.addAdvertisement(
-                request, bindingResult, authentication
+                request, bindingResult, authentication.getName()
         );
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }

@@ -44,6 +44,7 @@ public class AdvertisementImageService {
     @Value("${advertisement.draft.images.daysThreshold}")
     private int daysThreshold;
 
+    @Transactional
     public Set<AdvertisementImage> uploadImages(Advertisement advertisement, List<MultipartFile> images) {
         if ((images.size() + advertisement.getImages().size()) > maxImagesCount) {
             throw new FileUploadException("the number of images in the ad should not exceed " + maxImagesCount);

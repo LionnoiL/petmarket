@@ -2,6 +2,7 @@ package org.petmarket.payment.repository;
 
 import org.petmarket.errorhandling.ItemNotFoundException;
 import org.petmarket.payment.entity.Payment;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.Collections;
 import java.util.List;
@@ -27,4 +28,7 @@ public interface PaymentRepository extends PaymentRepositoryBasic {
                 ))
                 .toList();
     }
+
+    @Query(value = "SELECT * FROM pays ORDER BY RAND() LIMIT :count", nativeQuery = true)
+    List<Payment> findRandomEntities(int count);
 }
