@@ -19,10 +19,12 @@ import org.petmarket.advertisements.images.service.AdvertisementImageService;
 import org.petmarket.breeds.entity.Breed;
 import org.petmarket.breeds.entity.BreedTranslation;
 import org.petmarket.breeds.repository.BreedRepository;
+import org.petmarket.delivery.entity.Delivery;
 import org.petmarket.delivery.repository.DeliveryRepository;
 import org.petmarket.location.entity.City;
 import org.petmarket.location.repository.CityRepository;
 import org.petmarket.options.service.OptionsService;
+import org.petmarket.payment.entity.Payment;
 import org.petmarket.payment.repository.PaymentRepository;
 import org.petmarket.users.dto.UserRequestDto;
 import org.petmarket.users.dto.UserResponseDto;
@@ -59,6 +61,8 @@ import java.util.*;
 @Service
 public class FakeDataService {
 
+    public static final String BASE_OLX_URL = "https://www.olx.ua";
+
     private final UserAuthService userAuthService;
     private final UserService userService;
     private final AdvertisementService advertisementService;
@@ -71,6 +75,8 @@ public class FakeDataService {
     private final UserRepository userRepository;
     private final DeliveryRepository deliveryRepository;
     private final PaymentRepository paymentRepository;
+
+    private Random random = new Random();
 
     @Transactional
     public void createUsers(int count) {
@@ -109,6 +115,7 @@ public class FakeDataService {
         }
     }
 
+    @Transactional
     public void createAdvertisements(int count) {
         for (int i = 0; i < count; i++) {
             AdvertisementRequestDto requestDto = AdvertisementRequestDto.builder()
@@ -133,11 +140,11 @@ public class FakeDataService {
     }
 
     private List<Long> getRandomPaymentsIds() {
-        return paymentRepository.findRandomEntities(1).stream().map(e -> e.getId()).toList();
+        return paymentRepository.findRandomEntities(1).stream().map(Payment::getId).toList();
     }
 
     private List<Long> getRandomDeliveriesIds() {
-        return deliveryRepository.findRandomEntities(2).stream().map(e -> e.getId()).toList();
+        return deliveryRepository.findRandomEntities(2).stream().map(Delivery::getId).toList();
     }
 
     private void uploadImages(Advertisement advertisement, Document document) {
@@ -159,8 +166,7 @@ public class FakeDataService {
 
     public BigDecimal getRandomPrice() {
         double randomValue = Math.random() * (5000 - 500) + 500;
-        BigDecimal result = BigDecimal.valueOf(randomValue).setScale(0, RoundingMode.HALF_UP);
-        return result;
+        return BigDecimal.valueOf(randomValue).setScale(0, RoundingMode.HALF_UP);
     }
 
     private Document fillDtoFromOlx(AdvertisementRequestDto requestDto) {
@@ -177,35 +183,34 @@ public class FakeDataService {
 
         String hrefLink = "";
         String pageQuery = "";
-        Random random = new Random();
         int page = random.nextInt(20);
         if (page > 1) {
             pageQuery = "?page=" + page;
         }
         if (requestDto.getCategoryId() == 4) {
             hrefLink = getRandomOlxLinkOnPage(
-                    getDocumentFromLink("https://www.olx.ua/uk/zhivotnye/akvariumnye-rybki/" + pageQuery)
+                    getDocumentFromLink(BASE_OLX_URL + "/uk/zhivotnye/akvariumnye-rybki/" + pageQuery)
             );
         } else if (requestDto.getCategoryId() == 5) {
             hrefLink = getRandomOlxLinkOnPage(
-                    getDocumentFromLink("https://www.olx.ua/uk/zhivotnye/selskohozyaystvennye-zhivotnye/" +
+                    getDocumentFromLink(BASE_OLX_URL + "/uk/zhivotnye/selskohozyaystvennye-zhivotnye/" +
                             pageQuery)
             );
         } else if (requestDto.getCategoryId() == 3) {
             hrefLink = getRandomOlxLinkOnPage(
-                    getDocumentFromLink("https://www.olx.ua/uk/zhivotnye/ptitsy/" + pageQuery)
+                    getDocumentFromLink(BASE_OLX_URL + "/uk/zhivotnye/ptitsy/" + pageQuery)
             );
         } else if (requestDto.getCategoryId() == 1) {
             hrefLink = getRandomOlxLinkOnPage(
-                    getDocumentFromLink("https://www.olx.ua/uk/zhivotnye/sobaki/" + pageQuery)
+                    getDocumentFromLink(BASE_OLX_URL + "/uk/zhivotnye/sobaki/" + pageQuery)
             );
         } else if (requestDto.getCategoryId() == 2) {
             hrefLink = getRandomOlxLinkOnPage(
-                    getDocumentFromLink("https://www.olx.ua/uk/zhivotnye/koshki/" + pageQuery)
+                    getDocumentFromLink(BASE_OLX_URL + "/uk/zhivotnye/koshki/" + pageQuery)
             );
         } else if (requestDto.getCategoryId() == 8) {
             hrefLink = getRandomOlxLinkOnPage(
-                    getDocumentFromLink("https://www.olx.ua/uk/zhivotnye/gryzuny/" + pageQuery)
+                    getDocumentFromLink(BASE_OLX_URL + "/uk/zhivotnye/gryzuny/" + pageQuery)
             );
         } else {
             String queryString;
@@ -227,7 +232,6 @@ public class FakeDataService {
     }
 
     private String getRandomOlxLinkOnPage (Document document) {
-        Random random = new Random();
         Elements links = document.select("a.css-rc5s2u");
         List<String> hrefList = new ArrayList<>();
         for (Element link : links) {
@@ -235,7 +239,7 @@ public class FakeDataService {
             hrefList.add(href);
         }
         int randomIndex = random.nextInt(hrefList.size());
-        return "https://www.olx.ua" + hrefList.get(randomIndex);
+        return BASE_OLX_URL + hrefList.get(randomIndex);
     }
 
     private Document getDocumentFromLink(String url) {
@@ -248,8 +252,7 @@ public class FakeDataService {
     }
 
     private String getRandomOlxLink(String queryString) {
-        Random random = new Random();
-        Document document = getDocumentFromLink("https://www.olx.ua/uk/list/q-" +
+        Document document = getDocumentFromLink(BASE_OLX_URL + "/uk/list/q-" +
                 queryString + "/?page=" + random.nextInt(10)
         );
         return getRandomOlxLinkOnPage(document);

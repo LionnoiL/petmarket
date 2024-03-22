@@ -1,5 +1,6 @@
 package org.petmarket.advertisements.advertisement.repository;
 
+import jakarta.transaction.Transactional;
 import org.petmarket.advertisements.advertisement.dto.AdvertisementPriceRangeDto;
 import org.petmarket.advertisements.advertisement.entity.Advertisement;
 import org.petmarket.advertisements.advertisement.entity.AdvertisementStatus;
@@ -7,6 +8,7 @@ import org.petmarket.advertisements.category.entity.AdvertisementCategory;
 import org.petmarket.location.entity.City;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -93,4 +95,15 @@ public interface AdvertisementRepository extends AdvertisementRepositoryBasic {
             WHERE adv.category = :category AND adv.status = 'ACTIVE'
             """)
     List<City> findAllCitiesByCategoryId(@Param("category") AdvertisementCategory category);
+
+    @Transactional
+    @Modifying
+    @Query(value = """
+            update Advertisement adv
+            set adv.status = :newStatus
+            WHERE adv.status = :oldStatus
+            """)
+    void updateStatus(@Param("oldStatus") AdvertisementStatus oldStatus,
+                      @Param("newStatus") AdvertisementStatus newStatus
+    );
 }
