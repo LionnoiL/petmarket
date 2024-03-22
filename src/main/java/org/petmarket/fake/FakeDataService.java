@@ -120,6 +120,9 @@ public class FakeDataService {
                     .build();
 
             Document document = fillDtoFromOlx(requestDto);
+            if (requestDto.getTitle() == null || requestDto.getTitle().isEmpty()) {
+                continue;
+            }
             AdvertisementDetailsResponseDto responseDto = advertisementService.addAdvertisement(
                     requestDto, new SimpleBindingResult(), getRandomEmail()
             );
@@ -172,38 +175,84 @@ public class FakeDataService {
             requestDto.setCategoryId(category.getId());
         }
 
-        String queryString;
-        if (breed == null) {
-            AdvertisementCategoryTranslate categoryTranslate = category.getTranslations().stream()
-                    .filter(t -> optionsService.getDefaultSiteLanguage().equals(t.getLanguage()))
-                    .findFirst().get();
-            queryString = categoryTranslate.getTitle();
+        String hrefLink = "";
+        String pageQuery = "";
+        Random random = new Random();
+        int page = random.nextInt(20);
+        if (page > 1) {
+            pageQuery = "?page=" + page;
+        }
+        if (requestDto.getCategoryId() == 4) {
+            hrefLink = getRandomOlxLinkOnPage(
+                    getDocumentFromLink("https://www.olx.ua/uk/zhivotnye/akvariumnye-rybki/" + pageQuery)
+            );
+        } else if (requestDto.getCategoryId() == 5) {
+            hrefLink = getRandomOlxLinkOnPage(
+                    getDocumentFromLink("https://www.olx.ua/uk/zhivotnye/selskohozyaystvennye-zhivotnye/" +
+                            pageQuery)
+            );
+        } else if (requestDto.getCategoryId() == 3) {
+            hrefLink = getRandomOlxLinkOnPage(
+                    getDocumentFromLink("https://www.olx.ua/uk/zhivotnye/ptitsy/" + pageQuery)
+            );
+        } else if (requestDto.getCategoryId() == 1) {
+            hrefLink = getRandomOlxLinkOnPage(
+                    getDocumentFromLink("https://www.olx.ua/uk/zhivotnye/sobaki/" + pageQuery)
+            );
+        } else if (requestDto.getCategoryId() == 2) {
+            hrefLink = getRandomOlxLinkOnPage(
+                    getDocumentFromLink("https://www.olx.ua/uk/zhivotnye/koshki/" + pageQuery)
+            );
+        } else if (requestDto.getCategoryId() == 8) {
+            hrefLink = getRandomOlxLinkOnPage(
+                    getDocumentFromLink("https://www.olx.ua/uk/zhivotnye/gryzuny/" + pageQuery)
+            );
         } else {
-            BreedTranslation breedTranslation = breed.getTranslations().stream()
-                    .filter(t -> optionsService.getDefaultSiteLanguage().equals(t.getLanguage()))
-                    .findFirst().get();
-            queryString = breedTranslation.getTitle();
+            String queryString;
+            if (breed == null) {
+                AdvertisementCategoryTranslate categoryTranslate = category.getTranslations().stream()
+                        .filter(t -> optionsService.getDefaultSiteLanguage().equals(t.getLanguage()))
+                        .findFirst().get();
+                queryString = categoryTranslate.getTitle();
+            } else {
+                BreedTranslation breedTranslation = breed.getTranslations().stream()
+                        .filter(t -> optionsService.getDefaultSiteLanguage().equals(t.getLanguage()))
+                        .findFirst().get();
+                queryString = breedTranslation.getTitle();
+            }
+            hrefLink = getRandomOlxLink(queryString);
         }
 
-        String hrefLink = getRandomOlxLink(queryString);
         return processOlxLink(hrefLink, requestDto);
     }
 
-    private String getRandomOlxLink(String queryString) {
+    private String getRandomOlxLinkOnPage (Document document) {
+        Random random = new Random();
+        Elements links = document.select("a.css-rc5s2u");
+        List<String> hrefList = new ArrayList<>();
+        for (Element link : links) {
+            String href = link.attr("href");
+            hrefList.add(href);
+        }
+        int randomIndex = random.nextInt(hrefList.size());
+        return "https://www.olx.ua" + hrefList.get(randomIndex);
+    }
+
+    private Document getDocumentFromLink(String url) {
         try {
-            Document document = Jsoup.connect("https://www.olx.ua/uk/list/q-" + queryString).get();
-            Elements links = document.select("a.css-rc5s2u");
-            List<String> hrefList = new ArrayList<>();
-            for (Element link : links) {
-                String href = link.attr("href");
-                hrefList.add(href);
-            }
-            Random random = new Random();
-            int randomIndex = random.nextInt(hrefList.size());
-            return "https://www.olx.ua" + hrefList.get(randomIndex);
+            Document document = Jsoup.connect(url).get();
+            return document;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private String getRandomOlxLink(String queryString) {
+        Random random = new Random();
+        Document document = getDocumentFromLink("https://www.olx.ua/uk/list/q-" +
+                queryString + "/?page=" + random.nextInt(10)
+        );
+        return getRandomOlxLinkOnPage(document);
     }
 
     private Document processOlxLink(String hrefLink, AdvertisementRequestDto requestDto) {
