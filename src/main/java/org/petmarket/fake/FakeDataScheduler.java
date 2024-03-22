@@ -17,7 +17,7 @@ public class FakeDataScheduler {
     private final AdvertisementRepository advertisementRepository;
 
     @Scheduled(cron = "0 */7 * * * *")
-    public void createData3() {
+    public void createData() {
         Random random = new Random();
         fakeDataService.createAdvertisements(random.nextInt(4));
     }
