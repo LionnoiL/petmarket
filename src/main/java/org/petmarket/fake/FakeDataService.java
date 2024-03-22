@@ -1,6 +1,7 @@
 package org.petmarket.fake;
 
 import com.github.javafaker.Faker;
+import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.jsoup.Jsoup;
@@ -10,8 +11,13 @@ import org.jsoup.select.Elements;
 import org.petmarket.advertisements.advertisement.dto.AdvertisementDetailsResponseDto;
 import org.petmarket.advertisements.advertisement.dto.AdvertisementRequestDto;
 import org.petmarket.advertisements.advertisement.entity.Advertisement;
+import org.petmarket.advertisements.advertisement.entity.AdvertisementStatus;
 import org.petmarket.advertisements.advertisement.entity.AdvertisementType;
 import org.petmarket.advertisements.advertisement.service.AdvertisementService;
+import org.petmarket.advertisements.attributes.entity.Attribute;
+import org.petmarket.advertisements.attributes.entity.AttributeGroup;
+import org.petmarket.advertisements.attributes.repository.AttributeGroupRepository;
+import org.petmarket.advertisements.attributes.repository.AttributeRepository;
 import org.petmarket.advertisements.category.entity.AdvertisementCategory;
 import org.petmarket.advertisements.category.entity.AdvertisementCategoryTranslate;
 import org.petmarket.advertisements.category.repository.AdvertisementCategoryRepository;
@@ -75,6 +81,10 @@ public class FakeDataService {
     private final UserRepository userRepository;
     private final DeliveryRepository deliveryRepository;
     private final PaymentRepository paymentRepository;
+    private final AttributeGroupRepository attributeGroupRepository;
+    private final AttributeRepository attributeRepository;
+
+    private final EntityManager entityManager;
 
     private Random random = new Random();
 
@@ -130,12 +140,31 @@ public class FakeDataService {
             if (requestDto.getTitle() == null || requestDto.getTitle().isEmpty()) {
                 continue;
             }
+
             AdvertisementDetailsResponseDto responseDto = advertisementService.addAdvertisement(
                     requestDto, new SimpleBindingResult(), getRandomEmail()
             );
             Advertisement advertisement = advertisementService.getAdvertisement(responseDto.getId());
             advertisement.setImages(new HashSet<>());
             uploadImages(advertisement, document);
+            addAttributes(advertisement);
+            advertisement.setStatus(AdvertisementStatus.ACTIVE);
+            entityManager.persist(advertisement);
+        }
+    }
+
+    private void addAttributes(Advertisement advertisement) {
+        List<Attribute> attributes = new ArrayList<>();
+        List<AttributeGroup> groups = attributeGroupRepository.findRandomEntity(
+                advertisement.getCategory().getId(), random.nextInt(3));
+        for (AttributeGroup group : groups) {
+            Attribute attribute = attributeRepository.findRandomEntity(group.getId());
+            attributes.add(attribute);
+        }
+
+        if (!attributes.isEmpty()) {
+            advertisement.setAttributes(attributes);
+            entityManager.persist(advertisement);
         }
     }
 
@@ -231,7 +260,7 @@ public class FakeDataService {
         return processOlxLink(hrefLink, requestDto);
     }
 
-    private String getRandomOlxLinkOnPage (Document document) {
+    private String getRandomOlxLinkOnPage(Document document) {
         Elements links = document.select("a.css-rc5s2u");
         List<String> hrefList = new ArrayList<>();
         for (Element link : links) {

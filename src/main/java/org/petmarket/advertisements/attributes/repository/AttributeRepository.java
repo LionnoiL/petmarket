@@ -13,12 +13,12 @@ import static org.petmarket.utils.MessageUtils.ATTRIBUTE_NOT_FOUND;
 public interface AttributeRepository extends AttributeRepositoryBasic {
 
     @Query(value = """
-                SELECT DISTINCT attr
-                FROM Advertisement adv
-                JOIN adv.attributes attr
-                JOIN attr.group ag
-                WHERE adv.category.id = :id AND ag.useInFilter = true AND adv.status = 'ACTIVE'
-                """)
+            SELECT DISTINCT attr
+            FROM Advertisement adv
+            JOIN adv.attributes attr
+            JOIN attr.group ag
+            WHERE adv.category.id = :id AND ag.useInFilter = true AND adv.status = 'ACTIVE'
+            """)
     List<Attribute> findAllAttributesInFilterByCategoryId(@Param("id") Long id);
 
     default List<Attribute> getAttributesFromIds(List<Long> ids) {
@@ -33,4 +33,12 @@ public interface AttributeRepository extends AttributeRepositoryBasic {
                 ))
                 .toList();
     }
+
+    @Query(value = """
+            SELECT a.* FROM attribute a
+            Left JOIN attribute_groups ag ON ag.id = a.attribute_group_id
+            WHERE ag.id = :attributeGroupId
+            ORDER BY RAND() LIMIT 1
+            """, nativeQuery = true)
+    Attribute findRandomEntity(Long attributeGroupId);
 }

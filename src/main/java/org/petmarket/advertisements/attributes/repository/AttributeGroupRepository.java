@@ -20,4 +20,12 @@ public interface AttributeGroupRepository extends AttributeGroupRepositoryBasic 
             @Param("category") AdvertisementCategory category, @Param("useInFilter") boolean useInFilter);
 
     List<AttributeGroup> findAllByUseInFilterOrderBySortValueAsc(boolean useInFilter);
+
+    @Query(value = """
+            SELECT ag.* FROM attribute_groups ag
+            Left JOIN attributes_group_categories ac ON ac.attribute_group_id = ag.id
+            WHERE ac.category_id = :categoryId
+            ORDER BY RAND() LIMIT :count
+            """, nativeQuery = true)
+    List<AttributeGroup> findRandomEntity(Long categoryId, int count);
 }
