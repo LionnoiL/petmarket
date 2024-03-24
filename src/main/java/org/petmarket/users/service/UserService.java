@@ -149,17 +149,23 @@ public class UserService {
             newPhones.add(mainPhone);
         }
         Set<UserPhone> phones = user.getPhones();
+        if (phones == null) {
+            phones = new HashSet<>();
+        }
 
         phones.removeIf(phone -> !newPhones.contains(phone.getPhoneNumber()));
 
+        Set<UserPhone> finalPhones = phones;
         newPhones.stream()
-                .filter(phoneNumber -> phones.stream().noneMatch(phone -> phone.getPhoneNumber().equals(phoneNumber)))
-                .forEach(phoneNumber -> phones.add(UserPhone.builder()
+                .filter(phoneNumber -> finalPhones.stream()
+                        .noneMatch(phone -> phone.getPhoneNumber().equals(phoneNumber)))
+                .forEach(phoneNumber -> finalPhones.add(UserPhone.builder()
                         .user(user)
                         .phoneNumber(phoneNumber)
                         .build()));
 
-        phones.stream().forEach(phone -> phone.setMain(Objects.equals(phone.getPhoneNumber(), request.getMainPhone())));
+        phones.stream()
+                .forEach(phone -> phone.setMain(Objects.equals(phone.getPhoneNumber(), request.getMainPhone())));
         return phones;
     }
 }

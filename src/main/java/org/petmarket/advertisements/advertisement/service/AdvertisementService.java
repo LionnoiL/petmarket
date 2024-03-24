@@ -163,7 +163,7 @@ public class AdvertisementService {
     @Transactional
     public AdvertisementDetailsResponseDto addAdvertisement(AdvertisementRequestDto request,
                                                             BindingResult bindingResult,
-                                                            Authentication authentication) {
+                                                            String email) {
         ErrorUtils.checkItemNotCreatedException(bindingResult);
 
         Advertisement advertisement = advertisementMapper.mapDtoRequestToEntity(request);
@@ -173,7 +173,8 @@ public class AdvertisementService {
                         request.getTitle()
                 )
         );
-        advertisement.setAuthor(getUserByEmail(authentication.getName()));
+
+        advertisement.setAuthor(getUserByEmail(email));
         advertisement.setStatus(AdvertisementStatus.DRAFT);
         //setter
         fillDateEnding(advertisement);
