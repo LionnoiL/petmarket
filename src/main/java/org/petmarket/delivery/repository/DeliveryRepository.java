@@ -3,6 +3,7 @@ package org.petmarket.delivery.repository;
 import org.petmarket.delivery.entity.Delivery;
 import org.petmarket.errorhandling.ItemNotFoundException;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.Collections;
 import java.util.List;
@@ -30,5 +31,5 @@ public interface DeliveryRepository extends DeliveryRepositoryBasic {
     }
 
     @Query(value = "SELECT * FROM deliveries ORDER BY RAND() LIMIT :count", nativeQuery = true)
-    List<Delivery> findRandomEntities(int count);
+    List<Delivery> findRandomEntities(@Param("count") int count);
 }
