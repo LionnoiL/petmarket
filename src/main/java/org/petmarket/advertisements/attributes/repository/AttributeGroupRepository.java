@@ -27,5 +27,5 @@ public interface AttributeGroupRepository extends AttributeGroupRepositoryBasic 
             WHERE ac.category_id = :categoryId
             ORDER BY RAND() LIMIT :count
             """, nativeQuery = true)
-    List<AttributeGroup> findRandomEntity(Long categoryId, int count);
+    List<AttributeGroup> findRandomEntity(@Param("categoryId") Long categoryId, @Param("count") int count);
 }

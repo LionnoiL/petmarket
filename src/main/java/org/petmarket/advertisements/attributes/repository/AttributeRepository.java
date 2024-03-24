@@ -40,5 +40,5 @@ public interface AttributeRepository extends AttributeRepositoryBasic {
             WHERE ag.id = :attributeGroupId
             ORDER BY RAND() LIMIT 1
             """, nativeQuery = true)
-    Attribute findRandomEntity(Long attributeGroupId);
+    Attribute findRandomEntity(@Param("attributeGroupId") Long attributeGroupId);
 }

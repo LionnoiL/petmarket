@@ -16,5 +16,5 @@ public interface BreedRepository extends JpaRepository<Breed, Long> {
     Breed findRandomEntity();
 
     @Query(value = "SELECT * FROM animal_breeds WHERE category_id = :id ORDER BY RAND() LIMIT 1", nativeQuery = true)
-    Breed findRandomEntityByCategoryId(long id);
+    Breed findRandomEntityByCategoryId(@Param("id") long id);
 }
