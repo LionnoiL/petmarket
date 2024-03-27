@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 
 import java.util.List;
 
@@ -39,6 +40,7 @@ public class City {
 
     @ManyToOne
     @JoinColumn(name = "state_id")
+    @IndexedEmbedded(includeEmbeddedObjectId = true)
     private State state;
 
     @ManyToOne

@@ -245,6 +245,7 @@ public class AdvertisementController {
             @RequestParam(required = false) String searchTerm,
             @RequestParam(required = false) List<Long> breedIds,
             @RequestParam(required = false) List<Long> attributeIds,
+            @RequestParam(required = false) List<Long> statesIds,
             @RequestParam(required = false) List<Long> cityIds,
             @RequestParam(required = false) BigDecimal minPrice,
             @RequestParam(required = false) BigDecimal maxPrice,
@@ -252,8 +253,8 @@ public class AdvertisementController {
             @RequestParam(required = false) Long categoryId) {
         Language language = languageService.getByLangCode(langCode);
         AdvertisementCategoryResponseDto category = null;
-        Page<Advertisement> advertisements = advertisementService.search(
-                searchTerm, page, size, breedIds, attributeIds, cityIds, minPrice, maxPrice, sortOption, categoryId);
+        Page<Advertisement> advertisements = advertisementService.search(searchTerm, page, size, breedIds,
+                attributeIds, statesIds, cityIds, minPrice, maxPrice, sortOption, categoryId);
         Page<AdvertisementShortResponseDto> advertisementShortResponseDtos = advertisements.map(
                 adv -> advertisementMapper.mapEntityToShortDto(adv, language)
         );
