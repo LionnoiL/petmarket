@@ -18,6 +18,8 @@ public interface CityRepository extends CityRepositoryBasic {
 
     List<City> findByStateAndNameContainingOrderByName(State state, String name);
 
-    @Query(value = "SELECT * FROM cities ORDER BY RAND() LIMIT 1", nativeQuery = true)
+    @Query(value = """
+                SELECT * FROM cities where city_type_short_name = 'м.' AND  ISNULL(district_id) ORDER BY RAND() LIMIT 1
+            """, nativeQuery = true)
     City findRandomEntity();
 }

@@ -27,7 +27,7 @@ public interface AdvertisementRepository extends AdvertisementRepositoryBasic {
                         SELECT a.category_id, a.id
                         FROM advertisements a
                         WHERE a.advertisement_status = 'ACTIVE'
-                        ORDER BY a.created
+                        ORDER BY a.created desc
                         LIMIT 1000
                     ) c
                     GROUP BY c.category_id
@@ -46,7 +46,7 @@ public interface AdvertisementRepository extends AdvertisementRepositoryBasic {
                         SELECT a.category_id, a.id
                         FROM advertisements a
                         WHERE a.advertisement_status = 'ACTIVE'
-                        ORDER BY a.created
+                        ORDER BY a.created desc
                         LIMIT 1000
                     ) c
                     GROUP BY c.category_id
