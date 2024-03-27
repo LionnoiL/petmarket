@@ -241,6 +241,10 @@ public class FakeDataService {
             hrefLink = getRandomOlxLinkOnPage(
                     getDocumentFromLink(BASE_OLX_URL + "/uk/zhivotnye/gryzuny/" + pageQuery)
             );
+        } else if (requestDto.getCategoryId() == 9) {
+            hrefLink = getRandomOlxLinkOnPage(
+                    getDocumentFromLink(BASE_OLX_URL + "/uk/zhivotnye/reptilii/" + pageQuery)
+            );
         } else {
             String queryString;
             if (breed == null) {
