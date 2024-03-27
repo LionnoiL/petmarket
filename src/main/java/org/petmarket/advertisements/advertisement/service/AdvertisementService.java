@@ -328,8 +328,9 @@ public class AdvertisementService {
     }
 
     public Page<Advertisement> search(String searchTerm, int page, int size, List<Long> breedsIds,
-                                      List<Long> attributeIds, List<Long> cityIds, BigDecimal minPrice,
-                                      BigDecimal maxPrice, AdvertisementSortOption sortOption, Long categoryId) {
+                                      List<Long> attributeIds, List<Long> statesIds, List<Long> cityIds,
+                                      BigDecimal minPrice, BigDecimal maxPrice,
+                                      AdvertisementSortOption sortOption, Long categoryId) {
         SearchSession searchSession = Search.session(entityManager);
         SearchScope<Advertisement> scope = searchSession.scope(Advertisement.class);
         Pageable pageable = PageRequest.of(page - 1, size);
@@ -341,7 +342,9 @@ public class AdvertisementService {
         Long finalCategoryId = categoryId;
         SearchQuery<Advertisement> searchQuery = searchSession.search(Advertisement.class)
                 .where(f -> buildSearchQueryWithFilters(
-                        f, searchTerm, finalCategoryId, breedsIds, attributeIds, cityIds, minPrice, maxPrice))
+                        f, searchTerm, finalCategoryId, breedsIds, attributeIds, statesIds, cityIds,
+                        minPrice, maxPrice
+                ))
                 .sort(buildAdvertisementSort(scope, sortOption))
                 .toQuery();
 
@@ -417,10 +420,9 @@ public class AdvertisementService {
         return s.toSort();
     }
 
-    private BooleanPredicateClausesStep<?> buildSearchQueryWithFilters(SearchPredicateFactory f, String searchTerm,
-                                                                       Long categoryId, List<Long> breedsIds,
-                                                                       List<Long> attributeIds, List<Long> cityIds,
-                                                                       BigDecimal minPrice, BigDecimal maxPrice) {
+    private BooleanPredicateClausesStep<?> buildSearchQueryWithFilters(
+            SearchPredicateFactory f, String searchTerm, Long categoryId, List<Long> breedsIds, List<Long> attributeIds,
+            List<Long> statesIds, List<Long> cityIds, BigDecimal minPrice, BigDecimal maxPrice) {
         BooleanPredicateClausesStep<?> queryStep = f.bool();
         if (categoryId != null) {
             queryStep.must(f.terms().field("category.id").matchingAny(categoryId));
@@ -436,6 +438,9 @@ public class AdvertisementService {
         }
         if (attributeIds != null && !attributeIds.isEmpty()) {
             queryStep.must(f.terms().field("attributes.id").matchingAny(attributeIds));
+        }
+        if (statesIds != null && !statesIds.isEmpty()) {
+            queryStep.must(f.terms().field("location.city.state.id").matchingAny(statesIds));
         }
         if (cityIds != null && !cityIds.isEmpty()) {
             queryStep.must(f.terms().field("location.city.id").matchingAny(cityIds));
