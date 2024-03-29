@@ -74,6 +74,7 @@ public interface AdvertisementRepository extends AdvertisementRepositoryBasic {
               new org.petmarket.advertisements.advertisement.dto.AdvertisementPriceRangeDto(MIN(a.price), MAX(a.price))
               FROM Advertisement a
               WHERE a.category.id = :categoryId
+              AND a.author.status <> 'DELETED'
               AND a.status = 'ACTIVE'
                     """)
     AdvertisementPriceRangeDto getAdvertisementPriceRangeByCategory(@Param("categoryId") Long categoryId);

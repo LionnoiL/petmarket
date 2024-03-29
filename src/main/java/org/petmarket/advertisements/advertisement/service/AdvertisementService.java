@@ -425,7 +425,8 @@ public class AdvertisementService {
             SearchPredicateFactory f, String searchTerm, Long categoryId, List<Long> breedsIds, List<Long> attributeIds,
             List<Long> statesIds, List<Long> cityIds, BigDecimal minPrice, BigDecimal maxPrice) {
         BooleanPredicateClausesStep<?> queryStep = f.bool();
-        queryStep.must(f.terms().field("author.status").matchingAny(UserStatus.ACTIVE, UserStatus.NOT_ACTIVE));
+        queryStep.mustNot(f.terms().field("author.status").matchingAny(UserStatus.DELETED));
+
         if (categoryId != null) {
             queryStep.must(f.terms().field("category.id").matchingAny(categoryId));
         }
@@ -453,6 +454,7 @@ public class AdvertisementService {
         if (maxPrice != null) {
             queryStep.must(f.range().field("price").atMost(maxPrice));
         }
+
         return queryStep;
     }
 
@@ -475,6 +477,7 @@ public class AdvertisementService {
 
         BooleanPredicateClausesStep<?> queryStep = f.bool()
                 .mustNot(f.terms().field("id").matchingAny(advertisement.getId()))
+                .mustNot(f.terms().field("author.status").matchingAny(UserStatus.DELETED))
                 .must(f.terms().field("category.id").matchingAny(advertisement.getCategory().getId()))
                 .must(f.terms().field("status").matchingAny(AdvertisementStatus.ACTIVE));
         if (advertisement.getBreed() != null) {
