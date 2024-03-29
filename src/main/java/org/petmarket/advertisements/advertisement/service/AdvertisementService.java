@@ -48,6 +48,7 @@ import org.petmarket.review.mapper.ReviewMapper;
 import org.petmarket.review.repository.ReviewRepository;
 import org.petmarket.translate.TranslateException;
 import org.petmarket.users.entity.User;
+import org.petmarket.users.entity.UserStatus;
 import org.petmarket.users.repository.UserRepository;
 import org.petmarket.utils.ErrorUtils;
 import org.petmarket.utils.TransliterateUtils;
@@ -424,6 +425,7 @@ public class AdvertisementService {
             SearchPredicateFactory f, String searchTerm, Long categoryId, List<Long> breedsIds, List<Long> attributeIds,
             List<Long> statesIds, List<Long> cityIds, BigDecimal minPrice, BigDecimal maxPrice) {
         BooleanPredicateClausesStep<?> queryStep = f.bool();
+        queryStep.must(f.terms().field("author.status").matchingAny(UserStatus.ACTIVE, UserStatus.NOT_ACTIVE));
         if (categoryId != null) {
             queryStep.must(f.terms().field("category.id").matchingAny(categoryId));
         }

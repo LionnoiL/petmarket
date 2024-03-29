@@ -179,4 +179,20 @@ public class UserController {
         userAuthService.updatePassword(user, updatePasswordRequestDto.getNewPassword());
         log.info("Password changed for user with email: " + updatePasswordRequestDto.getEmail());
     }
+
+    @Operation(summary = "Delete user by ID")
+    @ApiResponseSuccessful
+    @ApiResponseBadRequest
+    @ApiResponseUnauthorized
+    @ApiResponseForbidden
+    @ApiResponseNotFound
+    @PreAuthorize("isAuthenticated()")
+    @DeleteMapping("/{userId}")
+    public void deleteUser(@ParameterId @PathVariable @Positive Long userId) {
+        log.info("Received request to delete User with id {}.", userId);
+        User user = userService.findById(userId);
+        userService.checkAccess(user);
+        userService.deleteById(userId);
+        log.info("User with id {} deleted.", userId);
+    }
 }

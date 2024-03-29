@@ -3,6 +3,9 @@ package org.petmarket.users.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import lombok.*;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.petmarket.advertisements.advertisement.entity.Advertisement;
 import org.petmarket.cart.entity.Cart;
 import org.petmarket.language.entity.Language;
 import org.petmarket.location.entity.Location;
@@ -26,6 +29,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
+@Indexed
 public class User {
 
     @Id
@@ -42,6 +46,7 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
+    @GenericField
     private UserStatus status;
 
     @Enumerated(EnumType.STRING)
@@ -127,6 +132,9 @@ public class User {
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<UserPhone> phones = new HashSet<>();
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "author", fetch = FetchType.LAZY, orphanRemoval = true)
+    private Set<Advertisement> advertisements = new HashSet<>();
 
     @Override
     public String toString() {
