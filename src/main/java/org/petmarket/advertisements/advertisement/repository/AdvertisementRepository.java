@@ -58,6 +58,16 @@ public interface AdvertisementRepository extends AdvertisementRepositoryBasic {
             nativeQuery = true)
     List<Long> findFavoriteTags(@Param("limit") int limit);
 
+    @Query(
+            value = """
+                    SELECT a
+                    FROM Advertisement a
+                    JOIN a.author
+                    WHERE a.category IN :categories
+                    AND a.status = :status
+                    AND a.author.status <> 'DELETED'
+                    ORDER BY a.created DESC
+                    """)
     Page<Advertisement> findAllByCategoryInAndStatusOrderByCreatedDesc(
             List<AdvertisementCategory> categories, AdvertisementStatus status, Pageable pageable);
 
@@ -65,17 +75,29 @@ public interface AdvertisementRepository extends AdvertisementRepositoryBasic {
                                                                              Long excludedAdvertisementId,
                                                                              Pageable pageable);
 
+    @Query(
+            value = """
+                    SELECT a
+                    FROM Advertisement a
+                    JOIN a.author
+                    WHERE a.status = :status
+                    AND a.author.status <> 'DELETED'
+                    ORDER BY a.created DESC
+                    """)
     Page<Advertisement> findAllByStatusOrderByCreatedDesc(AdvertisementStatus status,
                                                           Pageable pageable);
 
     @Query(
             value = """
-              SELECT
-              new org.petmarket.advertisements.advertisement.dto.AdvertisementPriceRangeDto(MIN(a.price), MAX(a.price))
-              FROM Advertisement a
-              WHERE a.category.id = :categoryId
-              AND a.author.status <> 'DELETED'
-              AND a.status = 'ACTIVE'
+                    SELECT
+                    new org.petmarket.advertisements.advertisement.dto.AdvertisementPriceRangeDto
+                    (MIN(a.price), MAX(a.price))
+                    FROM Advertisement a
+                    JOIN a.author auth
+                    JOIN a.category cat
+                    WHERE cat.id = :categoryId
+                    AND auth.status <> 'DELETED'
+                    AND a.status = 'ACTIVE'
                     """)
     AdvertisementPriceRangeDto getAdvertisementPriceRangeByCategory(@Param("categoryId") Long categoryId);
 

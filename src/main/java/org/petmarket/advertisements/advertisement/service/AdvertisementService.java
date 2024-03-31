@@ -97,6 +97,7 @@ public class AdvertisementService {
 
         Specification<Object> where = Specification.where((root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
+            root.fetch("author");
 
             if (category != null) {
                 predicates.add(criteriaBuilder.equal(root.get("category"), category));
@@ -117,6 +118,9 @@ public class AdvertisementService {
                 }
                 predicates.add(criteriaBuilder.or(orPredicates.toArray(new Predicate[0])));
             }
+
+            predicates.add(criteriaBuilder.notEqual(root.get("author").get("status"), UserStatus.DELETED));
+
             return criteriaBuilder.and(predicates.toArray(new Predicate[]{}));
         });
 
