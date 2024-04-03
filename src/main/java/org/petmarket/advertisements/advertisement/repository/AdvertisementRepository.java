@@ -69,7 +69,8 @@ public interface AdvertisementRepository extends AdvertisementRepositoryBasic {
                     ORDER BY a.created DESC
                     """)
     Page<Advertisement> findAllByCategoryInAndStatusOrderByCreatedDesc(
-            List<AdvertisementCategory> categories, AdvertisementStatus status, Pageable pageable);
+            @Param("categories") List<AdvertisementCategory> categories,
+            @Param("status") AdvertisementStatus status, Pageable pageable);
 
     Page<Advertisement> findAllByAuthorIdAndStatusAndIdNotOrderByCreatedDesc(Long authorId, AdvertisementStatus status,
                                                                              Long excludedAdvertisementId,
@@ -84,7 +85,7 @@ public interface AdvertisementRepository extends AdvertisementRepositoryBasic {
                     AND a.author.status <> 'DELETED'
                     ORDER BY a.created DESC
                     """)
-    Page<Advertisement> findAllByStatusOrderByCreatedDesc(AdvertisementStatus status,
+    Page<Advertisement> findAllByStatusOrderByCreatedDesc(@Param("status") AdvertisementStatus status,
                                                           Pageable pageable);
 
     @Query(
