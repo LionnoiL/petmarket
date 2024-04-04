@@ -265,7 +265,7 @@ public class FakeDataService {
     }
 
     private String getRandomOlxLinkOnPage(Document document) {
-        Elements links = document.select("a.css-rc5s2u");
+        Elements links = document.select("a.css-q0eq4");
         List<String> hrefList = new ArrayList<>();
         for (Element link : links) {
             String href = link.attr("href");
