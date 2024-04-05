@@ -6,6 +6,7 @@ import org.petmarket.advertisements.advertisement.entity.Advertisement;
 import org.petmarket.advertisements.advertisement.entity.AdvertisementStatus;
 import org.petmarket.advertisements.category.entity.AdvertisementCategory;
 import org.petmarket.location.entity.City;
+import org.petmarket.users.entity.UserStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
@@ -130,4 +131,11 @@ public interface AdvertisementRepository extends AdvertisementRepositoryBasic {
     void updateStatus(@Param("oldStatus") AdvertisementStatus oldStatus,
                       @Param("newStatus") AdvertisementStatus newStatus
     );
+
+    @Query(value = """
+            SELECT a.author.status
+            FROM Advertisement a
+            WHERE a.id = :advertisementId
+            """)
+    UserStatus getAdvertisementAuthorStatus(@Param("advertisementId") Long advertisementId);
 }

@@ -304,8 +304,14 @@ public class AdvertisementService {
     }
 
     public Advertisement getAdvertisement(Long id) {
-        return advertisementRepository.findById(id)
+        Advertisement advertisement = advertisementRepository.findById(id)
                 .orElseThrow(() -> new ItemNotFoundException(ADVERTISEMENT_NOT_FOUND));
+
+        if (advertisementRepository.getAdvertisementAuthorStatus(id) == UserStatus.DELETED) {
+            throw new ItemNotFoundException(ADVERTISEMENT_NOT_FOUND);
+        }
+
+        return advertisement;
     }
 
     public List<Advertisement> getAdvertisements(List<Long> ids) {
