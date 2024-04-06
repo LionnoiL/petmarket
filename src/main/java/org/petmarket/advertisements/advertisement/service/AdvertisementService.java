@@ -48,6 +48,7 @@ import org.petmarket.review.mapper.ReviewMapper;
 import org.petmarket.review.repository.ReviewRepository;
 import org.petmarket.translate.TranslateException;
 import org.petmarket.users.entity.User;
+import org.petmarket.users.entity.UserStatus;
 import org.petmarket.users.repository.UserRepository;
 import org.petmarket.utils.ErrorUtils;
 import org.petmarket.utils.TransliterateUtils;
@@ -96,6 +97,7 @@ public class AdvertisementService {
 
         Specification<Object> where = Specification.where((root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
+            root.fetch("author");
 
             if (category != null) {
                 predicates.add(criteriaBuilder.equal(root.get("category"), category));
@@ -116,6 +118,9 @@ public class AdvertisementService {
                 }
                 predicates.add(criteriaBuilder.or(orPredicates.toArray(new Predicate[0])));
             }
+
+            predicates.add(criteriaBuilder.notEqual(root.get("author").get("status"), UserStatus.DELETED));
+
             return criteriaBuilder.and(predicates.toArray(new Predicate[]{}));
         });
 
@@ -299,8 +304,14 @@ public class AdvertisementService {
     }
 
     public Advertisement getAdvertisement(Long id) {
-        return advertisementRepository.findById(id)
+        Advertisement advertisement = advertisementRepository.findById(id)
                 .orElseThrow(() -> new ItemNotFoundException(ADVERTISEMENT_NOT_FOUND));
+
+        if (advertisementRepository.getAdvertisementAuthorStatus(id) == UserStatus.DELETED) {
+            throw new ItemNotFoundException(ADVERTISEMENT_NOT_FOUND);
+        }
+
+        return advertisement;
     }
 
     public List<Advertisement> getAdvertisements(List<Long> ids) {
@@ -424,6 +435,8 @@ public class AdvertisementService {
             SearchPredicateFactory f, String searchTerm, Long categoryId, List<Long> breedsIds, List<Long> attributeIds,
             List<Long> statesIds, List<Long> cityIds, BigDecimal minPrice, BigDecimal maxPrice) {
         BooleanPredicateClausesStep<?> queryStep = f.bool();
+        queryStep.mustNot(f.terms().field("author.status").matchingAny(UserStatus.DELETED));
+
         if (categoryId != null) {
             queryStep.must(f.terms().field("category.id").matchingAny(categoryId));
         }
@@ -451,6 +464,7 @@ public class AdvertisementService {
         if (maxPrice != null) {
             queryStep.must(f.range().field("price").atMost(maxPrice));
         }
+
         return queryStep;
     }
 
@@ -473,6 +487,7 @@ public class AdvertisementService {
 
         BooleanPredicateClausesStep<?> queryStep = f.bool()
                 .mustNot(f.terms().field("id").matchingAny(advertisement.getId()))
+                .mustNot(f.terms().field("author.status").matchingAny(UserStatus.DELETED))
                 .must(f.terms().field("category.id").matchingAny(advertisement.getCategory().getId()))
                 .must(f.terms().field("status").matchingAny(AdvertisementStatus.ACTIVE));
         if (advertisement.getBreed() != null) {

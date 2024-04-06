@@ -142,6 +142,11 @@ public class UserService {
         return user;
     }
 
+    @Transactional
+    public void deleteById(Long userId) {
+        userRepository.setUserStatusToDeleted(userId);
+    }
+
     private Set<UserPhone> mergePhones(User user, UserUpdateRequestDto request) {
         Set<String> newPhones = request.getPhones();
         String mainPhone = request.getMainPhone();

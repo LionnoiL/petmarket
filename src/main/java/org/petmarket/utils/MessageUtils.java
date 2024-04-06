@@ -35,6 +35,7 @@ public final class MessageUtils {
     public static final String PAYMENT_NOT_FOUND = "Payment not found";
     public static final String DELIVERY_NOT_FOUND = "Delivery not found";
     public static final String USER_NOT_FOUND = "User not found";
+    public static final String USER_IS_DELETED = "User is deleted";
     public static final String ROLE_NOT_FOUND = "Role not found";
     public static final String INVALID_EMAIL_OR_PASSWORD = "Invalid email or password";
     public static final String VERIFICATION_CODE_NOT_FOUND = "Verification code not found";

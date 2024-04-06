@@ -94,6 +94,8 @@ public class UserAuthService {
 
             if (user == null) {
                 throw new UsernameNotFoundException(ROLE_NOT_FOUND);
+            } else if (user.getStatus() == UserStatus.DELETED) {
+                throw new BadCredentialsException(USER_IS_DELETED);
             }
 
             String accessToken = jwtTokenProvider.createToken(username, user.getRoles());

@@ -6,6 +6,7 @@ import org.petmarket.advertisements.advertisement.entity.Advertisement;
 import org.petmarket.advertisements.advertisement.entity.AdvertisementStatus;
 import org.petmarket.advertisements.category.entity.AdvertisementCategory;
 import org.petmarket.location.entity.City;
+import org.petmarket.users.entity.UserStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
@@ -58,23 +59,47 @@ public interface AdvertisementRepository extends AdvertisementRepositoryBasic {
             nativeQuery = true)
     List<Long> findFavoriteTags(@Param("limit") int limit);
 
+    @Query(
+            value = """
+                    SELECT a
+                    FROM Advertisement a
+                    JOIN a.author
+                    WHERE a.category IN :categories
+                    AND a.status = :status
+                    AND a.author.status <> 'DELETED'
+                    ORDER BY a.created DESC
+                    """)
     Page<Advertisement> findAllByCategoryInAndStatusOrderByCreatedDesc(
-            List<AdvertisementCategory> categories, AdvertisementStatus status, Pageable pageable);
+            @Param("categories") List<AdvertisementCategory> categories,
+            @Param("status") AdvertisementStatus status, Pageable pageable);
 
     Page<Advertisement> findAllByAuthorIdAndStatusAndIdNotOrderByCreatedDesc(Long authorId, AdvertisementStatus status,
                                                                              Long excludedAdvertisementId,
                                                                              Pageable pageable);
 
-    Page<Advertisement> findAllByStatusOrderByCreatedDesc(AdvertisementStatus status,
+    @Query(
+            value = """
+                    SELECT a
+                    FROM Advertisement a
+                    JOIN a.author
+                    WHERE a.status = :status
+                    AND a.author.status <> 'DELETED'
+                    ORDER BY a.created DESC
+                    """)
+    Page<Advertisement> findAllByStatusOrderByCreatedDesc(@Param("status") AdvertisementStatus status,
                                                           Pageable pageable);
 
     @Query(
             value = """
-              SELECT
-              new org.petmarket.advertisements.advertisement.dto.AdvertisementPriceRangeDto(MIN(a.price), MAX(a.price))
-              FROM Advertisement a
-              WHERE a.category.id = :categoryId
-              AND a.status = 'ACTIVE'
+                    SELECT
+                    new org.petmarket.advertisements.advertisement.dto.AdvertisementPriceRangeDto
+                    (MIN(a.price), MAX(a.price))
+                    FROM Advertisement a
+                    JOIN a.author auth
+                    JOIN a.category cat
+                    WHERE cat.id = :categoryId
+                    AND auth.status <> 'DELETED'
+                    AND a.status = 'ACTIVE'
                     """)
     AdvertisementPriceRangeDto getAdvertisementPriceRangeByCategory(@Param("categoryId") Long categoryId);
 
@@ -106,4 +131,11 @@ public interface AdvertisementRepository extends AdvertisementRepositoryBasic {
     void updateStatus(@Param("oldStatus") AdvertisementStatus oldStatus,
                       @Param("newStatus") AdvertisementStatus newStatus
     );
+
+    @Query(value = """
+            SELECT a.author.status
+            FROM Advertisement a
+            WHERE a.id = :advertisementId
+            """)
+    UserStatus getAdvertisementAuthorStatus(@Param("advertisementId") Long advertisementId);
 }

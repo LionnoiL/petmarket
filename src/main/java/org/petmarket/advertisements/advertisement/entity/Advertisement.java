@@ -61,6 +61,7 @@ public class Advertisement implements TranslateHolder {
 
     @ManyToOne
     @JoinColumn(name = "author_id")
+    @IndexedEmbedded
     private User author;
 
     @Column(name = "alias", nullable = false)

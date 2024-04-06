@@ -1,5 +1,5 @@
 package org.petmarket.users.entity;
 
 public enum UserStatus {
-    ACTIVE, NOT_ACTIVE
+    ACTIVE, NOT_ACTIVE, DELETED
 }
