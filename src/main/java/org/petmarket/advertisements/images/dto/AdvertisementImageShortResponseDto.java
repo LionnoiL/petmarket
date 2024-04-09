@@ -16,7 +16,7 @@ import org.petmarket.advertisements.images.entity.AdvertisementImageType;
 public class AdvertisementImageShortResponseDto {
 
     @NotBlank
-    @Schema(example = "10", description = "")
+    @Schema(example = "10")
     private Long id;
 
     @Schema(example = "https://petmarket.s3.eu-north-1.amazonaws.com/advertisements/images/3_7xKrP_s.webp",
