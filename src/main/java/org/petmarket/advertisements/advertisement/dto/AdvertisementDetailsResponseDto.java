@@ -62,4 +62,6 @@ public class AdvertisementDetailsResponseDto {
     private List<AttributeResponseDto> attributes;
     private List<AdvertisementReviewResponseDto> reviews;
     private List<AdvertisementImageResponseDto> images;
+    private List<AdvertisementImageResponseDto> documents;
+    private List<AdvertisementImageResponseDto> vaccines;
 }
