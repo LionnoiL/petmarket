@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.advertisements.advertisement.entity.Advertisement;
 import org.petmarket.advertisements.images.entity.AdvertisementImage;
+import org.petmarket.advertisements.images.entity.AdvertisementImageType;
 import org.petmarket.advertisements.images.repository.AdvertisementImageRepository;
 import org.petmarket.errorhandling.FileUploadException;
 import org.petmarket.files.FileStorageName;
@@ -45,7 +46,9 @@ public class AdvertisementImageService {
     private int daysThreshold;
 
     @Transactional
-    public Set<AdvertisementImage> uploadImages(Advertisement advertisement, List<MultipartFile> images) {
+    public Set<AdvertisementImage> uploadImages(Advertisement advertisement, List<MultipartFile> images,
+                                                AdvertisementImageType type
+    ) {
         if ((images.size() + advertisement.getImages().size()) > maxImagesCount) {
             throw new FileUploadException("the number of images in the ad should not exceed " + maxImagesCount);
         }
@@ -62,6 +65,7 @@ public class AdvertisementImageService {
             List<String> names = List.of(storageNameBig.getShortName(), storageNameSmall.getShortName());
 
             AdvertisementImage advertisementImage = AdvertisementImage.builder()
+                    .type(type)
                     .url(storageNameBig.getFullName())
                     .urlSmall(storageNameSmall.getFullName())
                     .name(gson.toJson(names))

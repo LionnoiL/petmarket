@@ -25,6 +25,7 @@ import org.petmarket.advertisements.category.mapper.AdvertisementCategoryRespons
 import org.petmarket.advertisements.category.service.AdvertisementCategoryService;
 import org.petmarket.advertisements.images.dto.AdvertisementImageResponseDto;
 import org.petmarket.advertisements.images.entity.AdvertisementImage;
+import org.petmarket.advertisements.images.entity.AdvertisementImageType;
 import org.petmarket.advertisements.images.mapper.AdvertisementImageMapper;
 import org.petmarket.advertisements.images.service.AdvertisementImageService;
 import org.petmarket.errorhandling.ItemNotFoundException;
@@ -220,12 +221,14 @@ public class AdvertisementController {
     @ApiResponseForbidden
     @ApiResponseNotFound
     @PreAuthorize("isAuthenticated()")
-    @PostMapping(value = "/{id}/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/{id}/images/{type}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Set<AdvertisementImageResponseDto> uploadImages(@PathVariable Long id,
+                                                           @PathVariable(required = false) AdvertisementImageType type,
                                                            @RequestParam("images") List<MultipartFile> images) {
         Advertisement advertisement = advertisementService.getAdvertisement(id);
         accessCheckerService.checkUpdateAccess(List.of(advertisement));
-        Set<AdvertisementImage> advertisementImages = advertisementImageService.uploadImages(advertisement, images);
+        Set<AdvertisementImage> advertisementImages = advertisementImageService.uploadImages(
+                advertisement, images, type);
         return advertisementImages.stream().map(imageMapper::toDto).collect(Collectors.toSet());
     }
 

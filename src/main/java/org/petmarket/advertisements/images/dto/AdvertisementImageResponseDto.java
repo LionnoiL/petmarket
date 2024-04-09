@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.petmarket.advertisements.images.entity.AdvertisementImageType;
 
 @Data
 @Builder
@@ -39,4 +40,6 @@ public class AdvertisementImageResponseDto {
     @NotBlank
     @JsonProperty("url_small")
     private String urlSmall;
+
+    private AdvertisementImageType type;
 }
