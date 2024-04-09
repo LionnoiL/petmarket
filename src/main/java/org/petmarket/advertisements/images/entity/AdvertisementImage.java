@@ -30,6 +30,10 @@ public class AdvertisementImage {
     @Column(name = "image_url_small", nullable = false)
     private String urlSmall;
 
+    @Column(name = "advertisement_image_type", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private AdvertisementImageType type;
+
     @ManyToOne
     @JoinColumn(name = "advertisement_id", nullable = false)
     private Advertisement advertisement;
