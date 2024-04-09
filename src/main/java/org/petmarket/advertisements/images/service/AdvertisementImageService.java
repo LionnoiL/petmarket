@@ -64,6 +64,10 @@ public class AdvertisementImageService {
             Gson gson = new Gson();
             List<String> names = List.of(storageNameBig.getShortName(), storageNameSmall.getShortName());
 
+            if (type == null) {
+                type = AdvertisementImageType.ADVERTISEMENT_IMAGE;
+            }
+
             AdvertisementImage advertisementImage = AdvertisementImage.builder()
                     .type(type)
                     .url(storageNameBig.getFullName())
