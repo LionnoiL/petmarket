@@ -18,9 +18,6 @@ public class AdvertisementImage {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "image_name", nullable = false)
-    private String name;
-
     @Column(name = "main_image")
     private boolean mainImage;
 

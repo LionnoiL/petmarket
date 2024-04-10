@@ -1,11 +1,6 @@
 package org.petmarket.advertisements.images.service;
 
-import com.nimbusds.jose.shaded.gson.Gson;
 import jakarta.transaction.Transactional;
-import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.advertisements.advertisement.entity.Advertisement;
@@ -20,6 +15,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -46,38 +46,33 @@ public class AdvertisementImageService {
 
     @Transactional
     public Set<AdvertisementImage> uploadImages(Advertisement advertisement,
-        List<MultipartFile> images, AdvertisementImageType type) {
+                                                List<MultipartFile> images, AdvertisementImageType type) {
         if ((images.size() + advertisement.getImages().size()) > maxImagesCount) {
             throw new FileUploadException(
-                "the number of images in the ad should not exceed " + maxImagesCount);
+                    "the number of images in the ad should not exceed " + maxImagesCount);
         }
         Set<AdvertisementImage> result = new HashSet<>();
         boolean mainImage = true;
         for (MultipartFile file : images) {
 
             FileStorageName storageNameBig = imageService.convertAndSendImage(catalogName,
-                advertisement.getId(),
-                file, bigImageWidth, bigImageHeight, "b");
+                    advertisement.getId(),
+                    file, bigImageWidth, bigImageHeight, "b");
             FileStorageName storageNameSmall = imageService.convertAndSendImage(catalogName,
-                advertisement.getId(),
-                file, smallImageWidth, smallImageHeight, "s");
-
-            Gson gson = new Gson();
-            List<String> names = List.of(storageNameBig.getShortName(),
-                storageNameSmall.getShortName());
+                    advertisement.getId(),
+                    file, smallImageWidth, smallImageHeight, "s");
 
             if (type == null) {
                 type = AdvertisementImageType.ADVERTISEMENT_IMAGE;
             }
 
             AdvertisementImage advertisementImage = AdvertisementImage.builder()
-                .type(type)
-                .url(storageNameBig.getFullName())
-                .urlSmall(storageNameSmall.getFullName())
-                .name(gson.toJson(names))
-                .advertisement(advertisement)
-                .mainImage(!isImagesPresentByType(advertisement, type) && mainImage)
-                .build();
+                    .type(type)
+                    .url(storageNameBig.getFullName())
+                    .urlSmall(storageNameSmall.getFullName())
+                    .advertisement(advertisement)
+                    .mainImage(!isImagesPresentByType(advertisement, type) && mainImage)
+                    .build();
             advertisementImageRepository.save(advertisementImage);
             result.add(advertisementImage);
             mainImage = false;
@@ -92,9 +87,9 @@ public class AdvertisementImageService {
 
         do {
             advertisementImagePage = advertisementImageRepository
-                .findImagesBeforeDeletionDate(
-                    LocalDateTime.now().minusDays(daysThreshold),
-                    PageRequest.of(pageNumber, 1000));
+                    .findImagesBeforeDeletionDate(
+                            LocalDateTime.now().minusDays(daysThreshold),
+                            PageRequest.of(pageNumber, 1000));
             for (AdvertisementImage image : advertisementImagePage.getContent()) {
                 imageService.deleteImage(catalogName, image.getUrl());
                 imageService.deleteImage(catalogName, image.getUrlSmall());
@@ -105,7 +100,7 @@ public class AdvertisementImageService {
     }
 
     private boolean isImagesPresentByType(Advertisement advertisement,
-        AdvertisementImageType type) {
+                                          AdvertisementImageType type) {
         if (advertisement == null || type == null) {
             return false;
         }
