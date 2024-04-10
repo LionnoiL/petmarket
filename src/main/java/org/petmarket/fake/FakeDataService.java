@@ -21,6 +21,7 @@ import org.petmarket.advertisements.attributes.repository.AttributeRepository;
 import org.petmarket.advertisements.category.entity.AdvertisementCategory;
 import org.petmarket.advertisements.category.entity.AdvertisementCategoryTranslate;
 import org.petmarket.advertisements.category.repository.AdvertisementCategoryRepository;
+import org.petmarket.advertisements.images.entity.AdvertisementImageType;
 import org.petmarket.advertisements.images.service.AdvertisementImageService;
 import org.petmarket.breeds.entity.Breed;
 import org.petmarket.breeds.entity.BreedTranslation;
@@ -187,7 +188,7 @@ public class FakeDataService {
                 String src = element.attr("src");
                 files.add(downloadImageAsMultipartFile(src));
             }
-            advertisementImageService.uploadImages(advertisement, files);
+            advertisementImageService.uploadImages(advertisement, files, AdvertisementImageType.ADVERTISEMENT_IMAGE);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -265,7 +266,7 @@ public class FakeDataService {
     }
 
     private String getRandomOlxLinkOnPage(Document document) {
-        Elements links = document.select("a.css-q0eq4");
+        Elements links = document.select("a.css-z3gu2d");
         List<String> hrefList = new ArrayList<>();
         for (Element link : links) {
             String href = link.attr("href");

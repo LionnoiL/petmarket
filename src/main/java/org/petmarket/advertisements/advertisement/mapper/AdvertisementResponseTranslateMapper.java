@@ -10,6 +10,8 @@ import org.petmarket.advertisements.attributes.entity.Attribute;
 import org.petmarket.advertisements.attributes.mapper.AttributeTranslateMapper;
 import org.petmarket.advertisements.attributes.service.AttributeService;
 import org.petmarket.advertisements.category.mapper.AdvertisementCategoryResponseTranslateMapper;
+import org.petmarket.advertisements.images.dto.AdvertisementImageResponseDto;
+import org.petmarket.advertisements.images.entity.AdvertisementImageType;
 import org.petmarket.breeds.mapper.BreedMapper;
 import org.petmarket.delivery.mapper.DeliveryResponseTranslateMapper;
 import org.petmarket.language.entity.Language;
@@ -21,6 +23,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,7 +47,8 @@ public class AdvertisementResponseTranslateMapper {
             return null;
         }
         AdvertisementTranslate translation = (AdvertisementTranslate) translationService.getTranslate(
-                entity.getTranslations().stream().map(LanguageHolder.class::cast).collect(Collectors.toSet()),
+                entity.getTranslations().stream().map(LanguageHolder.class::cast)
+                        .collect(Collectors.toSet()),
                 language,
                 optionsService.getDefaultSiteLanguage()
         );
@@ -67,7 +71,28 @@ public class AdvertisementResponseTranslateMapper {
         dto.setFavoriteAttributes(attributeMapper.mapEntityToDto(favoriteAttributes, language));
         dto.setAttributes(attributeMapper.mapEntityToDto(nonFavoriteAttributes, language));
 
+        splitImages(dto);
         return dto;
+    }
+
+    public void splitImages(AdvertisementDetailsResponseDto dto) {
+        List<AdvertisementImageResponseDto> allImages = dto.getImages();
+        List<AdvertisementImageResponseDto> images = allImages.stream()
+                .filter(image -> AdvertisementImageType.ADVERTISEMENT_IMAGE.equals(image.getType()))
+                .sorted(Comparator.comparing(image -> !image.isMainImage()))
+                .toList();
+        List<AdvertisementImageResponseDto> documents = allImages.stream()
+                .filter(image -> AdvertisementImageType.DOCUMENT.equals(image.getType()))
+                .sorted(Comparator.comparing(image -> !image.isMainImage()))
+                .toList();
+        List<AdvertisementImageResponseDto> vaccines = allImages.stream()
+                .filter(image -> AdvertisementImageType.VACCINE.equals(image.getType()))
+                .sorted(Comparator.comparing(image -> !image.isMainImage()))
+                .toList();
+
+        dto.setImages(images);
+        dto.setDocuments(documents);
+        dto.setVaccines(vaccines);
     }
 
     public List<AdvertisementDetailsResponseDto> mapEntityToDto(List<Advertisement> advertisements,
@@ -80,12 +105,14 @@ public class AdvertisementResponseTranslateMapper {
                 .toList();
     }
 
-    public AdvertisementShortResponseDto mapEntityToShortDto(Advertisement entity, Language language) {
+    public AdvertisementShortResponseDto mapEntityToShortDto(Advertisement entity,
+                                                             Language language) {
         if (entity == null) {
             return null;
         }
         AdvertisementTranslate translation = (AdvertisementTranslate) translationService.getTranslate(
-                entity.getTranslations().stream().map(LanguageHolder.class::cast).collect(Collectors.toSet()),
+                entity.getTranslations().stream().map(LanguageHolder.class::cast)
+                        .collect(Collectors.toSet()),
                 language,
                 optionsService.getDefaultSiteLanguage()
         );
@@ -102,11 +129,15 @@ public class AdvertisementResponseTranslateMapper {
 
         dto.setFavoriteAttributes(attributeMapper.mapEntityToDto(favoriteAttributes, language));
         dto.setAttributes(attributeMapper.mapEntityToDto(nonFavoriteAttributes, language));
+
+        dto.getImages()
+                .removeIf(image -> !AdvertisementImageType.ADVERTISEMENT_IMAGE.equals(image.getType()));
         return dto;
     }
 
-    public List<AdvertisementShortResponseDto> mapEntityToShortDto(List<Advertisement> advertisements,
-                                                                   Language language) {
+    public List<AdvertisementShortResponseDto> mapEntityToShortDto(
+            List<Advertisement> advertisements,
+            Language language) {
         if (advertisements == null) {
             return Collections.emptyList();
         }

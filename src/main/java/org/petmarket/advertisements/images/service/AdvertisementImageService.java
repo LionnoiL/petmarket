@@ -1,11 +1,11 @@
 package org.petmarket.advertisements.images.service;
 
-import com.nimbusds.jose.shaded.gson.Gson;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.advertisements.advertisement.entity.Advertisement;
 import org.petmarket.advertisements.images.entity.AdvertisementImage;
+import org.petmarket.advertisements.images.entity.AdvertisementImageType;
 import org.petmarket.advertisements.images.repository.AdvertisementImageRepository;
 import org.petmarket.errorhandling.FileUploadException;
 import org.petmarket.files.FileStorageName;
@@ -45,28 +45,33 @@ public class AdvertisementImageService {
     private int daysThreshold;
 
     @Transactional
-    public Set<AdvertisementImage> uploadImages(Advertisement advertisement, List<MultipartFile> images) {
+    public Set<AdvertisementImage> uploadImages(Advertisement advertisement,
+                                                List<MultipartFile> images, AdvertisementImageType type) {
         if ((images.size() + advertisement.getImages().size()) > maxImagesCount) {
-            throw new FileUploadException("the number of images in the ad should not exceed " + maxImagesCount);
+            throw new FileUploadException(
+                    "the number of images in the ad should not exceed " + maxImagesCount);
         }
         Set<AdvertisementImage> result = new HashSet<>();
         boolean mainImage = true;
         for (MultipartFile file : images) {
 
-            FileStorageName storageNameBig = imageService.convertAndSendImage(catalogName, advertisement.getId(),
+            FileStorageName storageNameBig = imageService.convertAndSendImage(catalogName,
+                    advertisement.getId(),
                     file, bigImageWidth, bigImageHeight, "b");
-            FileStorageName storageNameSmall = imageService.convertAndSendImage(catalogName, advertisement.getId(),
+            FileStorageName storageNameSmall = imageService.convertAndSendImage(catalogName,
+                    advertisement.getId(),
                     file, smallImageWidth, smallImageHeight, "s");
 
-            Gson gson = new Gson();
-            List<String> names = List.of(storageNameBig.getShortName(), storageNameSmall.getShortName());
+            if (type == null) {
+                type = AdvertisementImageType.ADVERTISEMENT_IMAGE;
+            }
 
             AdvertisementImage advertisementImage = AdvertisementImage.builder()
+                    .type(type)
                     .url(storageNameBig.getFullName())
                     .urlSmall(storageNameSmall.getFullName())
-                    .name(gson.toJson(names))
                     .advertisement(advertisement)
-                    .mainImage(advertisement.getImages().isEmpty() && mainImage)
+                    .mainImage(!isImagesPresentByType(advertisement, type) && mainImage)
                     .build();
             advertisementImageRepository.save(advertisementImage);
             result.add(advertisementImage);
@@ -92,5 +97,13 @@ public class AdvertisementImageService {
             advertisementImageRepository.deleteAll(advertisementImagePage.getContent());
             pageNumber++;
         } while (advertisementImagePage.hasNext());
+    }
+
+    private boolean isImagesPresentByType(Advertisement advertisement,
+                                          AdvertisementImageType type) {
+        if (advertisement == null || type == null) {
+            return false;
+        }
+        return advertisement.getImages().stream().anyMatch(image -> type.equals(image.getType()));
     }
 }

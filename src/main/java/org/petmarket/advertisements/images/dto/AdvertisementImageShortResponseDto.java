@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.petmarket.advertisements.images.entity.AdvertisementImageType;
 
 @Data
 @Builder
@@ -15,7 +16,7 @@ import lombok.NoArgsConstructor;
 public class AdvertisementImageShortResponseDto {
 
     @NotBlank
-    @Schema(example = "10", description = "")
+    @Schema(example = "10")
     private Long id;
 
     @Schema(example = "https://petmarket.s3.eu-north-1.amazonaws.com/advertisements/images/3_7xKrP_s.webp",
@@ -24,4 +25,6 @@ public class AdvertisementImageShortResponseDto {
     @NotBlank
     @JsonProperty("url")
     private String url;
+
+    private AdvertisementImageType type;
 }
