@@ -1,9 +1,5 @@
 package org.petmarket.advertisements.advertisement.mapper;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.advertisements.advertisement.dto.AdvertisementDetailsResponseDto;
@@ -25,6 +21,12 @@ import org.petmarket.translate.LanguageHolder;
 import org.petmarket.translate.TranslationService;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Slf4j
 @RequiredArgsConstructor
 @Component
@@ -45,10 +47,10 @@ public class AdvertisementResponseTranslateMapper {
             return null;
         }
         AdvertisementTranslate translation = (AdvertisementTranslate) translationService.getTranslate(
-            entity.getTranslations().stream().map(LanguageHolder.class::cast)
-                .collect(Collectors.toSet()),
-            language,
-            optionsService.getDefaultSiteLanguage()
+                entity.getTranslations().stream().map(LanguageHolder.class::cast)
+                        .collect(Collectors.toSet()),
+                language,
+                optionsService.getDefaultSiteLanguage()
         );
         AdvertisementDetailsResponseDto dto = mapper.mapEntityToDto(entity);
         dto.setTitle(translation.getTitle());
@@ -76,14 +78,17 @@ public class AdvertisementResponseTranslateMapper {
     public void splitImages(AdvertisementDetailsResponseDto dto) {
         List<AdvertisementImageResponseDto> allImages = dto.getImages();
         List<AdvertisementImageResponseDto> images = allImages.stream()
-            .filter(image -> AdvertisementImageType.ADVERTISEMENT_IMAGE.equals(image.getType()))
-            .toList();
+                .filter(image -> AdvertisementImageType.ADVERTISEMENT_IMAGE.equals(image.getType()))
+                .sorted(Comparator.comparing(image -> !image.isMainImage()))
+                .toList();
         List<AdvertisementImageResponseDto> documents = allImages.stream()
-            .filter(image -> AdvertisementImageType.DOCUMENT.equals(image.getType()))
-            .toList();
+                .filter(image -> AdvertisementImageType.DOCUMENT.equals(image.getType()))
+                .sorted(Comparator.comparing(image -> !image.isMainImage()))
+                .toList();
         List<AdvertisementImageResponseDto> vaccines = allImages.stream()
-            .filter(image -> AdvertisementImageType.VACCINE.equals(image.getType()))
-            .toList();
+                .filter(image -> AdvertisementImageType.VACCINE.equals(image.getType()))
+                .sorted(Comparator.comparing(image -> !image.isMainImage()))
+                .toList();
 
         dto.setImages(images);
         dto.setDocuments(documents);
@@ -91,25 +96,25 @@ public class AdvertisementResponseTranslateMapper {
     }
 
     public List<AdvertisementDetailsResponseDto> mapEntityToDto(List<Advertisement> advertisements,
-        Language language) {
+                                                                Language language) {
         if (advertisements == null) {
             return Collections.emptyList();
         }
         return advertisements.stream()
-            .map(p -> mapEntityToDto(p, language))
-            .toList();
+                .map(p -> mapEntityToDto(p, language))
+                .toList();
     }
 
     public AdvertisementShortResponseDto mapEntityToShortDto(Advertisement entity,
-        Language language) {
+                                                             Language language) {
         if (entity == null) {
             return null;
         }
         AdvertisementTranslate translation = (AdvertisementTranslate) translationService.getTranslate(
-            entity.getTranslations().stream().map(LanguageHolder.class::cast)
-                .collect(Collectors.toSet()),
-            language,
-            optionsService.getDefaultSiteLanguage()
+                entity.getTranslations().stream().map(LanguageHolder.class::cast)
+                        .collect(Collectors.toSet()),
+                language,
+                optionsService.getDefaultSiteLanguage()
         );
         AdvertisementShortResponseDto dto = mapper.mapEntityToShortDto(entity);
         dto.setTitle(translation.getTitle());
@@ -126,18 +131,18 @@ public class AdvertisementResponseTranslateMapper {
         dto.setAttributes(attributeMapper.mapEntityToDto(nonFavoriteAttributes, language));
 
         dto.getImages()
-            .removeIf(image -> !AdvertisementImageType.ADVERTISEMENT_IMAGE.equals(image.getType()));
+                .removeIf(image -> !AdvertisementImageType.ADVERTISEMENT_IMAGE.equals(image.getType()));
         return dto;
     }
 
     public List<AdvertisementShortResponseDto> mapEntityToShortDto(
-        List<Advertisement> advertisements,
-        Language language) {
+            List<Advertisement> advertisements,
+            Language language) {
         if (advertisements == null) {
             return Collections.emptyList();
         }
         return advertisements.stream()
-            .map(p -> mapEntityToShortDto(p, language))
-            .toList();
+                .map(p -> mapEntityToShortDto(p, language))
+                .toList();
     }
 }
