@@ -9,16 +9,15 @@ import org.petmarket.advertisements.advertisement.entity.Advertisement;
 import org.petmarket.cart.entity.Cart;
 import org.petmarket.language.entity.Language;
 import org.petmarket.location.entity.Location;
+import org.petmarket.order.entity.Order;
+import org.petmarket.order.entity.OrderStatus;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "users")
@@ -134,7 +133,10 @@ public class User {
     private Set<UserPhone> phones = new HashSet<>();
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "author", fetch = FetchType.LAZY, orphanRemoval = true)
-    private Set<Advertisement> advertisements = new HashSet<>();
+    private List<Advertisement> advertisements = new ArrayList<>();
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "author", fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<Order> orders = new ArrayList<>();
 
     @Override
     public String toString() {
@@ -147,5 +149,11 @@ public class User {
                 ", username='" + username + '\'' +
                 ", email='" + email + '\'' +
                 '}';
+    }
+
+    public int getCompleteOrdersCount() {
+        return getOrders().stream().filter(
+                order -> OrderStatus.COMPLETED.equals(order.getStatus())
+        ).toList().size();
     }
 }
