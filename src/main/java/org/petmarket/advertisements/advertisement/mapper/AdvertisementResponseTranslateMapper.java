@@ -76,7 +76,13 @@ public class AdvertisementResponseTranslateMapper {
     }
 
     public void splitImages(AdvertisementDetailsResponseDto dto) {
+        if (dto == null) {
+            return;
+        }
         List<AdvertisementImageResponseDto> allImages = dto.getImages();
+        if (allImages == null) {
+            return;
+        }
         List<AdvertisementImageResponseDto> images = allImages.stream()
                 .filter(image -> AdvertisementImageType.ADVERTISEMENT_IMAGE.equals(image.getType()))
                 .sorted(Comparator.comparing(image -> !image.isMainImage()))
