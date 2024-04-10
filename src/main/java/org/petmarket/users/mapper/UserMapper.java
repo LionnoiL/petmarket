@@ -1,6 +1,5 @@
 package org.petmarket.users.mapper;
 
-import java.time.LocalDate;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -13,6 +12,7 @@ import org.petmarket.users.dto.UserRequestDto;
 import org.petmarket.users.dto.UserResponseDto;
 import org.petmarket.users.entity.User;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,13 +47,17 @@ public abstract class UserMapper {
         responseDto.setBirthdayYear(birthday.getYear());
     }
 
+    @Mapping(target = "completeOrdersCount", expression =
+            """
+                      java(entity.getCompleteOrdersCount())
+                    """)
     public abstract AuthorResponseDto mapEntityToAuthorDto(User entity);
 
     @Mapping(target = "shortName", expression =
             """
-              java(entity.getFirstName() + (entity.getLastName() != null && !entity.getLastName().isEmpty() ? " " +
-              entity.getLastName().charAt(0) + "." : ""))
-            """)
+                      java(entity.getFirstName() + (entity.getLastName() != null && !entity.getLastName().isEmpty() ? " " +
+                      entity.getLastName().charAt(0) + "." : ""))
+                    """)
     public abstract AuthorShortResponseDto mapEntityToAuthorShortDto(User entity);
 
     public abstract User mapDtoRequestToDto(UserRequestDto dto);

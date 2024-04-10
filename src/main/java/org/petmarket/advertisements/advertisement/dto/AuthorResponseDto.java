@@ -24,6 +24,9 @@ public class AuthorResponseDto {
     @JsonProperty("reviews_count")
     private int reviewsCount;
 
+    @JsonProperty("complete_orders_count")
+    private int completeOrdersCount;
+
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonProperty("last_activity")
     private LocalDateTime lastActivity;
