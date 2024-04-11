@@ -13,7 +13,7 @@ import java.time.LocalDate;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AdvertisementReviewResponseDto {
+public class UserReviewResponseDto {
 
     private Long id;
 
@@ -21,7 +21,7 @@ public class AdvertisementReviewResponseDto {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate created;
 
-    @Schema(example = "BUYER_TO_ADVERTISEMENT")
+    @Schema(example = "BUYER_TO_SELLER")
     private ReviewType type;
 
     @Schema(example = "2")
@@ -30,9 +30,9 @@ public class AdvertisementReviewResponseDto {
     @Schema(example = "Товар поганої якості")
     private String description;
 
-    @JsonProperty("advertisement_id")
+    @JsonProperty("user_id")
     @Schema(example = "1")
-    private Long advertisementId;
+    private Long userId;
 
     @JsonProperty("author_first_name")
     @Schema(example = "Andrii")
@@ -54,7 +54,7 @@ public class AdvertisementReviewResponseDto {
                 ", type=" + type +
                 ", value=" + value +
                 ", description='" + description + '\'' +
-                ", advertisementId=" + advertisementId +
+                ", userId=" + userId +
                 ", authorFirstName='" + authorFirstName + '\'' +
                 ", authorLastName='" + authorLastName + '\'' +
                 ", authorId=" + authorId +
