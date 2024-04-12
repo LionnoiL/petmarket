@@ -1,5 +1,6 @@
 package org.petmarket.security.jwt;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,6 +12,9 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class JwtResponseDto {
+
+    @JsonProperty("user_id")
+    private Long userId;
 
     private String email;
     private String accessToken;
@@ -31,5 +35,9 @@ public class JwtResponseDto {
 
     public String getRefreshToken() {
         return refreshToken;
+    }
+
+    public Long getUserId() {
+        return userId;
     }
 }

@@ -104,7 +104,7 @@ public class UserAuthService {
                 refreshToken = jwtTokenProvider.createRefreshToken(username, user.getRoles());
             }
 
-            JwtResponseDto response = new JwtResponseDto(username, accessToken, refreshToken);
+            JwtResponseDto response = new JwtResponseDto(user.getId(), username, accessToken, refreshToken);
             userService.setLastActivity(user.getUsername());
             return ResponseEntity.ok(response);
         } catch (AuthenticationException e) {
@@ -124,8 +124,8 @@ public class UserAuthService {
             String accessToken = jwtTokenProvider.createToken(user.getEmail(), user.getRoles());
             String refreshToken = jwtTokenProvider.createRefreshToken(user.getEmail(),
                     user.getRoles());
-            JwtResponseDto jwtResponseDto = new JwtResponseDto(
-                    user.getEmail(), accessToken, refreshToken
+            JwtResponseDto jwtResponseDto = new JwtResponseDto(user.getId(), user.getEmail(),
+                accessToken, refreshToken
             );
 
             return ResponseEntity.ok(jwtResponseDto);

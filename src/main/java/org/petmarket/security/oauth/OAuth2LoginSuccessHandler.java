@@ -91,7 +91,8 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
         String token = jwtTokenProvider.createToken(email, user.getRoles());
         String refreshToken = jwtTokenProvider.createRefreshToken(email, user.getRoles());
-        JwtResponseDto jwtResponseDto = new JwtResponseDto(email, token, refreshToken);
+        JwtResponseDto jwtResponseDto = new JwtResponseDto(user.getId(), email, token,
+            refreshToken);
 
         ObjectMapper mapper = new ObjectMapper();
 
