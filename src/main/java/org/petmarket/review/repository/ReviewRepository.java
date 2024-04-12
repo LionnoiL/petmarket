@@ -16,6 +16,25 @@ public interface ReviewRepository extends ReviewRepositoryBasic {
             """, nativeQuery = true)
     List<Review> findReviewByAdvertisementID(@Param("id") Long id);
 
+    @Query(value = """
+            SELECT r.* FROM reviews r
+            WHERE r.user_id = :id ORDER BY r.id DESC
+            LIMIT :size
+            """, nativeQuery = true)
+    List<Review> findReviewByUserID(@Param("id") Long id, @Param("size") int size);
+
+    @Query(value = """
+            SELECT
+               SUM(CASE WHEN rewiew_value = 1 THEN 1 ELSE 0 END) AS rating1,
+               SUM(CASE WHEN rewiew_value = 2 THEN 1 ELSE 0 END) AS rating2,
+               SUM(CASE WHEN rewiew_value = 3 THEN 1 ELSE 0 END) AS rating3,
+               SUM(CASE WHEN rewiew_value = 4 THEN 1 ELSE 0 END) AS rating4,
+               SUM(CASE WHEN rewiew_value = 5 THEN 1 ELSE 0 END) AS rating5
+            FROM reviews
+                WHERE user_id = :id
+            """, nativeQuery = true)
+    List<Integer[]> findRatingsByUserID(@Param("id") Long id);
+
     @Modifying
     @Query(value = "DELETE FROM reviews r where r.advertisement_id = :id", nativeQuery = true)
     void deleteAllReviewsByAdvertisementId(@Param("id") Long id);

@@ -7,6 +7,11 @@ import org.petmarket.errorhandling.AccessDeniedException;
 import org.petmarket.errorhandling.ItemNotFoundException;
 import org.petmarket.files.FileStorageName;
 import org.petmarket.images.ImageService;
+import org.petmarket.review.dto.RatingList;
+import org.petmarket.review.dto.UserReviewListResponseDto;
+import org.petmarket.review.entity.Review;
+import org.petmarket.review.mapper.ReviewMapper;
+import org.petmarket.review.service.ReviewService;
 import org.petmarket.security.jwt.JwtUser;
 import org.petmarket.users.dto.UserContactsResponseDto;
 import org.petmarket.users.dto.UserUpdateRequestDto;
@@ -21,10 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static org.petmarket.utils.MessageUtils.ACCESS_DENIED;
 
@@ -35,6 +37,9 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final ImageService imageService;
+    private final ReviewService reviewService;
+    private final ReviewMapper reviewMapper;
+
     @Value("${aws.s3.catalog.users}")
     private String catalogName;
     @Value("${users.images.avatar.width}")
@@ -172,5 +177,21 @@ public class UserService {
         phones.stream()
                 .forEach(phone -> phone.setMain(Objects.equals(phone.getPhoneNumber(), request.getMainPhone())));
         return phones;
+    }
+
+    public UserReviewListResponseDto getReviewsByUser(User user, int size) {
+        if (user == null || size <= 0) {
+            return null;
+        }
+        List<Review> reviews = reviewService.findAllByUser(user, size);
+        RatingList ratingList = reviewService.findRatingsByUser(user);
+
+        UserReviewListResponseDto userReviews = UserReviewListResponseDto.builder()
+                .reviewsCount(user.getReviewsCount())
+                .rating(user.getRating())
+                .ratingList(ratingList)
+                .reviews(reviewMapper.mapEntityToUserReviewDto(reviews))
+                .build();
+        return userReviews;
     }
 }
