@@ -15,6 +15,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface AdvertisementRepository extends AdvertisementRepositoryBasic {
@@ -138,4 +139,20 @@ public interface AdvertisementRepository extends AdvertisementRepositoryBasic {
             WHERE a.id = :advertisementId
             """)
     UserStatus getAdvertisementAuthorStatus(@Param("advertisementId") Long advertisementId);
+
+    @Query(value = """
+            SELECT a
+            FROM Advertisement a
+            JOIN a.images i
+            WHERE i.id = :imageId
+            """)
+    Optional<Advertisement> findAdvertisementByImageId(@Param("imageId") Long imageId);
+
+    @Query(value = """
+            SELECT a
+            FROM Advertisement a
+            JOIN a.images i
+            WHERE i.id IN :imageIds
+            """)
+    List<Advertisement> findAdvertisementsByImageIds(@Param("imageIds") List<Long> imageIds);
 }

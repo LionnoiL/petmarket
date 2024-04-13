@@ -324,4 +324,51 @@ public class AdvertisementController {
         return advertisements
                 .map(adv -> advertisementMapper.mapEntityToShortDto(adv, language));
     }
+
+    @Operation(summary = "Delete Advertisement Image")
+    @ApiResponseDeleted
+    @ApiResponseUnauthorized
+    @ApiResponseForbidden
+    @ApiResponseNotFound
+    @DeleteMapping("/image/{imageId}")
+    public void deleteImage(@ParameterId @PathVariable Long imageId) {
+        accessCheckerService.checkUpdateAccess(List.of(advertisementService.getAdvertisementByImageId(imageId)));
+        advertisementImageService.deleteImageById(imageId);
+    }
+
+    @Operation(summary = "Delete images by ids")
+    @ApiResponseDeleted
+    @ApiResponseUnauthorized
+    @ApiResponseForbidden
+    @DeleteMapping("/images")
+    public void deleteImagesByIds(
+            @Parameter(description = "List of images identifiers",
+                    schema = @Schema(type = "array[integer]")
+            ) @RequestParam List<Long> imageIds) {
+        accessCheckerService.checkUpdateAccess(advertisementService.getAdvertisementsByImageIds(imageIds));
+        advertisementImageService.deleteImagesByIds(imageIds);
+    }
+
+    @Operation(summary = "Delete All Advertisement Images")
+    @ApiResponseDeleted
+    @ApiResponseUnauthorized
+    @ApiResponseForbidden
+    @DeleteMapping("/images/{advertisementId}")
+    public void deleteAllImages(@ParameterId @PathVariable Long advertisementId) {
+        accessCheckerService.checkUpdateAccess(List.of(advertisementService
+                .getAdvertisement(advertisementId)));
+        advertisementImageService.deleteImagesByAdvertisementId(advertisementId);
+    }
+
+    @Operation(summary = "Delete All Advertisement Images by type")
+    @ApiResponseDeleted
+    @ApiResponseUnauthorized
+    @ApiResponseForbidden
+    @DeleteMapping("/images/{advertisementId}/{type}")
+    public void deleteAllImagesByType(@ParameterId @PathVariable Long advertisementId,
+                                      @PathVariable AdvertisementImageType type) {
+        accessCheckerService.checkUpdateAccess(List.of(advertisementService
+                .getAdvertisement(advertisementId)));
+        advertisementImageService.deleteImagesByAdvertisementIdAndType(advertisementId, type);
+    }
 }

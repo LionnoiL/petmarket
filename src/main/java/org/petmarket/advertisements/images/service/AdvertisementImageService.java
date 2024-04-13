@@ -8,6 +8,7 @@ import org.petmarket.advertisements.images.entity.AdvertisementImage;
 import org.petmarket.advertisements.images.entity.AdvertisementImageType;
 import org.petmarket.advertisements.images.repository.AdvertisementImageRepository;
 import org.petmarket.errorhandling.FileUploadException;
+import org.petmarket.errorhandling.ItemNotFoundException;
 import org.petmarket.files.FileStorageName;
 import org.petmarket.images.ImageService;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,6 +21,8 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import static org.petmarket.utils.MessageUtils.ADVERTISEMENT_IMAGE_NOT_FOUND;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -97,6 +100,39 @@ public class AdvertisementImageService {
             advertisementImageRepository.deleteAll(advertisementImagePage.getContent());
             pageNumber++;
         } while (advertisementImagePage.hasNext());
+    }
+
+    @Transactional
+    public void deleteImageById(Long imageId) {
+        AdvertisementImage image = advertisementImageRepository.findById(imageId)
+                .orElseThrow(() -> new ItemNotFoundException(ADVERTISEMENT_IMAGE_NOT_FOUND));
+        imageService.deleteImage(catalogName, image.getUrl());
+        imageService.deleteImage(catalogName, image.getUrlSmall());
+        advertisementImageRepository.delete(image);
+    }
+
+    @Transactional
+    public void deleteImagesByIds(List<Long> imageIds) {
+        deleteImages(advertisementImageRepository.findAllById(imageIds));
+    }
+
+    @Transactional
+    public void deleteImagesByAdvertisementId(Long advertisementId) {
+        deleteImages(advertisementImageRepository.findAllByAdvertisementId(advertisementId));
+    }
+
+    @Transactional
+    public void deleteImagesByAdvertisementIdAndType(Long advertisementId, AdvertisementImageType type) {
+        deleteImages(advertisementImageRepository.findAllByAdvertisementIdAndType(advertisementId, type));
+    }
+
+    private void deleteImages(List<AdvertisementImage> images) {
+        for (AdvertisementImage image : images) {
+            imageService.deleteImage(catalogName, image.getUrl());
+            imageService.deleteImage(catalogName, image.getUrlSmall());
+        }
+
+        advertisementImageRepository.deleteAll(images);
     }
 
     private boolean isImagesPresentByType(Advertisement advertisement,
