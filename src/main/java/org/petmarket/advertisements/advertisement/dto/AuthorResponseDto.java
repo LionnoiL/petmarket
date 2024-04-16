@@ -2,6 +2,7 @@ package org.petmarket.advertisements.advertisement.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.petmarket.users.entity.UserType;
 
@@ -23,6 +24,10 @@ public class AuthorResponseDto {
 
     @JsonProperty("reviews_count")
     private int reviewsCount;
+
+    @Schema(example = "5", description = "Speed of message response in minutes")
+    @JsonProperty("response_speed")
+    private int responseSpeed;
 
     @JsonProperty("complete_orders_count")
     private int completeOrdersCount;
