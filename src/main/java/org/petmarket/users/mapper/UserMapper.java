@@ -11,12 +11,13 @@ import org.petmarket.users.dto.UserPhoneDto;
 import org.petmarket.users.dto.UserRequestDto;
 import org.petmarket.users.dto.UserResponseDto;
 import org.petmarket.users.entity.User;
+import org.petmarket.utils.Helper;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-@Mapper(config = MapperConfig.class, uses = {UserPhoneMapper.class})
+@Mapper(config = MapperConfig.class, uses = {UserPhoneMapper.class}, imports = {Helper.class})
 public abstract class UserMapper {
 
     public abstract UserResponseDto mapEntityToDto(User entity);
@@ -51,6 +52,10 @@ public abstract class UserMapper {
             """
                       java(entity.getCompleteOrdersCount())
                     """)
+    @Mapping(target = "responseSpeed", expression =
+            """
+                      java(Helper.getRandomInt(1, 30))
+                    """) //TODO change after add message
     public abstract AuthorResponseDto mapEntityToAuthorDto(User entity);
 
     @Mapping(target = "shortName", expression =
