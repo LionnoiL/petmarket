@@ -91,8 +91,8 @@ public class AdvertisementImageService {
                             LocalDateTime.now().minusDays(daysThreshold),
                             PageRequest.of(pageNumber, 1000));
             for (AdvertisementImage image : advertisementImagePage.getContent()) {
-                imageService.deleteImage(catalogName, image.getUrl());
-                imageService.deleteImage(catalogName, image.getUrlSmall());
+                imageService.deleteImageFromS3(catalogName, image.getUrl());
+                imageService.deleteImageFromS3(catalogName, image.getUrlSmall());
             }
             advertisementImageRepository.deleteAll(advertisementImagePage.getContent());
             pageNumber++;
@@ -116,8 +116,8 @@ public class AdvertisementImageService {
 
     private void deleteImages(List<AdvertisementImage> images) {
         for (AdvertisementImage image : images) {
-            imageService.deleteImage(catalogName, image.getUrl());
-            imageService.deleteImage(catalogName, image.getUrlSmall());
+            imageService.deleteImageFromS3(catalogName, image.getUrl());
+            imageService.deleteImageFromS3(catalogName, image.getUrlSmall());
         }
 
         advertisementImageRepository.deleteAll(images);
