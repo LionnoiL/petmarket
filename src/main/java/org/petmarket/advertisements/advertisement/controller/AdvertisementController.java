@@ -325,17 +325,6 @@ public class AdvertisementController {
                 .map(adv -> advertisementMapper.mapEntityToShortDto(adv, language));
     }
 
-    @Operation(summary = "Delete Advertisement Image")
-    @ApiResponseDeleted
-    @ApiResponseUnauthorized
-    @ApiResponseForbidden
-    @ApiResponseNotFound
-    @DeleteMapping("/image/{imageId}")
-    public void deleteImage(@ParameterId @PathVariable Long imageId) {
-        accessCheckerService.checkUpdateAccess(List.of(advertisementService.getAdvertisementByImageId(imageId)));
-        advertisementImageService.deleteImageById(imageId);
-    }
-
     @Operation(summary = "Delete images by ids")
     @ApiResponseDeleted
     @ApiResponseUnauthorized
@@ -349,24 +338,24 @@ public class AdvertisementController {
         advertisementImageService.deleteImagesByIds(imageIds);
     }
 
-    @Operation(summary = "Delete All Advertisement Images")
+    @Operation(summary = "Delete All Images Of Advertisement")
     @ApiResponseDeleted
     @ApiResponseUnauthorized
     @ApiResponseForbidden
-    @DeleteMapping("/images/{advertisementId}")
+    @DeleteMapping("/{advertisementId}/images")
     public void deleteAllImages(@ParameterId @PathVariable Long advertisementId) {
         accessCheckerService.checkUpdateAccess(List.of(advertisementService
                 .getAdvertisement(advertisementId)));
         advertisementImageService.deleteImagesByAdvertisementId(advertisementId);
     }
 
-    @Operation(summary = "Delete All Advertisement Images by type")
+    @Operation(summary = "Delete All Images of Advertisement by Type")
     @ApiResponseDeleted
     @ApiResponseUnauthorized
     @ApiResponseForbidden
-    @DeleteMapping("/images/{advertisementId}/{type}")
+    @DeleteMapping("/{advertisementId}/images-by-type")
     public void deleteAllImagesByType(@ParameterId @PathVariable Long advertisementId,
-                                      @PathVariable AdvertisementImageType type) {
+                                      @RequestBody AdvertisementImageType type) {
         accessCheckerService.checkUpdateAccess(List.of(advertisementService
                 .getAdvertisement(advertisementId)));
         advertisementImageService.deleteImagesByAdvertisementIdAndType(advertisementId, type);
