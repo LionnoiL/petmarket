@@ -394,6 +394,15 @@ public class AdvertisementService {
         return new PageImpl<>(similarAdvertisements, pageable, searchQuery.fetchTotalHitCount());
     }
 
+    public Advertisement getAdvertisementByImageId(Long imageId) {
+        return advertisementRepository.findAdvertisementByImageId(imageId)
+                .orElseThrow(() -> new ItemNotFoundException(ADVERTISEMENT_NOT_FOUND));
+    }
+
+    public List<Advertisement> getAdvertisementsByImageIds(List<Long> imageIds) {
+        return advertisementRepository.findAdvertisementsByImageIds(imageIds);
+    }
+
     private Long getCategoryIdFromSearch(String search) {
         if (search == null || search.isBlank()) {
             return null;

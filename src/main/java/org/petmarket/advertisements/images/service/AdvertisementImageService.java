@@ -91,12 +91,36 @@ public class AdvertisementImageService {
                             LocalDateTime.now().minusDays(daysThreshold),
                             PageRequest.of(pageNumber, 1000));
             for (AdvertisementImage image : advertisementImagePage.getContent()) {
-                imageService.deleteImage(catalogName, image.getUrl());
-                imageService.deleteImage(catalogName, image.getUrlSmall());
+                imageService.deleteImageFromS3(catalogName, image.getUrl());
+                imageService.deleteImageFromS3(catalogName, image.getUrlSmall());
             }
             advertisementImageRepository.deleteAll(advertisementImagePage.getContent());
             pageNumber++;
         } while (advertisementImagePage.hasNext());
+    }
+
+    @Transactional
+    public void deleteImagesByIds(List<Long> imageIds) {
+        deleteImages(advertisementImageRepository.findAllById(imageIds));
+    }
+
+    @Transactional
+    public void deleteImagesByAdvertisementId(Long advertisementId) {
+        deleteImages(advertisementImageRepository.findAllByAdvertisementId(advertisementId));
+    }
+
+    @Transactional
+    public void deleteImagesByAdvertisementIdAndType(Long advertisementId, AdvertisementImageType type) {
+        deleteImages(advertisementImageRepository.findAllByAdvertisementIdAndType(advertisementId, type));
+    }
+
+    private void deleteImages(List<AdvertisementImage> images) {
+        for (AdvertisementImage image : images) {
+            imageService.deleteImageFromS3(catalogName, image.getUrl());
+            imageService.deleteImageFromS3(catalogName, image.getUrlSmall());
+        }
+
+        advertisementImageRepository.deleteAll(images);
     }
 
     private boolean isImagesPresentByType(Advertisement advertisement,

@@ -42,6 +42,7 @@ public final class MessageUtils {
     public static final String BREED_NOT_FOUND = "Breed not found";
     public static final String REVIEW_NOT_FOUND = "Review not found";
     public static final String ORDER_NOT_FOUND = "Order not found";
+    public static final String ADVERTISEMENT_IMAGE_NOT_FOUND = "Advertisement image not found";
     public static final String LANGUAGE_IS_PRESENT_IN_LIST = "Language is present in list";
     public static final String NO_TRANSLATION = "No translation";
     public static final String PARENT_CATEGORY_CANNOT_IN_LIST = "The parent category id cannot be in the list " +

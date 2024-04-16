@@ -324,4 +324,40 @@ public class AdvertisementController {
         return advertisements
                 .map(adv -> advertisementMapper.mapEntityToShortDto(adv, language));
     }
+
+    @Operation(summary = "Delete images by ids")
+    @ApiResponseDeleted
+    @ApiResponseUnauthorized
+    @ApiResponseForbidden
+    @DeleteMapping("/images")
+    public void deleteImagesByIds(
+            @Parameter(description = "List of images identifiers",
+                    schema = @Schema(type = "array[integer]")
+            ) @RequestParam List<Long> imageIds) {
+        accessCheckerService.checkUpdateAccess(advertisementService.getAdvertisementsByImageIds(imageIds));
+        advertisementImageService.deleteImagesByIds(imageIds);
+    }
+
+    @Operation(summary = "Delete All Images Of Advertisement")
+    @ApiResponseDeleted
+    @ApiResponseUnauthorized
+    @ApiResponseForbidden
+    @DeleteMapping("/{advertisementId}/images")
+    public void deleteAllImages(@ParameterId @PathVariable Long advertisementId) {
+        accessCheckerService.checkUpdateAccess(List.of(advertisementService
+                .getAdvertisement(advertisementId)));
+        advertisementImageService.deleteImagesByAdvertisementId(advertisementId);
+    }
+
+    @Operation(summary = "Delete All Images of Advertisement by Type")
+    @ApiResponseDeleted
+    @ApiResponseUnauthorized
+    @ApiResponseForbidden
+    @DeleteMapping("/{advertisementId}/images-by-type")
+    public void deleteAllImagesByType(@ParameterId @PathVariable Long advertisementId,
+                                      @RequestBody AdvertisementImageType type) {
+        accessCheckerService.checkUpdateAccess(List.of(advertisementService
+                .getAdvertisement(advertisementId)));
+        advertisementImageService.deleteImagesByAdvertisementIdAndType(advertisementId, type);
+    }
 }

@@ -36,7 +36,7 @@ public class ImageService {
         return storageName;
     }
 
-    public void deleteImage(String awsCatalog, String url) {
+    public void deleteImageFromS3(String awsCatalog, String url) {
         String fileNameAws = s3Service.getFileNameAws(url);
         s3Service.deleteFile(awsCatalog, fileNameAws);
     }

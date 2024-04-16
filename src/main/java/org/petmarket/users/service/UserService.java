@@ -97,7 +97,7 @@ public class UserService {
         String oldAvatarUrl = user.getUserAvatarUrl();
         user.setUserAvatarUrl(storage.getFullName());
         userRepository.save(user);
-        imageService.deleteImage(catalogName, oldAvatarUrl);
+        imageService.deleteImageFromS3(catalogName, oldAvatarUrl);
     }
 
     public void checkAccess(User chekedUser) {

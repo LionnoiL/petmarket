@@ -99,8 +99,8 @@ public class MediaService {
     public void deleteMedia(Long id) {
         Media media = mediaRepository.findById(id)
                 .orElseThrow(() -> new ItemNotFoundException("Media with id " + id + " not found"));
-        imageService.deleteImage(catalogName, media.getUrl());
-        imageService.deleteImage(catalogName, media.getUrlSmall());
+        imageService.deleteImageFromS3(catalogName, media.getUrl());
+        imageService.deleteImageFromS3(catalogName, media.getUrlSmall());
         mediaRepository.deleteById(id);
     }
 
