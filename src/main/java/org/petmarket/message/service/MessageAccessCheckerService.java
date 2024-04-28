@@ -39,19 +39,6 @@ public class MessageAccessCheckerService {
         }
     }
 
-    public void checkViewAccess(List<Message> messages) {
-        if (!userService.isCurrentUserAdmin()) {
-            User user = userService.getCurrentUser();
-
-            for (Message message : messages) {
-                if (!message.getAuthor().equals(user) && !message.getRecipient().equals(user)) {
-                    throw new AccessDeniedException(String
-                            .format("Access denied to view message with id %s", message.getId()));
-                }
-            }
-        }
-    }
-
     public void checkReadAccess(Long messageId) {
         Message message = messageService.getMessageById(messageId);
 

@@ -15,6 +15,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
+
 @Service
 @RequiredArgsConstructor
 public class MessageService {
@@ -40,7 +42,7 @@ public class MessageService {
         messageRepository.save(message);
     }
 
-    public Page<MessageResponseDto> getMessagesByUserId(Pageable pageable) {
+    public Page<MessageResponseDto> getUserMessages(Pageable pageable) {
         Long userId = userService.getCurrentUser().getId();
 
         return new PageImpl<>(messageRepository.findByAuthorIdOrRecipientId(userId, userId, pageable)
@@ -53,10 +55,10 @@ public class MessageService {
                     if (!messageResponseDto.getCreated().equals(messageResponseDto.getUpdated())) {
                         messageResponseDto.setEdited(true);
                     }
-                }).toList());
+                }).sorted(Comparator.comparing(MessageResponseDto::getCreated).reversed()).toList());
     }
 
-    public Page<MessageResponseDto> getSentMessagesByUserId(Pageable pageable) {
+    public Page<MessageResponseDto> getSentUserMessages(Pageable pageable) {
         return new PageImpl<>(messageRepository.findByAuthorId(userService.getCurrentUser().getId(), pageable)
                 .map(messageMapper::messageToMessageResponseDto)
                 .stream().peek(messageResponseDto -> {
@@ -65,17 +67,17 @@ public class MessageService {
                     if (!messageResponseDto.getCreated().equals(messageResponseDto.getUpdated())) {
                         messageResponseDto.setEdited(true);
                     }
-                }).toList());
+                }).sorted(Comparator.comparing(MessageResponseDto::getCreated).reversed()).toList());
     }
 
-    public Page<MessageResponseDto> getReceivedMessagesByUserId(Pageable pageable) {
+    public Page<MessageResponseDto> getReceivedUserMessages(Pageable pageable) {
         return new PageImpl<>(messageRepository.findByRecipientId(userService.getCurrentUser().getId(), pageable)
                 .map(messageMapper::messageToMessageResponseDto)
                 .stream().peek(messageResponseDto -> {
                     if (!messageResponseDto.getCreated().equals(messageResponseDto.getUpdated())) {
                         messageResponseDto.setEdited(true);
                     }
-                }).toList());
+                }).sorted(Comparator.comparing(MessageResponseDto::getCreated).reversed()).toList());
     }
 
     public void deleteMessage(Long id) {

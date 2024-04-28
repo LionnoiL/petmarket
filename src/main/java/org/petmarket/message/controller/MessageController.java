@@ -7,15 +7,11 @@ import lombok.RequiredArgsConstructor;
 import org.petmarket.message.dto.MessageRequestDto;
 import org.petmarket.message.dto.MessageResponseDto;
 import org.petmarket.message.dto.MessageUpdateDto;
-import org.petmarket.message.mapper.MessageMapper;
 import org.petmarket.message.service.MessageAccessCheckerService;
 import org.petmarket.message.service.MessageService;
 import org.petmarket.utils.annotations.parametrs.ParameterPageNumber;
 import org.petmarket.utils.annotations.parametrs.ParameterPageSize;
-import org.petmarket.utils.annotations.responses.ApiResponseBadRequest;
-import org.petmarket.utils.annotations.responses.ApiResponseForbidden;
-import org.petmarket.utils.annotations.responses.ApiResponseSuccessful;
-import org.petmarket.utils.annotations.responses.ApiResponseUnauthorized;
+import org.petmarket.utils.annotations.responses.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -32,7 +28,6 @@ import java.util.List;
 public class MessageController {
     private final MessageService messageService;
     private final MessageAccessCheckerService messageAccessCheckerService;
-    private final MessageMapper messageMapper;
 
     @Operation(summary = "Create new message")
     @PostMapping
@@ -46,11 +41,14 @@ public class MessageController {
         messageService.addMessage(messageRequestDto);
     }
 
+    //TODO: add delete received messages, sent messages, and messages by user id
+
     @Operation(summary = "Delete message by id")
     @DeleteMapping("/{id}")
     @ApiResponseSuccessful
     @ApiResponseUnauthorized
     @ApiResponseForbidden
+    @ApiResponseNotFound
     @PreAuthorize("isAuthenticated()")
     public void deleteMessage(@PathVariable Long id) {
         messageAccessCheckerService.checkDeleteAccess(id);
@@ -77,7 +75,7 @@ public class MessageController {
     public Page<MessageResponseDto> getSentMessages(
             @ParameterPageNumber @RequestParam(defaultValue = "1") @Positive int page,
             @ParameterPageSize @RequestParam(defaultValue = "30") @Positive int size) {
-        return messageService.getSentMessagesByUserId(PageRequest.of(page - 1, size));
+        return messageService.getSentUserMessages(PageRequest.of(page - 1, size));
     }
 
     @Operation(summary = "Get user received messages")
@@ -88,7 +86,7 @@ public class MessageController {
     public Page<MessageResponseDto> getReceivedMessages(
             @ParameterPageNumber @RequestParam(defaultValue = "1") @Positive int page,
             @ParameterPageSize @RequestParam(defaultValue = "30") @Positive int size) {
-        return messageService.getReceivedMessagesByUserId(PageRequest.of(page - 1, size));
+        return messageService.getReceivedUserMessages(PageRequest.of(page - 1, size));
     }
 
     @Operation(summary = "Get user messages")
@@ -99,9 +97,17 @@ public class MessageController {
     public Page<MessageResponseDto> getMessages(
             @ParameterPageNumber @RequestParam(defaultValue = "1") @Positive int page,
             @ParameterPageSize @RequestParam(defaultValue = "30") @Positive int size) {
-        return messageService.getMessagesByUserId(PageRequest.of(page - 1, size));
+        return messageService.getUserMessages(PageRequest.of(page - 1, size));
     }
 
-
-    //TODO: add mark as read
+    @Operation(summary = "Mark message as read")
+    @PutMapping("/{id}/read")
+    @ApiResponseSuccessful
+    @ApiResponseUnauthorized
+    @ApiResponseForbidden
+    @PreAuthorize("isAuthenticated()")
+    public void markAsRead(@PathVariable Long id) {
+        messageAccessCheckerService.checkReadAccess(id);
+        messageService.markAsRead(id);
+    }
 }
