@@ -80,7 +80,7 @@ public class AdvertisementResponseTranslateMapper {
         User currentUser = userService.getCurrentUser();
         if (currentUser != null) {
             dto.setInFavoriteList(currentUser.getFavoriteAdvertisements().stream()
-                    .anyMatch(a->a.getAdvertisement().equals(entity))
+                    .anyMatch(a -> a.getAdvertisement().equals(entity))
             );
         }
         return dto;
@@ -154,7 +154,7 @@ public class AdvertisementResponseTranslateMapper {
         User currentUser = userService.getCurrentUser();
         if (currentUser != null) {
             dto.setInFavoriteList(currentUser.getFavoriteAdvertisements().stream()
-                    .anyMatch(a->a.getAdvertisement().equals(entity))
+                    .anyMatch(a -> a.getAdvertisement().equals(entity))
             );
         }
         return dto;

@@ -208,7 +208,7 @@ public class UserService {
         List<FavoriteAdvertisement> favoriteAdvertisements = user.getFavoriteAdvertisements();
         boolean exist = favoriteAdvertisements.stream().anyMatch(a -> a.getAdvertisement().equals(advertisement));
         if (exist) {
-            favoriteAdvertisements.removeIf(a->a.getAdvertisement().equals(advertisement));
+            favoriteAdvertisements.removeIf(a -> a.getAdvertisement().equals(advertisement));
         } else {
             favoriteAdvertisements.add(FavoriteAdvertisement.builder()
                     .advertisement(advertisement)
