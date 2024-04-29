@@ -3,6 +3,7 @@ package org.petmarket.users.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.petmarket.advertisements.advertisement.entity.Advertisement;
 import org.petmarket.errorhandling.AccessDeniedException;
 import org.petmarket.errorhandling.ItemNotFoundException;
 import org.petmarket.files.FileStorageName;
@@ -15,6 +16,7 @@ import org.petmarket.review.service.ReviewService;
 import org.petmarket.security.jwt.JwtUser;
 import org.petmarket.users.dto.UserContactsResponseDto;
 import org.petmarket.users.dto.UserUpdateRequestDto;
+import org.petmarket.users.entity.FavoriteAdvertisement;
 import org.petmarket.users.entity.User;
 import org.petmarket.users.entity.UserPhone;
 import org.petmarket.users.repository.UserRepository;
@@ -186,12 +188,35 @@ public class UserService {
         List<Review> reviews = reviewService.findAllByUser(user, size);
         RatingList ratingList = reviewService.findRatingsByUser(user);
 
-        UserReviewListResponseDto userReviews = UserReviewListResponseDto.builder()
+        return UserReviewListResponseDto.builder()
                 .reviewsCount(user.getReviewsCount())
                 .rating(user.getRating())
                 .ratingList(ratingList)
                 .reviews(reviewMapper.mapEntityToUserReviewDto(reviews))
                 .build();
-        return userReviews;
+    }
+
+    @Transactional
+    public boolean addOrDeleteAdvertisementToFavorite(User user, Advertisement advertisement) {
+        if (user == null) {
+            throw new ItemNotFoundException("User not found");
+        }
+        if (advertisement == null) {
+            throw new ItemNotFoundException("Advertisement not found");
+        }
+        boolean advertisementInList = false;
+        List<FavoriteAdvertisement> favoriteAdvertisements = user.getFavoriteAdvertisements();
+        boolean exist = favoriteAdvertisements.stream().anyMatch(a -> a.getAdvertisement().equals(advertisement));
+        if (exist) {
+            favoriteAdvertisements.removeIf(a -> a.getAdvertisement().equals(advertisement));
+        } else {
+            favoriteAdvertisements.add(FavoriteAdvertisement.builder()
+                    .advertisement(advertisement)
+                    .user(user)
+                    .build());
+            advertisementInList = true;
+        }
+        userRepository.save(user);
+        return advertisementInList;
     }
 }

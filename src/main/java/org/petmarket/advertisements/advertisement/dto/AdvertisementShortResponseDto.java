@@ -44,6 +44,9 @@ public class AdvertisementShortResponseDto {
     private AdvertisementType type;
     private int rating;
 
+    @JsonProperty("in_current_user_favorite_list")
+    private boolean inFavoriteList;
+
     @JsonProperty("favorite_attributes")
     private List<AttributeResponseDto> favoriteAttributes;
     private List<AttributeResponseDto> attributes;
