@@ -54,6 +54,9 @@ public class AdvertisementDetailsResponseDto {
     private int rating;
     private BreedResponseDto breed;
 
+    @JsonProperty("in_current_user_favorite_list")
+    private boolean inFavoriteList;
+
     @JsonProperty("additional_information")
     private String additionalInformation;
 
