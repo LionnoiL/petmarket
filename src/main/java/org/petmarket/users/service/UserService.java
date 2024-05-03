@@ -144,6 +144,7 @@ public class UserService {
     @Transactional
     public User updateUser(User user, UserUpdateRequestDto request) {
         BeanUtils.copyProperties(request, user);
+        user.setUsername(user.getEmail());
         user.setPhones(mergePhones(user, request));
         userRepository.save(user);
         return user;
