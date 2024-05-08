@@ -56,6 +56,12 @@ public class EmailService implements NotificationService {
                     fields,
                     user
             );
+            case MAIL_UPDATE_SUCCESSFULLY -> sendEmailMessage(
+                    translationService.getTranslate(TranslationMessages.MAIL_CHANGED_SUCCESSFULLY, userLangCode),
+                    templateName,
+                    fields,
+                    user
+            );
             default -> log.info("error sending mail to {}", user.getEmail());
         }
     }
