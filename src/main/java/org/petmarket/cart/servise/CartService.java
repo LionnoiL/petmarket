@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.advertisements.advertisement.entity.Advertisement;
+import org.petmarket.advertisements.advertisement.entity.AdvertisementStatus;
 import org.petmarket.advertisements.advertisement.service.AdvertisementService;
 import org.petmarket.cart.dto.CartForCheckoutResponseDto;
 import org.petmarket.cart.dto.CartItemRequestDto;
@@ -12,6 +13,7 @@ import org.petmarket.cart.entity.Cart;
 import org.petmarket.cart.entity.CartItem;
 import org.petmarket.cart.mapper.CartMapper;
 import org.petmarket.cart.repository.CartRepository;
+import org.petmarket.errorhandling.AdvertisementStatusException;
 import org.petmarket.errorhandling.ItemNotFoundException;
 import org.petmarket.language.entity.Language;
 import org.petmarket.users.entity.User;
@@ -56,6 +58,10 @@ public class CartService {
         for (CartItemRequestDto item : items) {
             Advertisement advertisement = advertisementService.getAdvertisement(
                     item.getAdvertisementId());
+            if (!AdvertisementStatus.ACTIVE.equals(advertisement.getStatus())) {
+                throw new AdvertisementStatusException("Advertisement not active");
+            }
+
             CartItem foundItem = cart.getItemByAdvertisementId(item.getAdvertisementId());
             if (foundItem == null) {
                 foundItem = CartItem.builder()
