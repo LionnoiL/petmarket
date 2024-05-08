@@ -14,22 +14,24 @@ jobs:
 
       - name: Update application.properties
         run: |
-          sed -i 's/${MYSQL_HOST}/${{ secrets.MYSQL_HOST }}/' src/main/resources/application.properties
-          sed -i 's/${MYSQL_PORT}/${{ secrets.MYSQL_PORT }}/' src/main/resources/application.properties
-          sed -i 's/${MYSQL_USER}/${{ secrets.MYSQL_USER }}/' src/main/resources/application.properties
-          sed -i 's/${MYSQL_PASSWORD}/${{ secrets.MYSQL_PASSWORD }}/' src/main/resources/application.properties
-          sed -i 's/${SECRET_KEY}/${{ secrets.SECRET_KEY }}/' src/main/resources/application.properties
-          sed -i 's/${S3_REGION}/${{ secrets.S3_REGION }}/' src/main/resources/application.properties
-          sed -i 's/${S3_ACCESS_KEY}/${{ secrets.S3_ACCESS_KEY }}/' src/main/resources/application.properties
-          sed -i 's/${S3_SECURE_KEY}/${{ secrets.S3_SECURE_KEY }}/' src/main/resources/application.properties
-          sed -i 's/${S3_BUCKET}/${{ secrets.S3_BUCKET }}/' src/main/resources/application.properties
-          sed -i 's/${FRONT_SECRET_KEY}/${{ secrets.FRONT_SECRET_KEY }}/' src/main/resources/application.properties
-          sed -i 's/${GOOGLE_CLIENT_ID}/${{ secrets.GOOGLE_CLIENT_ID }}/' src/main/resources/application.properties
-          sed -i 's/${GOOGLE_CLIENT_SECRET}/${{ secrets.GOOGLE_CLIENT_SECRET }}/' src/main/resources/application.properties
-          sed -i 's/${FACEBOOK_CLIENT_ID}/${{ secrets.FACEBOOK_CLIENT_ID }}/' src/main/resources/application.properties
-          sed -i 's/${FACEBOOK_CLIENT_SECRET}/${{ secrets.FACEBOOK_CLIENT_SECRET }}/' src/main/resources/application.properties
-          sed -i 's/${GMAIL_USER_NAME}/${{ secrets.GMAIL_USER_NAME }}/' src/main/resources/application.properties
-          sed -i 's/${GMAIL_USER_PASSWORD}/${{ secrets.GMAIL_USER_PASSWORD }}/' src/main/resources/application.properties
+          sed -i \
+          -e "s/\${MYSQL_HOST}/${{ secrets.MYSQL_HOST }}/g" \
+          -e "s/\${MYSQL_PORT}/${{ secrets.MYSQL_PORT }}/g" \
+          -e "s/\${MYSQL_USER}/${{ secrets.MYSQL_USER }}/g" \
+          -e "s/\${MYSQL_PASSWORD}/${{ secrets.MYSQL_PASSWORD }}/g" \
+          -e "s/\${SECRET_KEY}/${{ secrets.SECRET_KEY }}/g" \
+          -e "s/\${S3_REGION}/${{ secrets.S3_REGION }}/g" \
+          -e "s/\${S3_ACCESS_KEY}/${{ secrets.S3_ACCESS_KEY }}/g" \
+          -e "s/\${S3_SECURE_KEY}/${{ secrets.S3_SECURE_KEY }}/g" \
+          -e "s/\${S3_BUCKET}/${{ secrets.S3_BUCKET }}/g" \
+          -e "s/\${FRONT_SECRET_KEY}/${{ secrets.FRONT_SECRET_KEY }}/g" \
+          -e "s/\${GOOGLE_CLIENT_ID}/${{ secrets.GOOGLE_CLIENT_ID }}/g" \
+          -e "s/\${GOOGLE_CLIENT_SECRET}/${{ secrets.GOOGLE_CLIENT_SECRET }}/g" \
+          -e "s/\${FACEBOOK_CLIENT_ID}/${{ secrets.FACEBOOK_CLIENT_ID }}/g" \
+          -e "s/\${FACEBOOK_CLIENT_SECRET}/${{ secrets.FACEBOOK_CLIENT_SECRET }}/g" \
+          -e "s/\${GMAIL_USER_NAME}/${{ secrets.GMAIL_USER_NAME }}/g" \
+          -e "s/\${GMAIL_USER_PASSWORD}/${{ secrets.GMAIL_USER_PASSWORD }}/g" \
+          src/main/resources/application.properties
 
       - name: Set up Java
         uses: actions/setup-java@v2
