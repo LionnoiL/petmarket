@@ -1,0 +1,31 @@
+name: Checkstyle
+
+on:
+  push:
+    branches:
+      - '*'
+
+jobs:
+  checkstyle:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up JDK
+      uses: actions/setup-java@v2
+      with:
+        java-version: '17'
+
+    - name: Run Checkstyle
+      run: mvn checkstyle:check
+
+    - name: Check Checkstyle results
+      run: |
+        if grep -q "ERROR" target/checkstyle-result.xml; then
+          echo "Checkstyle found errors."
+          exit 1
+        else
+          echo "Checkstyle passed."
+        fi
