@@ -1,0 +1,57 @@
+name: Deploy to Ubuntu Server
+
+on:
+  push:
+    branches:
+      - main
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Java
+        uses: actions/setup-java@v2
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Build and package JAR
+        run: mvn clean package
+        env:
+            MYSQL_HOST: ${{ secrets.MYSQL_HOST }}
+            MYSQL_PORT: ${{ secrets.MYSQL_PORT }}
+            MYSQL_USER: ${{ secrets.MYSQL_USER }}
+            MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+            SECRET_KEY: ${{ secrets.SECRET_KEY }}
+            S3_REGION: ${{ secrets.S3_REGION }}
+            S3_ACCESS_KEY: ${{ secrets.S3_ACCESS_KEY }}
+            S3_SECURE_KEY: ${{ secrets.S3_SECURE_KEY }}
+            S3_BUCKET: ${{ secrets.S3_BUCKET }}
+            FRONT_SECRET_KEY: ${{ secrets.FRONT_SECRET_KEY }}
+            GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+            GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+            FACEBOOK_CLIENT_ID: ${{ secrets.FACEBOOK_CLIENT_ID }}
+            FACEBOOK_CLIENT_SECRET: ${{ secrets.FACEBOOK_CLIENT_SECRET }}
+            GMAIL_USER_NAME: ${{ secrets.GMAIL_USER_NAME }}
+            GMAIL_USER_PASSWORD: ${{ secrets.GMAIL_USER_PASSWORD }}
+
+      - name: Copy JAR to Ubuntu server
+        uses: garygrossgarten/github-action-scp@release
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          privateKey: ${{ secrets.SSH_PRIVATE_KEY }}
+          local: "target/petmarket.jar"
+          remote: "/home/gaponov/java_deploy/petmarket/petmarket.jar"
+
+      - name: Restart service
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            sudo systemctl restart petmarket.service
