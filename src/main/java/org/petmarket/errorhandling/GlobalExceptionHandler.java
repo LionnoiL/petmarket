@@ -24,6 +24,11 @@ import java.sql.SQLIntegrityConstraintViolationException;
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
+    @ExceptionHandler(AdvertisementStatusException.class)
+    private ResponseEntity<Object> handleException(AdvertisementStatusException exception) {
+        return buildExceptionBody(exception, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     private ResponseEntity<Object> handleException(MethodArgumentTypeMismatchException exception) {
         return buildExceptionBody(exception, HttpStatus.BAD_REQUEST);
