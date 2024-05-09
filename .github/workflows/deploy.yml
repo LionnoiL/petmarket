@@ -31,7 +31,7 @@ jobs:
           -e "s/\${FACEBOOK_CLIENT_SECRET}/${{ secrets.FACEBOOK_CLIENT_SECRET }}/g" \
           -e "s/\${GMAIL_USER_NAME}/${{ secrets.GMAIL_USER_NAME }}/g" \
           -e "s/\${GMAIL_USER_PASSWORD}/${{ secrets.GMAIL_USER_PASSWORD }}/g" \
-          -e "s/\${SERVER_PORT}/${{ secrets.SERVER_PORT }}/g" \
+          -e "s/\${SERVER_PORT:5555}/${{ secrets.SERVER_PORT }}/g" \
           src/main/resources/application.properties
 
       - name: Set up Java
