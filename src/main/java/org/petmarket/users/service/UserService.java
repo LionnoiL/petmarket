@@ -8,6 +8,8 @@ import org.petmarket.errorhandling.AccessDeniedException;
 import org.petmarket.errorhandling.ItemNotFoundException;
 import org.petmarket.files.FileStorageName;
 import org.petmarket.images.ImageService;
+import org.petmarket.notifications.NotificationService;
+import org.petmarket.notifications.NotificationType;
 import org.petmarket.review.dto.RatingList;
 import org.petmarket.review.dto.UserReviewListResponseDto;
 import org.petmarket.review.entity.Review;
@@ -40,6 +42,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final ImageService imageService;
     private final ReviewService reviewService;
+    private final NotificationService emailService;
     private final ReviewMapper reviewMapper;
 
     @Value("${aws.s3.catalog.users}")
@@ -143,10 +146,19 @@ public class UserService {
 
     @Transactional
     public User updateUser(User user, UserUpdateRequestDto request) {
+        String oldUserEmail = user.getEmail();
+
         BeanUtils.copyProperties(request, user);
         user.setUsername(user.getEmail());
         user.setPhones(mergePhones(user, request));
         userRepository.save(user);
+
+        if (!Objects.equals(oldUserEmail, user.getEmail())) {
+            Map<String, Object> fields = new HashMap<>();
+            emailService.send(NotificationType.MAIL_UPDATE_SUCCESSFULLY, fields, user);
+            emailService.send(NotificationType.MAIL_UPDATE_SUCCESSFULLY, fields, user.getLanguage(), oldUserEmail);
+        }
+
         return user;
     }
 
