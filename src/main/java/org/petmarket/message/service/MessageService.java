@@ -2,20 +2,17 @@ package org.petmarket.message.service;
 
 import lombok.RequiredArgsConstructor;
 import org.petmarket.errorhandling.ItemNotFoundException;
-import org.petmarket.message.dto.MessageResponseDto;
-import org.petmarket.message.dto.MessageUpdateDto;
+import org.petmarket.message.dto.*;
 import org.petmarket.message.entity.Message;
-import org.petmarket.message.dto.MessageRequestDto;
 import org.petmarket.message.entity.MessageStatus;
 import org.petmarket.message.mapper.MessageMapper;
 import org.petmarket.message.repository.MessageRepository;
+import org.petmarket.users.mapper.UserMapper;
 import org.petmarket.users.service.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.Comparator;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +20,7 @@ public class MessageService {
     private final MessageRepository messageRepository;
     private final MessageMapper messageMapper;
     private final UserService userService;
+    private final UserMapper userMapper;
 
     public void addMessage(MessageRequestDto messageRequestDto) {
         Message message = messageMapper.messageRequestDtoToMessage(messageRequestDto);
@@ -42,42 +40,32 @@ public class MessageService {
         messageRepository.save(message);
     }
 
-    public Page<MessageResponseDto> getUserMessages(Pageable pageable) {
-        Long userId = userService.getCurrentUser().getId();
+    public void markChatMessagesAsRead(Long chatUserId) {
+        messageRepository.markChatMessagesAsRead(UserService.getCurrentUserId(), chatUserId);
+    }
 
-        return new PageImpl<>(messageRepository.findByAuthorIdOrRecipientId(userId, userId, pageable)
+    public ChatResponseDto getChatWithUser(Long chatUserId, Pageable pageable) {
+        Long userId = UserService.getCurrentUserId();
+
+        Page<MessageResponseDto> message = new PageImpl<>(messageRepository
+                .findAllByUserAndChatUserId(userId, chatUserId, pageable)
                 .map(messageMapper::messageToMessageResponseDto)
                 .stream().peek(messageResponseDto -> {
-                    if (messageResponseDto.getAuthor().getId() == userId) {
+                    if (messageResponseDto.getAuthorId().equals(userId)) {
                         messageResponseDto.setSender(true);
                     }
 
                     if (!messageResponseDto.getCreated().equals(messageResponseDto.getUpdated())) {
                         messageResponseDto.setEdited(true);
                     }
-                }).sorted(Comparator.comparing(MessageResponseDto::getCreated).reversed()).toList());
+                }).toList());
+
+        return new ChatResponseDto(userMapper.mapEntityToDto(userService.findById(chatUserId)), message);
     }
 
-    public Page<MessageResponseDto> getSentUserMessages(Pageable pageable) {
-        return new PageImpl<>(messageRepository.findByAuthorId(userService.getCurrentUser().getId(), pageable)
-                .map(messageMapper::messageToMessageResponseDto)
-                .stream().peek(messageResponseDto -> {
-                    messageResponseDto.setSender(true);
-
-                    if (!messageResponseDto.getCreated().equals(messageResponseDto.getUpdated())) {
-                        messageResponseDto.setEdited(true);
-                    }
-                }).sorted(Comparator.comparing(MessageResponseDto::getCreated).reversed()).toList());
-    }
-
-    public Page<MessageResponseDto> getReceivedUserMessages(Pageable pageable) {
-        return new PageImpl<>(messageRepository.findByRecipientId(userService.getCurrentUser().getId(), pageable)
-                .map(messageMapper::messageToMessageResponseDto)
-                .stream().peek(messageResponseDto -> {
-                    if (!messageResponseDto.getCreated().equals(messageResponseDto.getUpdated())) {
-                        messageResponseDto.setEdited(true);
-                    }
-                }).sorted(Comparator.comparing(MessageResponseDto::getCreated).reversed()).toList());
+    public Page<UserChatsResponseDto> getLatestChatMessages(Pageable pageable) {
+        Long userId = UserService.getCurrentUserId();
+        return messageRepository.findLatestChatMessagesByUserId(userId, pageable);
     }
 
     public void deleteMessage(Long id) {
