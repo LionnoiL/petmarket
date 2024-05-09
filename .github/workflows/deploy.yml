@@ -52,6 +52,14 @@ jobs:
           remote: "/home/gaponov/java_deploy/petmarket/petmarket.jar"
           overwrite: true
 
+      - name: Change owner and group of file
+        run: |
+          sudo chown gaponov:gaponov /home/gaponov/java_deploy/petmarket/petmarket.jar
+
+      - name: Set permissions on file
+        run: |
+          chmod 744 /home/gaponov/java_deploy/petmarket/petmarket.jar
+    
       - name: Restart service
         uses: appleboy/ssh-action@master
         with:
