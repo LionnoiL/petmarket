@@ -31,7 +31,7 @@ public class OptionsService {
                 .orElseThrow(() -> new ItemNotFoundException(LANGUAGE_NOT_FOUND));
     }
 
-    public int getNumberOfDaysAdvIsActive () {
+    public int getNumberOfDaysAdvIsActive() {
         int numberDays = 10;
         String optionsValueByKey = getOptionsValueByKey(OptionsKey.NUMBER_OF_DAYS_ADV_IS_ACTIVE);
         if (!optionsValueByKey.isEmpty()) {
