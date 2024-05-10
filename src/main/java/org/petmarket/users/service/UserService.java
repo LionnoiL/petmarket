@@ -4,7 +4,9 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.advertisements.advertisement.entity.Advertisement;
+import org.petmarket.advertisements.advertisement.entity.AdvertisementStatus;
 import org.petmarket.errorhandling.AccessDeniedException;
+import org.petmarket.errorhandling.AdvertisementStatusException;
 import org.petmarket.errorhandling.ItemNotFoundException;
 import org.petmarket.files.FileStorageName;
 import org.petmarket.images.ImageService;
@@ -223,6 +225,9 @@ public class UserService {
         if (exist) {
             favoriteAdvertisements.removeIf(a -> a.getAdvertisement().equals(advertisement));
         } else {
+            if (!AdvertisementStatus.ACTIVE.equals(advertisement.getStatus())) {
+                throw new AdvertisementStatusException("Advertisement not active");
+            }
             favoriteAdvertisements.add(FavoriteAdvertisement.builder()
                     .advertisement(advertisement)
                     .user(user)

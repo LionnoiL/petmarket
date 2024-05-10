@@ -33,6 +33,7 @@ jobs:
           -e "s/\${GMAIL_USER_PASSWORD}/${{ secrets.GMAIL_USER_PASSWORD }}/g" \
           -e "s/\${SERVER_PORT:5555}/${{ secrets.SERVER_PORT }}/g" \
           -e "s/\${SSL_KEY_PASSWORD:}/${{ secrets.SSL_KEY_PASSWORD }}/g" \
+          -e "s/\${SSL_ENABLED:false}/true/g" \
           src/main/resources/application.properties
 
       - name: Set up Java
