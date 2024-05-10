@@ -64,8 +64,7 @@ public class MessageService {
     }
 
     public Page<UserChatsResponseDto> getLatestChatMessages(Pageable pageable) {
-        Long userId = UserService.getCurrentUserId();
-        return messageRepository.findLatestChatMessagesByUserId(userId, pageable);
+        return messageRepository.findLatestChatMessagesByUserId(UserService.getCurrentUserId(), pageable);
     }
 
     public void deleteMessage(Long id) {

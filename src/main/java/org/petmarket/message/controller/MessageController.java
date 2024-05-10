@@ -48,7 +48,7 @@ public class MessageController {
     @ApiResponseForbidden
     @ApiResponseNotFound
     @PreAuthorize("isAuthenticated()")
-    public void deleteMessage(@PathVariable Long id) {
+    public void deleteMessage(@ParameterId @PathVariable Long id) {
         messageAccessCheckerService.checkDeleteAccess(id);
         messageService.deleteMessage(id);
     }
@@ -59,8 +59,9 @@ public class MessageController {
     @ApiResponseBadRequest
     @ApiResponseUnauthorized
     @ApiResponseForbidden
+    @ApiResponseNotFound
     @PreAuthorize("isAuthenticated()")
-    public void updateMessage(@PathVariable Long id, @RequestBody MessageUpdateDto messageUpdateDto) {
+    public void updateMessage(@ParameterId @PathVariable Long id, @RequestBody MessageUpdateDto messageUpdateDto) {
         messageAccessCheckerService.checkUpdateAccess(List.of(messageService.getMessageById(id)));
         messageService.updateMessage(id, messageUpdateDto);
     }
@@ -85,7 +86,7 @@ public class MessageController {
     @ApiResponseUnauthorized
     @ApiResponseForbidden
     @PreAuthorize("isAuthenticated()")
-    public void markAsRead(@PathVariable Long id) {
+    public void markAsRead(@ParameterId @PathVariable Long id) {
         messageAccessCheckerService.checkReadAccess(id);
         messageService.markAsRead(id);
     }
@@ -100,7 +101,7 @@ public class MessageController {
     }
 
     @Operation(summary = "Get all chats of current user")
-    @GetMapping("/chats")
+    @GetMapping("/chat")
     @ApiResponseSuccessful
     @ApiResponseUnauthorized
     @PreAuthorize("isAuthenticated()")

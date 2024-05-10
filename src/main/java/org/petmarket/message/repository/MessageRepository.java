@@ -44,10 +44,10 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
             ON latest_messages.chat_user_id = u.id
             INNER JOIN message m
             ON (
-                   (m.author_id = :userId AND m.recipient_id = latest_messages.chat_user_id)
-                   OR
-                   (m.recipient_id = :userId AND m.author_id = latest_messages.chat_user_id)
-               )
+                (m.author_id = :userId AND m.recipient_id = latest_messages.chat_user_id)
+                OR
+                (m.recipient_id = :userId AND m.author_id = latest_messages.chat_user_id)
+            )
             AND latest_messages.max_created = m.created
             """, countQuery = """
                           SELECT COUNT(*) FROM (

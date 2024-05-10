@@ -9,6 +9,7 @@ import org.petmarket.users.service.UserService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -17,51 +18,36 @@ public class MessageAccessCheckerService {
     private final MessageService messageService;
 
     public void checkCreateAccess(MessageRequestDto message) {
-        if (!userService.isCurrentUserAdmin()) {
-            User user = userService.getCurrentUser();
-
-            if (!message.getAuthorId().equals(user.getId())) {
-                throw new AccessDeniedException("Access denied to create message");
-            }
-        }
+        getNonAdminUser()
+                .filter(user -> message.getAuthorId().equals(user.getId()))
+                .orElseThrow(() -> new AccessDeniedException("Access denied to create message"));
     }
 
     public void checkUpdateAccess(List<Message> messages) {
-        if (!userService.isCurrentUserAdmin()) {
-            User user = userService.getCurrentUser();
-
-            for (Message message : messages) {
-                if (!message.getAuthor().equals(user)) {
-                    throw new AccessDeniedException(String
-                            .format("Access denied to update message with id %s", message.getId()));
-                }
-            }
-        }
+        getNonAdminUser().ifPresent(user -> messages.stream()
+                .filter(message -> message.getAuthor().equals(user))
+                .findAny()
+                .orElseThrow(() -> new AccessDeniedException("Access denied to update message")));
     }
 
     public void checkReadAccess(Long messageId) {
         Message message = messageService.getMessageById(messageId);
-
-        if (!userService.isCurrentUserAdmin()) {
-            User user = userService.getCurrentUser();
-
-            if (!message.getRecipient().equals(user)) {
-                throw new AccessDeniedException(String
-                        .format("Access denied to read message with id %s", message.getId()));
-            }
-        }
+        getNonAdminUser()
+                .filter(user -> message.getRecipient().equals(user))
+                .orElseThrow(() -> new AccessDeniedException("Access denied to read message"));
     }
 
     public void checkDeleteAccess(Long messageId) {
         Message message = messageService.getMessageById(messageId);
+        getNonAdminUser()
+                .filter(user -> message.getAuthor().equals(user))
+                .orElseThrow(() -> new AccessDeniedException("Access denied to delete message"));
+    }
 
-        if (!userService.isCurrentUserAdmin()) {
-            User user = userService.getCurrentUser();
-
-            if (!message.getAuthor().equals(user)) {
-                throw new AccessDeniedException(String
-                        .format("Access denied to delete message with id %s", message.getId()));
-            }
+    private Optional<User> getNonAdminUser() {
+        if (userService.isCurrentUserAdmin()) {
+            return Optional.empty();
         }
+        return Optional.ofNullable(userService.getCurrentUser());
     }
 }
