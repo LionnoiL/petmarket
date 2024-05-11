@@ -63,6 +63,7 @@ public class CartController {
     @ApiResponseSuccessful
     @ApiResponseNotFound
     @ApiResponseUnauthorized
+    @ApiResponseBadRequest
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/items")
     public CartResponseDto addItems(@Valid @RequestBody List<CartItemRequestDto> items) {

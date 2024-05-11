@@ -12,14 +12,12 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.petmarket.advertisements.advertisement.entity.Advertisement;
+import org.petmarket.advertisements.advertisement.service.AdvertisementService;
 import org.petmarket.errorhandling.ErrorResponse;
 import org.petmarket.security.front.FrontTokenRequestDto;
 import org.petmarket.security.front.FrontTokenService;
-import org.petmarket.users.dto.UpdatePasswordRequestDto;
-import org.petmarket.users.dto.ResetPasswordRequestDto;
-import org.petmarket.users.dto.UserContactsResponseDto;
-import org.petmarket.users.dto.UserResponseDto;
-import org.petmarket.users.dto.UserUpdateRequestDto;
+import org.petmarket.users.dto.*;
 import org.petmarket.users.entity.User;
 import org.petmarket.users.mapper.UserMapper;
 import org.petmarket.users.service.UserAuthService;
@@ -31,6 +29,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -50,6 +49,7 @@ public class UserController {
     private final UserService userService;
     private final UserAuthService userAuthService;
     private final FrontTokenService frontTokenService;
+    private final AdvertisementService advertisementService;
     private final UserMapper userMapper;
 
     @Operation(summary = "Send request to reset user password")
@@ -145,6 +145,24 @@ public class UserController {
         frontTokenService.checkToken(tokenRequestDto);
         User user = userService.findById(userId);
         return userService.getContacts(user);
+    }
+
+    @Operation(summary = "Add advertisement to favorite",
+            description = """
+                    If the advertisement is not in the list of favorites, it is added. Otherwise, it is deleted.
+                    """)
+    @ApiResponseSuccessful
+    @ApiResponseBadRequest
+    @ApiResponseUnauthorized
+    @ApiResponseNotFound
+    @PreAuthorize("isAuthenticated()")
+    @PutMapping("/advertisements/favorite/{advertisementId}")
+    public ResponseEntity<Boolean> addOrDeleteAdvertisementToFavorite(@PathVariable Long advertisementId, Authentication authentication) {
+        log.info("Received request to add advertisement to favorite list");
+        User user = userService.findByUsername(authentication.getName());
+        Advertisement advertisement = advertisementService.getAdvertisement(advertisementId);
+        boolean advertisementInList = userService.addOrDeleteAdvertisementToFavorite(user, advertisement);
+        return ResponseEntity.ok(advertisementInList);
     }
 
     @Operation(summary = "Update User by ID")

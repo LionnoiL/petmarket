@@ -3,10 +3,15 @@ package org.petmarket.users.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.petmarket.advertisements.advertisement.entity.Advertisement;
+import org.petmarket.advertisements.advertisement.entity.AdvertisementStatus;
 import org.petmarket.errorhandling.AccessDeniedException;
+import org.petmarket.errorhandling.AdvertisementStatusException;
 import org.petmarket.errorhandling.ItemNotFoundException;
 import org.petmarket.files.FileStorageName;
 import org.petmarket.images.ImageService;
+import org.petmarket.notifications.NotificationService;
+import org.petmarket.notifications.NotificationType;
 import org.petmarket.review.dto.RatingList;
 import org.petmarket.review.dto.UserReviewListResponseDto;
 import org.petmarket.review.entity.Review;
@@ -15,6 +20,7 @@ import org.petmarket.review.service.ReviewService;
 import org.petmarket.security.jwt.JwtUser;
 import org.petmarket.users.dto.UserContactsResponseDto;
 import org.petmarket.users.dto.UserUpdateRequestDto;
+import org.petmarket.users.entity.FavoriteAdvertisement;
 import org.petmarket.users.entity.User;
 import org.petmarket.users.entity.UserPhone;
 import org.petmarket.users.repository.UserRepository;
@@ -38,6 +44,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final ImageService imageService;
     private final ReviewService reviewService;
+    private final NotificationService emailService;
     private final ReviewMapper reviewMapper;
 
     @Value("${aws.s3.catalog.users}")
@@ -141,9 +148,19 @@ public class UserService {
 
     @Transactional
     public User updateUser(User user, UserUpdateRequestDto request) {
+        String oldUserEmail = user.getEmail();
+
         BeanUtils.copyProperties(request, user);
+        user.setUsername(user.getEmail());
         user.setPhones(mergePhones(user, request));
         userRepository.save(user);
+
+        if (!Objects.equals(oldUserEmail, user.getEmail())) {
+            Map<String, Object> fields = new HashMap<>();
+            emailService.send(NotificationType.MAIL_UPDATE_SUCCESSFULLY, fields, user);
+            emailService.send(NotificationType.MAIL_UPDATE_SUCCESSFULLY, fields, user.getLanguage(), oldUserEmail);
+        }
+
         return user;
     }
 
@@ -186,13 +203,39 @@ public class UserService {
         List<Review> reviews = reviewService.findAllByUser(user, size);
         RatingList ratingList = reviewService.findRatingsByUser(user);
 
-        UserReviewListResponseDto userReviews = UserReviewListResponseDto.builder()
+        return UserReviewListResponseDto.builder()
                 .reviewsCount(user.getReviewsCount())
                 .rating(user.getRating())
                 .ratingList(ratingList)
                 .reviews(reviewMapper.mapEntityToUserReviewDto(reviews))
                 .build();
-        return userReviews;
+    }
+
+    @Transactional
+    public boolean addOrDeleteAdvertisementToFavorite(User user, Advertisement advertisement) {
+        if (user == null) {
+            throw new ItemNotFoundException("User not found");
+        }
+        if (advertisement == null) {
+            throw new ItemNotFoundException("Advertisement not found");
+        }
+        boolean advertisementInList = false;
+        List<FavoriteAdvertisement> favoriteAdvertisements = user.getFavoriteAdvertisements();
+        boolean exist = favoriteAdvertisements.stream().anyMatch(a -> a.getAdvertisement().equals(advertisement));
+        if (exist) {
+            favoriteAdvertisements.removeIf(a -> a.getAdvertisement().equals(advertisement));
+        } else {
+            if (!AdvertisementStatus.ACTIVE.equals(advertisement.getStatus())) {
+                throw new AdvertisementStatusException("Advertisement not active");
+            }
+            favoriteAdvertisements.add(FavoriteAdvertisement.builder()
+                    .advertisement(advertisement)
+                    .user(user)
+                    .build());
+            advertisementInList = true;
+        }
+        userRepository.save(user);
+        return advertisementInList;
     }
 
     public Boolean isUserBlacklisted(Long ownerId, Long userId) {

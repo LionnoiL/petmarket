@@ -19,6 +19,8 @@ import org.petmarket.options.service.OptionsService;
 import org.petmarket.payment.mapper.PaymentResponseTranslateMapper;
 import org.petmarket.translate.LanguageHolder;
 import org.petmarket.translate.TranslationService;
+import org.petmarket.users.entity.User;
+import org.petmarket.users.service.UserService;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -35,6 +37,7 @@ public class AdvertisementResponseTranslateMapper {
     private final AttributeService attributeService;
     private final OptionsService optionsService;
     private final TranslationService translationService;
+    private final UserService userService;
     private final AdvertisementMapper mapper;
     private final AdvertisementCategoryResponseTranslateMapper categoryMapper;
     private final PaymentResponseTranslateMapper paymentMapper;
@@ -72,6 +75,14 @@ public class AdvertisementResponseTranslateMapper {
         dto.setAttributes(attributeMapper.mapEntityToDto(nonFavoriteAttributes, language));
 
         splitImages(dto);
+
+        dto.setInFavoriteList(false);
+        User currentUser = userService.getCurrentUser();
+        if (currentUser != null) {
+            dto.setInFavoriteList(currentUser.getFavoriteAdvertisements().stream()
+                    .anyMatch(a -> a.getAdvertisement().equals(entity))
+            );
+        }
         return dto;
     }
 
@@ -138,6 +149,14 @@ public class AdvertisementResponseTranslateMapper {
 
         dto.getImages()
                 .removeIf(image -> !AdvertisementImageType.ADVERTISEMENT_IMAGE.equals(image.getType()));
+
+        dto.setInFavoriteList(false);
+        User currentUser = userService.getCurrentUser();
+        if (currentUser != null) {
+            dto.setInFavoriteList(currentUser.getFavoriteAdvertisements().stream()
+                    .anyMatch(a -> a.getAdvertisement().equals(entity))
+            );
+        }
         return dto;
     }
 

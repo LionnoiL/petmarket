@@ -138,6 +138,9 @@ public class User {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "author", fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Order> orders = new ArrayList<>();
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<FavoriteAdvertisement> favoriteAdvertisements = new ArrayList<>();
+
     @Override
     public String toString() {
         return "User{" +

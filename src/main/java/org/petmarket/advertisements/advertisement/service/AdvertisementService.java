@@ -541,7 +541,7 @@ public class AdvertisementService {
 
     private void fillDateEnding(Advertisement advertisement) {
         LocalDate currentDate = LocalDate.now();
-        LocalDate dateEnding = currentDate.plusDays(10);
+        LocalDate dateEnding = currentDate.plusDays(optionsService.getNumberOfDaysAdvIsActive());
         advertisement.setEnding(dateEnding);
     }
 }
