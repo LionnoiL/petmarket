@@ -15,6 +15,7 @@ import org.petmarket.utils.annotations.responses.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,7 +37,7 @@ public class MessageController {
     @ApiResponseUnauthorized
     @ApiResponseForbidden
     @PreAuthorize("isAuthenticated()")
-    public void addMessage(@Valid @RequestBody MessageRequestDto messageRequestDto) {
+    public void addMessage(@Valid @RequestBody MessageRequestDto messageRequestDto, BindingResult bindingResult) {
         messageAccessCheckerService.checkCreateAccess(messageRequestDto);
         messageService.addMessage(messageRequestDto);
     }
@@ -62,7 +63,7 @@ public class MessageController {
     @ApiResponseNotFound
     @PreAuthorize("isAuthenticated()")
     public void updateMessage(@ParameterId @PathVariable Long id,
-                              @Valid @RequestBody MessageUpdateDto messageUpdateDto) {
+                              @Valid @RequestBody MessageUpdateDto messageUpdateDto, BindingResult bindingResult) {
         messageAccessCheckerService.checkUpdateAccess(List.of(messageService.getMessageById(id)));
         messageService.updateMessage(id, messageUpdateDto);
     }
