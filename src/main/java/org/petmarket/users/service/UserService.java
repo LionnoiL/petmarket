@@ -194,4 +194,8 @@ public class UserService {
                 .build();
         return userReviews;
     }
+
+    public Boolean isUserBlacklisted(Long ownerId, Long userId) {
+        return userRepository.countBlacklistedUsers(ownerId, userId) > 0;
+    }
 }

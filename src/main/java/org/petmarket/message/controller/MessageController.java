@@ -2,6 +2,7 @@ package org.petmarket.message.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.petmarket.message.dto.*;
@@ -13,7 +14,6 @@ import org.petmarket.utils.annotations.parametrs.ParameterPageSize;
 import org.petmarket.utils.annotations.responses.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -36,7 +36,7 @@ public class MessageController {
     @ApiResponseUnauthorized
     @ApiResponseForbidden
     @PreAuthorize("isAuthenticated()")
-    public void addMessage(@RequestBody MessageRequestDto messageRequestDto) {
+    public void addMessage(@Valid @RequestBody MessageRequestDto messageRequestDto) {
         messageAccessCheckerService.checkCreateAccess(messageRequestDto);
         messageService.addMessage(messageRequestDto);
     }
@@ -61,7 +61,8 @@ public class MessageController {
     @ApiResponseForbidden
     @ApiResponseNotFound
     @PreAuthorize("isAuthenticated()")
-    public void updateMessage(@ParameterId @PathVariable Long id, @RequestBody MessageUpdateDto messageUpdateDto) {
+    public void updateMessage(@ParameterId @PathVariable Long id,
+                              @Valid @RequestBody MessageUpdateDto messageUpdateDto) {
         messageAccessCheckerService.checkUpdateAccess(List.of(messageService.getMessageById(id)));
         messageService.updateMessage(id, messageUpdateDto);
     }
@@ -77,7 +78,7 @@ public class MessageController {
             @ParameterPageSize @RequestParam(defaultValue = "30") @Positive int size,
             @ParameterId @PathVariable Long chatUserId) {
         return messageService.getChatWithUser(chatUserId,
-                PageRequest.of(page - 1, size).withSort(Sort.Direction.DESC, "created"));
+                PageRequest.of(page - 1, size));
     }
 
     @Operation(summary = "Mark message as read")

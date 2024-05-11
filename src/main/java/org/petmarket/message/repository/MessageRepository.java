@@ -18,6 +18,7 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
             FROM Message m
             WHERE (m.author.id = :chatUserId AND m.recipient.id = :userId)
             OR (m.author.id = :userId AND m.recipient.id = :chatUserId)
+            ORDER BY m.created DESC
             """)
     Page<Message> findAllByUserAndChatUserId(@Param("userId") Long userId, @Param("chatUserId") Long chatUserId,
                                              Pageable pageable);
@@ -49,6 +50,9 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
                 (m.recipient_id = :userId AND m.author_id = latest_messages.chat_user_id)
             )
             AND latest_messages.max_created = m.created
+            LEFT JOIN users_black_list bl
+            ON bl.owner_id = :userId AND bl.user_id = latest_messages.chat_user_id
+            WHERE bl.user_id IS NULL
             """, countQuery = """
                           SELECT COUNT(*) FROM (
                               SELECT IF(author_id = :userId, recipient_id, author_id) AS chat_user_id

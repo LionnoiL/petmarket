@@ -21,4 +21,11 @@ public interface UserRepository extends UserRepositoryBasic {
     @Modifying
     @Query("UPDATE User u SET u.status = org.petmarket.users.entity.UserStatus.DELETED WHERE u.id = :id")
     void setUserStatusToDeleted(@Param("id") Long id);
+
+    @Query(value = """
+        SELECT COUNT(*)
+        FROM users_black_list
+        WHERE owner_id = :ownerId AND user_id = :userId
+        """, nativeQuery = true)
+    Long countBlacklistedUsers(@Param("ownerId") Long ownerId, @Param("userId") Long userId);
 }

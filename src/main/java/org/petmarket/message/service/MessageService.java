@@ -2,6 +2,7 @@ package org.petmarket.message.service;
 
 import lombok.RequiredArgsConstructor;
 import org.petmarket.errorhandling.ItemNotFoundException;
+import org.petmarket.errorhandling.UserBlackListedException;
 import org.petmarket.message.dto.*;
 import org.petmarket.message.entity.Message;
 import org.petmarket.message.entity.MessageStatus;
@@ -46,6 +47,10 @@ public class MessageService {
 
     public ChatResponseDto getChatWithUser(Long chatUserId, Pageable pageable) {
         Long userId = UserService.getCurrentUserId();
+
+        if (userService.isUserBlacklisted(userId, chatUserId)) {
+            throw new UserBlackListedException(String.format("User with id %s is blacklisted", chatUserId));
+        }
 
         Page<MessageResponseDto> message = new PageImpl<>(messageRepository
                 .findAllByUserAndChatUserId(userId, chatUserId, pageable)
