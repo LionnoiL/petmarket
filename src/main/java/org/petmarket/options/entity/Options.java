@@ -22,4 +22,8 @@ public class Options {
 
     @Column(name = "options_value")
     private String value;
+
+    public Options(OptionsKey key) {
+        this.key = key;
+    }
 }
