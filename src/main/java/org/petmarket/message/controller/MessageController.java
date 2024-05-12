@@ -3,17 +3,12 @@ package org.petmarket.message.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.petmarket.message.dto.*;
 import org.petmarket.message.service.MessageAccessCheckerService;
 import org.petmarket.message.service.MessageService;
 import org.petmarket.utils.annotations.parametrs.ParameterId;
-import org.petmarket.utils.annotations.parametrs.ParameterPageNumber;
-import org.petmarket.utils.annotations.parametrs.ParameterPageSize;
 import org.petmarket.utils.annotations.responses.*;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
@@ -68,20 +63,6 @@ public class MessageController {
         messageService.updateMessage(id, messageUpdateDto);
     }
 
-    @Operation(summary = "Get chat messages by chat user id")
-    @GetMapping("/chat/{chatUserId}")
-    @ApiResponseSuccessful
-    @ApiResponseUnauthorized
-    @ApiResponseForbidden
-    @PreAuthorize("isAuthenticated()")
-    public ChatResponseDto getChatMessages(
-            @ParameterPageNumber @RequestParam(defaultValue = "1") @Positive int page,
-            @ParameterPageSize @RequestParam(defaultValue = "30") @Positive int size,
-            @ParameterId @PathVariable Long chatUserId) {
-        return messageService.getChatWithUser(chatUserId,
-                PageRequest.of(page - 1, size));
-    }
-
     @Operation(summary = "Mark message as read")
     @PutMapping("/{id}/read")
     @ApiResponseSuccessful
@@ -91,25 +72,5 @@ public class MessageController {
     public void markAsRead(@ParameterId @PathVariable Long id) {
         messageAccessCheckerService.checkReadAccess(id);
         messageService.markAsRead(id);
-    }
-
-    @Operation(summary = "Mark chat messages as read")
-    @PutMapping("/chat/{chatUserId}/read")
-    @ApiResponseSuccessful
-    @ApiResponseUnauthorized
-    @PreAuthorize("isAuthenticated()")
-    public void markChatMessagesAsRead(@ParameterId @PathVariable Long chatUserId) {
-        messageService.markChatMessagesAsRead(chatUserId);
-    }
-
-    @Operation(summary = "Get all chats of current user")
-    @GetMapping("/chat")
-    @ApiResponseSuccessful
-    @ApiResponseUnauthorized
-    @PreAuthorize("isAuthenticated()")
-    public Page<UserChatsResponseDto> getLatestChatMessages(
-            @ParameterPageNumber @RequestParam(defaultValue = "1") @Positive int page,
-            @ParameterPageSize @RequestParam(defaultValue = "30") @Positive int size) {
-        return messageService.getLatestChatMessages(PageRequest.of(page - 1, size));
     }
 }

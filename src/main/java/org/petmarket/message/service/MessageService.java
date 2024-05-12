@@ -67,7 +67,7 @@ public class MessageService {
         return new ChatResponseDto(userMapper.mapEntityToDto(userService.findById(chatUserId)), message);
     }
 
-    public Page<UserChatsResponseDto> getLatestChatMessages(Pageable pageable) {
+    public Page<UserChatsResponseDto> getLatestChats(Pageable pageable) {
         return messageRepository.findLatestChatMessagesByUserId(UserService.getCurrentUserId(), pageable);
     }
 
