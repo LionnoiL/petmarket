@@ -24,6 +24,8 @@ public class MessageService {
     private final UserMapper userMapper;
 
     public void addMessage(MessageRequestDto messageRequestDto) {
+        checkBlackList(messageRequestDto.getRecipientId(), messageRequestDto.getAuthorId());
+
         Message message = messageMapper.messageRequestDtoToMessage(messageRequestDto);
         message.setStatus(MessageStatus.UNREAD);
         messageRepository.save(message);
@@ -47,10 +49,7 @@ public class MessageService {
 
     public ChatResponseDto getChatWithUser(Long chatUserId, Pageable pageable) {
         Long userId = UserService.getCurrentUserId();
-
-        if (userService.isUserBlacklisted(userId, chatUserId)) {
-            throw new UserBlackListedException(String.format("User with id %s is blacklisted", chatUserId));
-        }
+        checkBlackList(userId, chatUserId);
 
         Page<MessageResponseDto> message = new PageImpl<>(messageRepository
                 .findAllByUserAndChatUserId(userId, chatUserId, pageable)
@@ -80,5 +79,11 @@ public class MessageService {
     public Message getMessageById(Long id) {
         return messageRepository.findById(id)
                 .orElseThrow(() -> new ItemNotFoundException(String.format("Message with id %s not found", id)));
+    }
+
+    private void checkBlackList(Long recipientId, Long authorId) {
+        if (userService.isUserBlacklisted(recipientId, authorId)) {
+            throw new UserBlackListedException(String.format("User with id %s is blacklisted", authorId));
+        }
     }
 }
