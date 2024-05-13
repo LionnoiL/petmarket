@@ -26,7 +26,7 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     @Modifying
     @Transactional
     @Query(value = """
-            UPDATE Message m
+            UPDATE message m
             SET m.message_status = 'READ'
             WHERE m.author_id = :chatUserId AND m.recipient_id = :userId AND m.message_status = 'UNREAD'
             """, nativeQuery = true)
