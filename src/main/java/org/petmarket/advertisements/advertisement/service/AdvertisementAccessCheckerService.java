@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.advertisements.advertisement.entity.Advertisement;
 import org.petmarket.advertisements.advertisement.entity.AdvertisementStatus;
+import org.petmarket.errorhandling.ItemNotFoundException;
 import org.petmarket.users.entity.User;
 import org.petmarket.users.service.UserService;
 import org.springframework.security.access.AccessDeniedException;
@@ -36,7 +37,7 @@ public class AdvertisementAccessCheckerService {
         if (!userService.isCurrentUserAdmin()) {
             User user = userService.getCurrentUser();
             if (user == null || !advertisement.getAuthor().equals(user)) {
-                throw new AccessDeniedException("Access denied to advertisement with id " + advertisement.getId());
+                throw new ItemNotFoundException("Advertisement was not found for user with id " + advertisement.getId());
             }
         }
     }
