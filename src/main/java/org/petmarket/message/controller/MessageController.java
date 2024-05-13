@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "Message")
+@Tag(name = "Chat")
 @RestController
 @RequiredArgsConstructor
 @Validated

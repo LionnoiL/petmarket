@@ -24,9 +24,10 @@ public class MessageService {
     private final UserMapper userMapper;
 
     public void addMessage(MessageRequestDto messageRequestDto) {
-        checkBlackList(messageRequestDto.getRecipientId(), messageRequestDto.getAuthorId());
+        checkBlackList(messageRequestDto.getRecipientId(), UserService.getCurrentUserId());
 
         Message message = messageMapper.messageRequestDtoToMessage(messageRequestDto);
+        message.setAuthor(userService.getCurrentUser());
         message.setStatus(MessageStatus.UNREAD);
         messageRepository.save(message);
     }

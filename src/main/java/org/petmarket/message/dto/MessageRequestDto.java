@@ -20,10 +20,6 @@ public class MessageRequestDto {
     private String text;
 
     @Schema(example = "1")
-    @JsonProperty("author_id")
-    private Long authorId;
-
-    @Schema(example = "1")
     @JsonProperty("recipient_id")
     private Long recipientId;
 }

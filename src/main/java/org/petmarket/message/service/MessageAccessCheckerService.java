@@ -18,11 +18,9 @@ public class MessageAccessCheckerService {
     private final MessageService messageService;
 
     public void checkCreateAccess(MessageRequestDto message) {
-        getNonAdminUser().ifPresent(u -> {
-            if (!message.getAuthorId().equals(u.getId())) {
-                throw new AccessDeniedException("Access denied to create message");
-            }
-        });
+        if (message.getRecipientId().equals(userService.getCurrentUser().getId())) {
+            throw new AccessDeniedException("Access denied to create message to current user");
+        }
     }
 
     public void checkUpdateAccess(List<Message> messages) {

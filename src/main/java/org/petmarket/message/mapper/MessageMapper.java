@@ -9,7 +9,6 @@ import org.petmarket.message.dto.MessageRequestDto;
 
 @Mapper(config = MapperConfig.class)
 public interface MessageMapper {
-    @Mapping(target = "author.id", source = "authorId")
     @Mapping(target = "recipient.id", source = "recipientId")
     Message messageRequestDtoToMessage(MessageRequestDto messageRequestDto);
 
