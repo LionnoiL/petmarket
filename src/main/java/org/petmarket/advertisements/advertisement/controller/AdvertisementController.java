@@ -274,6 +274,47 @@ public class AdvertisementController {
                 .build();
     }
 
+    @Operation(summary = "Search advertisements",
+            description = """
+                    Search for ads by search term, breeds, attributes, city's, price range, category
+                    and sorting option.
+                    If the search term is not specified, all ads in the city will be displayed.
+                """)
+    @ApiResponseSuccessful
+    @ApiResponseNotFound
+    @PostMapping(value = "/{langCode}/search")
+    public AdvertisementSearchDto searchAdvertisements(
+            @ParameterLanguage @PathVariable String langCode,
+            @ParameterPageNumber @RequestParam(defaultValue = "1") @Positive int page,
+            @ParameterPageSize @RequestParam(defaultValue = "30") @Positive int size,
+            @RequestBody AdvertisementSearchRequestDto searchRequest) {
+        if (searchRequest.getSortOption() == null) {
+            searchRequest.setSortOption(AdvertisementSortOption.RATING_HIGHEST);
+        }
+
+        Language language = languageService.getByLangCode(langCode);
+        AdvertisementCategoryResponseDto category = null;
+        Page<Advertisement> advertisements = advertisementService.search(searchRequest.getSearchTerm(),
+                page, size, searchRequest.getBreedIds(),
+                searchRequest.getAttributeIds(), searchRequest.getStatesIds(), searchRequest.getCityIds(),
+                searchRequest.getMinPrice(), searchRequest.getMaxPrice(), searchRequest.getSortOption(),
+                searchRequest.getCategoryId());
+        Page<AdvertisementShortResponseDto> advertisementShortResponseDtos = advertisements.map(
+                adv -> advertisementMapper.mapEntityToShortDto(adv, language)
+        );
+
+        if (!advertisements.isEmpty()) {
+            category = categoryResponseTranslateMapper.mapEntityToDto(
+                    advertisements.getContent().get(0).getCategory(), language);
+        }
+
+        return AdvertisementSearchDto.builder()
+                .advertisements(advertisementShortResponseDtos)
+                .category(category)
+                .searchTerm(searchRequest.getSearchTerm())
+                .build();
+    }
+
     @Operation(summary = "Get Authors Advertisements",
             description = """
                         Excludes the current advertisement from the list of advertisements.
