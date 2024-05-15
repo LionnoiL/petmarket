@@ -19,14 +19,6 @@ public class AdvertisementSearchRequestDto {
     private String searchTerm;
 
     @Schema(example = "1")
-    @JsonProperty(value = "page")
-    private int page;
-
-    @Schema(example = "10")
-    @JsonProperty(value = "size")
-    private int size;
-
-    @Schema(example = "1")
     @JsonProperty("breed_ids")
     private List<Long> breedIds;
 

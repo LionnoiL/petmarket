@@ -285,13 +285,9 @@ public class AdvertisementController {
     @PostMapping(value = "/{langCode}/search")
     public AdvertisementSearchDto searchAdvertisements(
             @ParameterLanguage @PathVariable String langCode,
+            @ParameterPageNumber @RequestParam(defaultValue = "1") @Positive int page,
+            @ParameterPageSize @RequestParam(defaultValue = "30") @Positive int size,
             @RequestBody AdvertisementSearchRequestDto searchRequest) {
-        if (searchRequest.getPage() == 0) {
-            searchRequest.setPage(1);
-        }
-        if (searchRequest.getSize() == 0) {
-            searchRequest.setSize(30);
-        }
         if (searchRequest.getSortOption() == null) {
             searchRequest.setSortOption(AdvertisementSortOption.RATING_HIGHEST);
         }
@@ -299,7 +295,7 @@ public class AdvertisementController {
         Language language = languageService.getByLangCode(langCode);
         AdvertisementCategoryResponseDto category = null;
         Page<Advertisement> advertisements = advertisementService.search(searchRequest.getSearchTerm(),
-                searchRequest.getPage(), searchRequest.getSize(), searchRequest.getBreedIds(),
+                page, size, searchRequest.getBreedIds(),
                 searchRequest.getAttributeIds(), searchRequest.getStatesIds(), searchRequest.getCityIds(),
                 searchRequest.getMinPrice(), searchRequest.getMaxPrice(), searchRequest.getSortOption(),
                 searchRequest.getCategoryId());
