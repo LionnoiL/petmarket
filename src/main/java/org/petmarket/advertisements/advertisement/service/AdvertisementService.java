@@ -445,6 +445,7 @@ public class AdvertisementService {
             List<Long> statesIds, List<Long> cityIds, BigDecimal minPrice, BigDecimal maxPrice) {
         BooleanPredicateClausesStep<?> queryStep = f.bool();
         queryStep.mustNot(f.terms().field("author.status").matchingAny(UserStatus.DELETED));
+        queryStep.must(f.terms().field("status").matchingAny(AdvertisementStatus.ACTIVE));
 
         if (categoryId != null) {
             queryStep.must(f.terms().field("category.id").matchingAny(categoryId));
