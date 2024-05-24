@@ -252,11 +252,11 @@ public class UserService {
             return;
         }
 
-        BlackList blackList = BlackList.builder()
+        blackListRepository.save(BlackList.builder()
                 .owner(findById(ownerId))
                 .user(findById(userId))
-                .build();
-        blackListRepository.save(blackList);
+                .build()
+        );
     }
 
     public void removeUserFromBlacklist(Long userId) {
