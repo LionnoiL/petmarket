@@ -213,4 +213,25 @@ public class UserController {
         userService.deleteById(userId);
         log.info("User with id {} deleted.", userId);
     }
+
+    @Operation(summary = "Add user to black list")
+    @ApiResponseSuccessful
+    @ApiResponseUnauthorized
+    @PreAuthorize("isAuthenticated()")
+    @PutMapping("/blacklist/{userId}")
+    public void addToBlackList(@ParameterId @PathVariable @Positive Long userId) {
+        userService.addUserToBlacklist(userId);
+        log.info("User with id {} added to black list.", userId);
+    }
+
+    @Operation(summary = "Remove user from black list")
+    @ApiResponseSuccessful
+    @ApiResponseUnauthorized
+    @ApiResponseNotFound
+    @PreAuthorize("isAuthenticated()")
+    @DeleteMapping("/blacklist/{userId}")
+    public void removeFromBlackList(@ParameterId @PathVariable @Positive Long userId) {
+        userService.removeUserFromBlacklist(userId);
+        log.info("User with id {} removed from black list.", userId);
+    }
 }
