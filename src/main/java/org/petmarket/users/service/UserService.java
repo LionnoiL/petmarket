@@ -30,6 +30,7 @@ import org.petmarket.users.repository.BlackListRepository;
 import org.petmarket.users.repository.UserRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -90,6 +91,7 @@ public class UserService {
         return auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
     }
 
+    @Cacheable(value = "users", key = "#userId")
     public User findById(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new ItemNotFoundException("User not found by id: " + userId));
