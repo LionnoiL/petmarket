@@ -30,8 +30,7 @@ public class LogsController {
     @GetMapping
     public ResponseEntity<List<String>> getLogs() {
         try {
-            List<String> lines = Files.readAllLines(Paths.get(logFilePath));
-            return ResponseEntity.ok(lines);
+            return ResponseEntity.ok(Files.readAllLines(Paths.get(logFilePath)));
         } catch (IOException e) {
             return ResponseEntity.status(500).body(null);
         }
