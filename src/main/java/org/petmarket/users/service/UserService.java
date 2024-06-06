@@ -18,16 +18,19 @@ import org.petmarket.review.entity.Review;
 import org.petmarket.review.mapper.ReviewMapper;
 import org.petmarket.review.service.ReviewService;
 import org.petmarket.security.jwt.JwtUser;
+import org.petmarket.users.dto.BlackListResponseDto;
 import org.petmarket.users.dto.UserContactsResponseDto;
 import org.petmarket.users.dto.UserUpdateRequestDto;
 import org.petmarket.users.entity.BlackList;
 import org.petmarket.users.entity.FavoriteAdvertisement;
 import org.petmarket.users.entity.User;
 import org.petmarket.users.entity.UserPhone;
+import org.petmarket.users.mapper.BlackListMapper;
 import org.petmarket.users.repository.BlackListRepository;
 import org.petmarket.users.repository.UserRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -49,6 +52,7 @@ public class UserService {
     private final NotificationService emailService;
     private final ReviewMapper reviewMapper;
     private final BlackListRepository blackListRepository;
+    private final BlackListMapper blackListMapper;
 
     @Value("${aws.s3.catalog.users}")
     private String catalogName;
@@ -262,5 +266,10 @@ public class UserService {
     public void removeUserFromBlacklist(Long userId) {
         blackListRepository.delete(blackListRepository.findByOwnerIdAndUserId(getCurrentUserId(), userId)
                 .orElseThrow(() -> new ItemNotFoundException("User not found in blacklist")));
+    }
+
+    public List<BlackListResponseDto> getBlackList(int page, int size) {
+        return blackListMapper.mapEntityToBlackListDto(userRepository
+                .findBlackListedUsersByOwnerId(getCurrentUserId(), PageRequest.of(page - 1, size)).getContent());
     }
 }

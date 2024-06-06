@@ -1,6 +1,9 @@
 package org.petmarket.users.repository;
 
+import org.petmarket.users.dto.BlackListEntityResponseDto;
 import org.petmarket.users.entity.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -28,4 +31,12 @@ public interface UserRepository extends UserRepositoryBasic {
         WHERE owner_id = :ownerId AND user_id = :userId
         """, nativeQuery = true)
     Long countBlacklistedUsers(@Param("ownerId") Long ownerId, @Param("userId") Long userId);
+
+    @Query(value = """
+        SELECT new org.petmarket.users.dto.BlackListEntityResponseDto(bl.id, u)
+        FROM User u
+        JOIN u.blackList bl
+        WHERE bl.owner.id = :ownerId
+        """)
+    Page<BlackListEntityResponseDto> findBlackListedUsersByOwnerId(@Param("ownerId") Long ownerId, Pageable pageable);
 }

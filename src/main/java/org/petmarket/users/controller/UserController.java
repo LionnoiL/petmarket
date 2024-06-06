@@ -24,6 +24,8 @@ import org.petmarket.users.service.UserAuthService;
 import org.petmarket.users.service.UserService;
 import org.petmarket.utils.ErrorUtils;
 import org.petmarket.utils.annotations.parametrs.ParameterId;
+import org.petmarket.utils.annotations.parametrs.ParameterPageNumber;
+import org.petmarket.utils.annotations.parametrs.ParameterPageSize;
 import org.petmarket.utils.annotations.responses.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -34,6 +36,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 import static org.petmarket.utils.MessageUtils.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -233,5 +237,16 @@ public class UserController {
     public void removeFromBlackList(@ParameterId @PathVariable @Positive Long userId) {
         userService.removeUserFromBlacklist(userId);
         log.info("User with id {} removed from black list.", userId);
+    }
+
+    @Operation(summary = "Get black list")
+    @ApiResponseSuccessful
+    @ApiResponseUnauthorized
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/blacklist")
+    public List<BlackListResponseDto> getBlackList(
+            @ParameterPageNumber @RequestParam(defaultValue = "1") @Positive int page,
+            @ParameterPageSize @RequestParam(defaultValue = "30") @Positive int size) {
+        return userService.getBlackList(page, size);
     }
 }
