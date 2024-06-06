@@ -286,7 +286,8 @@ public class AdvertisementService {
 
         Review review = Review.builder()
                 .author(author)
-                .type(ReviewType.USER_TO_ADVERTISEMENT)
+                .user(advertisement.getAuthor())
+                .type(ReviewType.BUYER_TO_SELLER)
                 .value(request.getValue())
                 .description(request.getDescription())
                 .advertisement(advertisement)
