@@ -46,6 +46,7 @@ import org.petmarket.review.entity.Review;
 import org.petmarket.review.entity.ReviewType;
 import org.petmarket.review.mapper.ReviewMapper;
 import org.petmarket.review.repository.ReviewRepository;
+import org.petmarket.review.service.ReviewService;
 import org.petmarket.translate.TranslateException;
 import org.petmarket.users.entity.User;
 import org.petmarket.users.entity.UserStatus;
@@ -88,6 +89,7 @@ public class AdvertisementService {
     private final OptionsService optionsService;
     private final TransliterateUtils transliterateUtils;
     private final EntityManager entityManager;
+    private final ReviewService reviewService;
 
     public Page<Advertisement> getByCategoryTypeCitiesAttributes(
             AdvertisementCategory category, List<Attribute> attributes, List<City> cities,
@@ -284,6 +286,10 @@ public class AdvertisementService {
         User author = getUserByEmail(authentication.getName());
         Advertisement advertisement = getAdvertisement(id);
 
+        if (reviewService.existsByAuthorIdAndUserId(author.getId(), advertisement.getAuthor().getId())) {
+            throw new ItemNotCreatedException(REVIEW_ALREADY_EXISTS);
+        }
+
         Review review = Review.builder()
                 .author(author)
                 .user(advertisement.getAuthor())
@@ -312,6 +318,7 @@ public class AdvertisementService {
             throw new ItemNotFoundException(ADVERTISEMENT_NOT_FOUND);
         }
 
+        advertisement.setRating(reviewRepository.findAverageRatingByUserID(id).orElse(0));
         return advertisement;
     }
 

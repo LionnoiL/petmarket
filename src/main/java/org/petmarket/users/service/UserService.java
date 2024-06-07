@@ -214,9 +214,7 @@ public class UserService {
 
         return UserReviewListResponseDto.builder()
                 .reviewsCount(user.getReviewsCount())
-                .rating((int) Math.ceil((double) (ratingList.getRating1() + ratingList.getRating2() * 2
-                        + ratingList.getRating3() * 3 + ratingList.getRating4() * 4 + ratingList.getRating5() * 5)
-                        / user.getReviewsCount()))
+                .rating(reviewService.findAverageRatingByUser(user))
                 .ratingList(ratingList)
                 .reviews(reviewMapper.mapEntityToUserReviewDto(reviews))
                 .build();
