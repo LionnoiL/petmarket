@@ -23,13 +23,13 @@ public class MessageService {
     private final UserService userService;
     private final UserMapper userMapper;
 
-    public void addMessage(MessageRequestDto messageRequestDto) {
+    public MessageResponseDto addMessage(MessageRequestDto messageRequestDto) {
         checkBlackList(messageRequestDto.getRecipientId(), UserService.getCurrentUserId());
 
         Message message = messageMapper.messageRequestDtoToMessage(messageRequestDto);
         message.setAuthor(userService.getCurrentUser());
         message.setStatus(MessageStatus.UNREAD);
-        messageRepository.save(message);
+        return messageMapper.messageToMessageResponseDto(messageRepository.save(message));
     }
 
     public void updateMessage(Long id, MessageUpdateDto messageUpdateDto) {
