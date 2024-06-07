@@ -318,7 +318,8 @@ public class AdvertisementService {
             throw new ItemNotFoundException(ADVERTISEMENT_NOT_FOUND);
         }
 
-        advertisement.setRating(reviewRepository.findAverageRatingByUserID(id).orElse(0));
+        advertisement.setRating(reviewRepository.findAverageRatingByUserID(advertisement.getAuthor().getId())
+                .orElse(0));
         return advertisement;
     }
 
