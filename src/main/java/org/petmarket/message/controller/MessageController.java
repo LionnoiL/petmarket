@@ -32,9 +32,9 @@ public class MessageController {
     @ApiResponseUnauthorized
     @ApiResponseForbidden
     @PreAuthorize("isAuthenticated()")
-    public void addMessage(@Valid @RequestBody MessageRequestDto messageRequestDto, BindingResult bindingResult) {
+    public MessageResponseDto addMessage(@Valid @RequestBody MessageRequestDto messageRequestDto, BindingResult bindingResult) {
         messageAccessCheckerService.checkCreateAccess(messageRequestDto);
-        messageService.addMessage(messageRequestDto);
+        return messageService.addMessage(messageRequestDto);
     }
 
     @Operation(summary = "Delete message by id")
