@@ -43,6 +43,14 @@ public class ReviewService {
         return new RatingList(ratings);
     }
 
+    public int findAverageRatingByUser(User user) {
+        if (user == null) {
+            return 0;
+        }
+
+        return reviewRepository.findAverageRatingByUserID(user.getId()).orElse(0);
+    }
+
     @Transactional
     public void deleteReview(Long id) {
         Review review = getReview(id);
@@ -77,5 +85,9 @@ public class ReviewService {
         return reviewRepository.findById(id).orElseThrow(() -> {
             throw new ItemNotFoundException(REVIEW_NOT_FOUND);
         });
+    }
+
+    public boolean existsByAuthorIdAndUserId(Long authorId, Long userId) {
+        return !reviewRepository.findReviewByAuthorIdAndUserId(authorId, userId).isEmpty();
     }
 }

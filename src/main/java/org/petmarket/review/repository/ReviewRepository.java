@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ReviewRepository extends ReviewRepositoryBasic {
 
@@ -46,4 +47,17 @@ public interface ReviewRepository extends ReviewRepositoryBasic {
     @Modifying
     @Query(value = "DELETE FROM reviews r where r.order_id = :id", nativeQuery = true)
     void deleteAllReviewsByOrderId(@Param("id") Long id);
+
+    @Query(value = """
+            SELECT ROUND(CAST(AVG(rewiew_value) AS DECIMAL)) FROM reviews
+            WHERE user_id = :id
+            AND review_type = 'BUYER_TO_SELLER' OR review_type = 'SELLER_TO_BUYER'
+            """, nativeQuery = true)
+    Optional<Integer> findAverageRatingByUserID(@Param("id") Long id);
+
+    @Query(value = """
+                SELECT r.* FROM reviews r
+                WHERE r.author_id = :authorId AND r.user_id = :userId
+                """, nativeQuery = true)
+    List<Review> findReviewByAuthorIdAndUserId(@Param("authorId") Long authorId, @Param("userId") Long userId);
 }
