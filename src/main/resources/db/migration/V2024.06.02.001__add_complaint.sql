@@ -1,0 +1,11 @@
+CREATE TABLE user_complaints (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    complaint TEXT NOT NULL,
+    user_id BIGINT,
+    complained_user_id BIGINT,
+    status VARCHAR(255) NOT NULL DEFAULT 'PENDING',
+    created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (complained_user_id) REFERENCES users(id)
+);
