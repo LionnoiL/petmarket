@@ -1,16 +1,19 @@
 package org.petmarket.users.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.petmarket.users.dto.ComplaintRequestDto;
+import org.petmarket.users.dto.ComplaintResponseDto;
 import org.petmarket.users.entity.Complaint;
 import org.petmarket.users.entity.ComplaintStatus;
 import org.petmarket.users.mapper.ComplaintMapper;
 import org.petmarket.users.repository.ComplaintRepository;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -20,39 +23,43 @@ public class ComplaintService {
     private final ComplaintMapper complaintMapper;
     private final UserService userService;
 
+    @Transactional
     public void addComplaint(ComplaintRequestDto complaintRequestDto) {
         if (complaintRequestDto.getComplainedUserId().equals(UserService.getCurrentUserId())) {
             log.error("User cannot complain about himself");
             throw new IllegalArgumentException("User cannot complain about himself");
         }
 
-        log.info("Adding complaint: {}", complaintRequestDto);
         Complaint complaint = complaintMapper.mapDtoToComplaint(complaintRequestDto);
         complaint.setUser(userService.getCurrentUser());
+        complaint.setComplainedUser(userService.findById(complaintRequestDto.getComplainedUserId()));
+        complaint.setStatus(ComplaintStatus.PENDING);
         complaintRepository.save(complaint);
     }
 
     public void deleteComplaint(Long id) {
-        log.info("Deleting complaint with id: {}", id);
         complaintRepository.deleteById(id);
     }
 
-    public Complaint getComplaint(Long id) {
-        log.info("Getting complaint with id: {}", id);
-        return complaintRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Complaint not found"));
+    public ComplaintResponseDto getComplaint(Long id) {
+        return complaintMapper.mapComplaintToDto(complaintRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Complaint not found")));
     }
 
-    public Page<Complaint> getComplaints(ComplaintStatus complaintStatus, int size,
-                                         int page, Sort.Direction direction) {
-        log.info("Getting all complaints");
-        return complaintRepository.findAllByStatus(complaintStatus,
-                PageRequest.of(page - 1, size, Sort.by(direction, "created")));
+    public List<ComplaintResponseDto> getComplaints(ComplaintStatus complaintStatus, int size,
+                                                    int page, Sort.Direction direction) {
+        return complaintMapper.mapComplaintToDto(complaintRepository.findAllByStatus(complaintStatus,
+                PageRequest.of(page - 1, size, Sort.by(direction, "created"))).toList());
     }
 
-    public Page<Complaint> getComplaintsByUserId(Long userId, ComplaintStatus status,
+    public List<ComplaintResponseDto> getComplaintsByUserId(Long userId, ComplaintStatus status,
                                                  int size, int page, Sort.Direction direction) {
-        log.info("Getting all complaints by user id: {}", userId);
-        return complaintRepository.findAllByComplainedUserIdAndStatus(userId, status, PageRequest
-                .of(page - 1, size, Sort.by(direction, "created")));
+        return complaintMapper.mapComplaintToDto(complaintRepository.findAllByComplainedUserIdAndStatus(userId,
+                status, PageRequest.of(page - 1, size, Sort.by(direction, "created"))).toList());
+    }
+
+    @Transactional
+    public void updateStatusById(Long id, ComplaintStatus status) {
+        complaintRepository.updateStatusById(id, status);
     }
 }
