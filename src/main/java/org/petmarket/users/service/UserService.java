@@ -30,7 +30,9 @@ import org.petmarket.users.repository.BlackListRepository;
 import org.petmarket.users.repository.UserRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -68,6 +70,7 @@ public class UserService {
         return principal.getId();
     }
 
+    @Cacheable(value = "users", key = "#username")
     public User findByUsername(String username) throws ItemNotFoundException {
         User user = userRepository.findByEmail(username)
                 .orElseThrow(() -> new ItemNotFoundException("User email not found"));
@@ -155,6 +158,10 @@ public class UserService {
         return contacts;
     }
 
+    @Caching(evict = {
+            @CacheEvict(value = "users", key = "#user.id"),
+            @CacheEvict(value = "users", key = "#user.email")
+    })
     @Transactional
     public User updateUser(User user, UserUpdateRequestDto request) {
         String oldUserEmail = user.getEmail();
@@ -176,6 +183,13 @@ public class UserService {
     @Transactional
     public void deleteById(Long userId) {
         userRepository.setUserStatusToDeleted(userId);
+    }
+
+    @Caching(evict = {
+            @CacheEvict(value = "users", key = "#userId"),
+            @CacheEvict(value = "users", key = "#user.email")
+    })
+    public void evictCaches(Long userId, User user) {
     }
 
     private Set<UserPhone> mergePhones(User user, UserUpdateRequestDto request) {

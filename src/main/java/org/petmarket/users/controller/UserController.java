@@ -215,6 +215,7 @@ public class UserController {
         User user = userService.findById(userId);
         userService.checkAccess(user);
         userService.deleteById(userId);
+        userService.evictCaches(userId, user);
         log.info("User with id {} deleted.", userId);
     }
 
