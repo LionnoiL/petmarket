@@ -185,13 +185,6 @@ public class UserService {
         userRepository.setUserStatusToDeleted(userId);
     }
 
-    @Caching(evict = {
-            @CacheEvict(value = "users", key = "#userId"),
-            @CacheEvict(value = "users", key = "#user.email")
-    })
-    public void evictCaches(Long userId, User user) {
-    }
-
     private Set<UserPhone> mergePhones(User user, UserUpdateRequestDto request) {
         Set<String> newPhones = request.getPhones();
         String mainPhone = request.getMainPhone();
@@ -228,7 +221,7 @@ public class UserService {
 
         return UserReviewListResponseDto.builder()
                 .reviewsCount(user.getReviewsCount())
-                .rating(reviewService.findAverageRatingByUser(user))
+                .rating(user.getRating())
                 .ratingList(ratingList)
                 .reviews(reviewMapper.mapEntityToUserReviewDto(reviews))
                 .build();

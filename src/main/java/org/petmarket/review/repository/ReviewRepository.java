@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface ReviewRepository extends ReviewRepositoryBasic {
 
@@ -26,11 +25,11 @@ public interface ReviewRepository extends ReviewRepositoryBasic {
 
     @Query(value = """
             SELECT
-               SUM(CASE WHEN rewiew_value = 1 THEN 1 ELSE 0 END) AS rating1,
-               SUM(CASE WHEN rewiew_value = 2 THEN 1 ELSE 0 END) AS rating2,
-               SUM(CASE WHEN rewiew_value = 3 THEN 1 ELSE 0 END) AS rating3,
-               SUM(CASE WHEN rewiew_value = 4 THEN 1 ELSE 0 END) AS rating4,
-               SUM(CASE WHEN rewiew_value = 5 THEN 1 ELSE 0 END) AS rating5
+               SUM(CASE WHEN review_value = 1 THEN 1 ELSE 0 END) AS rating1,
+               SUM(CASE WHEN review_value = 2 THEN 1 ELSE 0 END) AS rating2,
+               SUM(CASE WHEN review_value = 3 THEN 1 ELSE 0 END) AS rating3,
+               SUM(CASE WHEN review_value = 4 THEN 1 ELSE 0 END) AS rating4,
+               SUM(CASE WHEN review_value = 5 THEN 1 ELSE 0 END) AS rating5
             FROM reviews
                 WHERE user_id = :id
             """, nativeQuery = true)
@@ -49,15 +48,8 @@ public interface ReviewRepository extends ReviewRepositoryBasic {
     void deleteAllReviewsByOrderId(@Param("id") Long id);
 
     @Query(value = """
-            SELECT ROUND(CAST(AVG(rewiew_value) AS DECIMAL)) FROM reviews
-            WHERE user_id = :id
-            AND review_type = 'BUYER_TO_SELLER' OR review_type = 'SELLER_TO_BUYER'
+            SELECT r.* FROM reviews r
+            WHERE r.author_id = :authorId AND r.user_id = :userId
             """, nativeQuery = true)
-    Optional<Integer> findAverageRatingByUserID(@Param("id") Long id);
-
-    @Query(value = """
-                SELECT r.* FROM reviews r
-                WHERE r.author_id = :authorId AND r.user_id = :userId
-                """, nativeQuery = true)
     List<Review> findReviewByAuthorIdAndUserId(@Param("authorId") Long authorId, @Param("userId") Long userId);
 }

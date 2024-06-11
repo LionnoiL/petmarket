@@ -11,6 +11,7 @@ import org.petmarket.review.entity.Review;
 import org.petmarket.review.repository.ReviewRepository;
 import org.petmarket.users.entity.User;
 import org.petmarket.users.repository.UserRepository;
+import org.petmarket.users.service.UserCacheService;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -27,6 +28,7 @@ public class ReviewService {
     private final AdvertisementRepository advertisementRepository;
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
+    private final UserCacheService userCacheService;
 
     public List<Review> findAllByUser(User user, int size) {
         if (user == null || size <= 0) {
@@ -43,18 +45,12 @@ public class ReviewService {
         return new RatingList(ratings);
     }
 
-    public int findAverageRatingByUser(User user) {
-        if (user == null) {
-            return 0;
-        }
-
-        return reviewRepository.findAverageRatingByUserID(user.getId()).orElse(0);
-    }
-
     @Transactional
     public void deleteReview(Long id) {
         Review review = getReview(id);
+        User user = review.getUser();
         reviewRepository.delete(review);
+        userCacheService.evictCaches(user);
     }
 
     @Transactional
@@ -63,6 +59,7 @@ public class ReviewService {
             throw new ItemNotFoundException(ADVERTISEMENT_NOT_FOUND);
         }
         reviewRepository.deleteAllReviewsByAdvertisementId(id);
+        userCacheService.evictCaches();
     }
 
     @Transactional
@@ -71,6 +68,7 @@ public class ReviewService {
             throw new ItemNotFoundException(USER_NOT_FOUND);
         }
         reviewRepository.deleteAllReviewsByUserId(id);
+        userCacheService.evictCaches();
     }
 
     @Transactional
@@ -79,12 +77,11 @@ public class ReviewService {
             throw new ItemNotFoundException(ORDER_NOT_FOUND);
         }
         reviewRepository.deleteAllReviewsByOrderId(id);
+        userCacheService.evictCaches();
     }
 
     private Review getReview(Long id) {
-        return reviewRepository.findById(id).orElseThrow(() -> {
-            throw new ItemNotFoundException(REVIEW_NOT_FOUND);
-        });
+        return reviewRepository.findById(id).orElseThrow(() -> new ItemNotFoundException(REVIEW_NOT_FOUND));
     }
 
     public boolean existsByAuthorIdAndUserId(Long authorId, Long userId) {

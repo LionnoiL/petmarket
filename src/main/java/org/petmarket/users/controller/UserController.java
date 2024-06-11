@@ -21,6 +21,7 @@ import org.petmarket.users.dto.*;
 import org.petmarket.users.entity.User;
 import org.petmarket.users.mapper.UserMapper;
 import org.petmarket.users.service.UserAuthService;
+import org.petmarket.users.service.UserCacheService;
 import org.petmarket.users.service.UserService;
 import org.petmarket.utils.ErrorUtils;
 import org.petmarket.utils.annotations.parametrs.ParameterId;
@@ -55,6 +56,7 @@ public class UserController {
     private final FrontTokenService frontTokenService;
     private final AdvertisementService advertisementService;
     private final UserMapper userMapper;
+    private final UserCacheService userCacheService;
 
     @Operation(summary = "Send request to reset user password")
     @ApiResponses(value = {
@@ -215,7 +217,7 @@ public class UserController {
         User user = userService.findById(userId);
         userService.checkAccess(user);
         userService.deleteById(userId);
-        userService.evictCaches(userId, user);
+        userCacheService.evictCaches(user);
         log.info("User with id {} deleted.", userId);
     }
 
