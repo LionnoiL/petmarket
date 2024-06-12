@@ -1,8 +1,11 @@
 package org.petmarket.review.service;
 
+import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.search.mapper.orm.Search;
+import org.petmarket.advertisements.advertisement.entity.Advertisement;
 import org.petmarket.advertisements.advertisement.repository.AdvertisementRepository;
 import org.petmarket.errorhandling.ItemNotFoundException;
 import org.petmarket.order.repository.OrderRepository;
@@ -11,6 +14,7 @@ import org.petmarket.review.entity.Review;
 import org.petmarket.review.repository.ReviewRepository;
 import org.petmarket.users.entity.User;
 import org.petmarket.users.repository.UserRepository;
+import org.petmarket.users.service.UserCacheService;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -27,6 +31,8 @@ public class ReviewService {
     private final AdvertisementRepository advertisementRepository;
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
+    private final UserCacheService userCacheService;
+    private final EntityManager entityManager;
 
     public List<Review> findAllByUser(User user, int size) {
         if (user == null || size <= 0) {
@@ -43,18 +49,12 @@ public class ReviewService {
         return new RatingList(ratings);
     }
 
-    public int findAverageRatingByUser(User user) {
-        if (user == null) {
-            return 0;
-        }
-
-        return reviewRepository.findAverageRatingByUserID(user.getId()).orElse(0);
-    }
-
     @Transactional
     public void deleteReview(Long id) {
         Review review = getReview(id);
+        User user = review.getUser();
         reviewRepository.delete(review);
+        userCacheService.evictCaches(user);
     }
 
     @Transactional
@@ -63,6 +63,9 @@ public class ReviewService {
             throw new ItemNotFoundException(ADVERTISEMENT_NOT_FOUND);
         }
         reviewRepository.deleteAllReviewsByAdvertisementId(id);
+        userCacheService.evictCaches();
+        updateAdvertisementIndexes(List.of(advertisementRepository.findById(id)
+                .orElseThrow(() -> new ItemNotFoundException(ADVERTISEMENT_NOT_FOUND))));
     }
 
     @Transactional
@@ -71,6 +74,8 @@ public class ReviewService {
             throw new ItemNotFoundException(USER_NOT_FOUND);
         }
         reviewRepository.deleteAllReviewsByUserId(id);
+        userCacheService.evictCaches();
+        updateAdvertisementIndexes(advertisementRepository.findAllByAuthorId(id));
     }
 
     @Transactional
@@ -79,15 +84,22 @@ public class ReviewService {
             throw new ItemNotFoundException(ORDER_NOT_FOUND);
         }
         reviewRepository.deleteAllReviewsByOrderId(id);
+        userCacheService.evictCaches();
+        updateAdvertisementIndexes(advertisementRepository.findAllByOrderId(id));
     }
 
     private Review getReview(Long id) {
-        return reviewRepository.findById(id).orElseThrow(() -> {
-            throw new ItemNotFoundException(REVIEW_NOT_FOUND);
-        });
+        return reviewRepository.findById(id).orElseThrow(() -> new ItemNotFoundException(REVIEW_NOT_FOUND));
     }
 
     public boolean existsByAuthorIdAndUserId(Long authorId, Long userId) {
         return !reviewRepository.findReviewByAuthorIdAndUserId(authorId, userId).isEmpty();
+    }
+
+    public void updateAdvertisementIndexes(List<Advertisement> advertisements) {
+        for (Advertisement advertisement : advertisements) {
+            entityManager.refresh(advertisement);
+            Search.session(entityManager).indexingPlan().addOrUpdate(advertisement);
+        }
     }
 }

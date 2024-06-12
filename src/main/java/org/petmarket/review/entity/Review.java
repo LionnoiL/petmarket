@@ -49,7 +49,7 @@ public class Review {
     @Enumerated(EnumType.STRING)
     private ReviewType type;
 
-    @Column(name = "rewiew_value")
+    @Column(name = "review_value")
     private int value;
 
     @Column(name = "description")

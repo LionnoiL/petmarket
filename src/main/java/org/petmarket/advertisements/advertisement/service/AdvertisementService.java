@@ -51,6 +51,7 @@ import org.petmarket.translate.TranslateException;
 import org.petmarket.users.entity.User;
 import org.petmarket.users.entity.UserStatus;
 import org.petmarket.users.repository.UserRepository;
+import org.petmarket.users.service.UserCacheService;
 import org.petmarket.utils.ErrorUtils;
 import org.petmarket.utils.TransliterateUtils;
 import org.springframework.data.domain.Page;
@@ -90,6 +91,7 @@ public class AdvertisementService {
     private final TransliterateUtils transliterateUtils;
     private final EntityManager entityManager;
     private final ReviewService reviewService;
+    private final UserCacheService userCacheService;
 
     public Page<Advertisement> getByCategoryTypeCitiesAttributes(
             AdvertisementCategory category, List<Attribute> attributes, List<City> cities,
@@ -231,9 +233,7 @@ public class AdvertisementService {
         if (request.getCategoryId() != null) {
             category = categoryRepository.findById(request.getCategoryId())
                     .orElseThrow(
-                            () -> {
-                                throw new ItemNotFoundException(CATEGORY_NOT_FOUND);
-                            }
+                            () -> new ItemNotFoundException(CATEGORY_NOT_FOUND)
                     );
         }
         advertisement.setCategory(category);
@@ -279,35 +279,37 @@ public class AdvertisementService {
                 reviewRepository.findReviewByAdvertisementID(id));
     }
 
+    @Transactional
     public AdvertisementReviewResponseDto addReview(Long id, AdvertisementReviewRequestDto request,
                                                     BindingResult bindingResult, Authentication authentication) {
         ErrorUtils.checkItemNotCreatedException(bindingResult);
 
         User author = getUserByEmail(authentication.getName());
+        User user = getAdvertisement(id).getAuthor();
         Advertisement advertisement = getAdvertisement(id);
 
-        if (reviewService.existsByAuthorIdAndUserId(author.getId(), advertisement.getAuthor().getId())) {
+        if (reviewService.existsByAuthorIdAndUserId(author.getId(), user.getId())) {
             throw new ItemNotCreatedException(REVIEW_ALREADY_EXISTS);
         }
 
         Review review = Review.builder()
                 .author(author)
-                .user(advertisement.getAuthor())
+                .user(user)
                 .type(ReviewType.BUYER_TO_SELLER)
                 .value(request.getValue())
                 .description(request.getDescription())
                 .advertisement(advertisement)
                 .build();
         reviewRepository.save(review);
+        userCacheService.evictCaches(user);
+        reviewService.updateAdvertisementIndexes(List.of(advertisement));
 
         return reviewMapper.mapEntityToAdvertisementDto(review);
     }
 
     private Language getLanguage(String langCode) {
         return languageRepository.findByLangCodeAndEnableIsTrue(langCode)
-                .orElseThrow(() -> {
-                    throw new ItemNotFoundException(LANGUAGE_NOT_FOUND);
-                });
+                .orElseThrow(() -> new ItemNotFoundException(LANGUAGE_NOT_FOUND));
     }
 
     public Advertisement getAdvertisement(Long id) {
@@ -318,8 +320,6 @@ public class AdvertisementService {
             throw new ItemNotFoundException(ADVERTISEMENT_NOT_FOUND);
         }
 
-        advertisement.setRating(reviewRepository.findAverageRatingByUserID(advertisement.getAuthor().getId())
-                .orElse(0));
         return advertisement;
     }
 
