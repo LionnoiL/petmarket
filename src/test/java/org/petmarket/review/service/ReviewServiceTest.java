@@ -109,7 +109,7 @@ class ReviewServiceTest {
         user.setId(1L);
 
         when(reviewRepository.findRatingsByUserID(anyLong()))
-                .thenReturn(Collections.singletonList(new Integer[]{0, 0, 0, 0 , 5}));
+                .thenReturn(Collections.singletonList(new Integer[]{0, 0, 0, 0, 5}));
 
         // Act
         RatingList ratingList = reviewService.findRatingsByUser(user);
@@ -213,7 +213,6 @@ class ReviewServiceTest {
         verify(reviewRepository, times(0)).deleteAllReviewsByUserId(anyLong());
         verify(userCacheService, times(0)).evictCaches();
     }
-
 
     @Test
     public void testDeleteAllReviewsByOrder() {
