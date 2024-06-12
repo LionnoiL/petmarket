@@ -155,4 +155,15 @@ public interface AdvertisementRepository extends AdvertisementRepositoryBasic {
             WHERE i.id IN :imageIds
             """)
     List<Advertisement> findAdvertisementsByImageIds(@Param("imageIds") List<Long> imageIds);
+
+    @Query(value = """
+            SELECT a
+            FROM Advertisement a
+            JOIN a.author u
+            JOIN u.orders o
+            WHERE o.id = :orderId
+            """)
+    List<Advertisement> findAllByOrderId(Long orderId);
+
+    List<Advertisement> findAllByAuthorId(Long authorId);
 }

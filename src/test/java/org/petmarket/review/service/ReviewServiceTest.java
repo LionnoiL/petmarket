@@ -1,10 +1,16 @@
 package org.petmarket.review.service;
 
+import jakarta.persistence.EntityManager;
+import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.session.SearchSession;
+import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.petmarket.advertisements.advertisement.entity.Advertisement;
 import org.petmarket.advertisements.advertisement.repository.AdvertisementRepository;
 import org.petmarket.errorhandling.ItemNotFoundException;
 import org.petmarket.order.repository.OrderRepository;
@@ -40,6 +46,15 @@ class ReviewServiceTest {
 
     @Mock
     private UserCacheService userCacheService;
+
+    @Mock
+    private EntityManager entityManager;
+
+    @Mock
+    private SearchSession searchSession;
+
+    @Mock
+    private SearchIndexingPlan indexingPlan;
 
     @InjectMocks
     private ReviewService reviewService;
@@ -139,15 +154,21 @@ class ReviewServiceTest {
 
     @Test
     public void testDeleteAllReviewsByAdvertisement() {
-        // Arrange
-        when(advertisementRepository.existsById(anyLong())).thenReturn(true);
+        try (MockedStatic<Search> search = mockStatic(Search.class)) {
+            // Arrange
+            search.when(() -> Search.session(entityManager)).thenReturn(searchSession);
+            when(searchSession.indexingPlan()).thenReturn(indexingPlan);
 
-        // Act
-        reviewService.deleteAllReviewsByAdvertisement(1L);
+            when(advertisementRepository.existsById(anyLong())).thenReturn(true);
+            when(advertisementRepository.findById(anyLong())).thenReturn(Optional.of(new Advertisement()));
 
-        // Assert
-        verify(reviewRepository, times(1)).deleteAllReviewsByAdvertisementId(1L);
-        verify(userCacheService, times(1)).evictCaches();
+            // Act
+            reviewService.deleteAllReviewsByAdvertisement(1L);
+
+            // Assert
+            verify(reviewRepository, times(1)).deleteAllReviewsByAdvertisementId(1L);
+            verify(userCacheService, times(1)).evictCaches();
+        }
     }
 
     @Test

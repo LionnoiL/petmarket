@@ -1,8 +1,11 @@
 package org.petmarket.review.service;
 
+import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.search.mapper.orm.Search;
+import org.petmarket.advertisements.advertisement.entity.Advertisement;
 import org.petmarket.advertisements.advertisement.repository.AdvertisementRepository;
 import org.petmarket.errorhandling.ItemNotFoundException;
 import org.petmarket.order.repository.OrderRepository;
@@ -29,6 +32,7 @@ public class ReviewService {
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
     private final UserCacheService userCacheService;
+    private final EntityManager entityManager;
 
     public List<Review> findAllByUser(User user, int size) {
         if (user == null || size <= 0) {
@@ -60,6 +64,8 @@ public class ReviewService {
         }
         reviewRepository.deleteAllReviewsByAdvertisementId(id);
         userCacheService.evictCaches();
+        updateAdvertisementIndexes(List.of(advertisementRepository.findById(id)
+                .orElseThrow(() -> new ItemNotFoundException(ADVERTISEMENT_NOT_FOUND))));
     }
 
     @Transactional
@@ -69,6 +75,7 @@ public class ReviewService {
         }
         reviewRepository.deleteAllReviewsByUserId(id);
         userCacheService.evictCaches();
+        updateAdvertisementIndexes(advertisementRepository.findAllByAuthorId(id));
     }
 
     @Transactional
@@ -78,6 +85,7 @@ public class ReviewService {
         }
         reviewRepository.deleteAllReviewsByOrderId(id);
         userCacheService.evictCaches();
+        updateAdvertisementIndexes(advertisementRepository.findAllByOrderId(id));
     }
 
     private Review getReview(Long id) {
@@ -86,5 +94,12 @@ public class ReviewService {
 
     public boolean existsByAuthorIdAndUserId(Long authorId, Long userId) {
         return !reviewRepository.findReviewByAuthorIdAndUserId(authorId, userId).isEmpty();
+    }
+
+    public void updateAdvertisementIndexes(List<Advertisement> advertisements) {
+        for (Advertisement advertisement : advertisements) {
+            entityManager.refresh(advertisement);
+            Search.session(entityManager).indexingPlan().addOrUpdate(advertisement);
+        }
     }
 }

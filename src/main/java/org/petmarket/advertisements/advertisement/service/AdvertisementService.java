@@ -233,9 +233,7 @@ public class AdvertisementService {
         if (request.getCategoryId() != null) {
             category = categoryRepository.findById(request.getCategoryId())
                     .orElseThrow(
-                            () -> {
-                                throw new ItemNotFoundException(CATEGORY_NOT_FOUND);
-                            }
+                            () -> new ItemNotFoundException(CATEGORY_NOT_FOUND)
                     );
         }
         advertisement.setCategory(category);
@@ -281,6 +279,7 @@ public class AdvertisementService {
                 reviewRepository.findReviewByAdvertisementID(id));
     }
 
+    @Transactional
     public AdvertisementReviewResponseDto addReview(Long id, AdvertisementReviewRequestDto request,
                                                     BindingResult bindingResult, Authentication authentication) {
         ErrorUtils.checkItemNotCreatedException(bindingResult);
@@ -303,15 +302,14 @@ public class AdvertisementService {
                 .build();
         reviewRepository.save(review);
         userCacheService.evictCaches(user);
+        reviewService.updateAdvertisementIndexes(List.of(advertisement));
 
         return reviewMapper.mapEntityToAdvertisementDto(review);
     }
 
     private Language getLanguage(String langCode) {
         return languageRepository.findByLangCodeAndEnableIsTrue(langCode)
-                .orElseThrow(() -> {
-                    throw new ItemNotFoundException(LANGUAGE_NOT_FOUND);
-                });
+                .orElseThrow(() -> new ItemNotFoundException(LANGUAGE_NOT_FOUND));
     }
 
     public Advertisement getAdvertisement(Long id) {
