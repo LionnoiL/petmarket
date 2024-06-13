@@ -18,19 +18,19 @@ public class AdvertisementSearchRequestDto {
     @JsonProperty("search_term")
     private String searchTerm;
 
-    @Schema(example = "1")
+    @Schema(example = "[1]")
     @JsonProperty("breed_ids")
     private List<Long> breedIds;
 
-    @Schema(example = "1")
+    @Schema(example = "[1]")
     @JsonProperty("attribute_ids")
     private List<Long> attributeIds;
 
-    @Schema(example = "1")
+    @Schema(example = "[1]")
     @JsonProperty("states_ids")
     private List<Long> statesIds;
 
-    @Schema(example = "1")
+    @Schema(example = "[1]")
     @JsonProperty("city_ids")
     private List<Long> cityIds;
 
@@ -42,7 +42,7 @@ public class AdvertisementSearchRequestDto {
     @JsonProperty("max_price")
     private BigDecimal maxPrice;
 
-    @Schema(example = "1")
+    @Schema(example = "RATING_HIGHEST")
     @JsonProperty(value = "sort_option")
     private AdvertisementSortOption sortOption;
 
