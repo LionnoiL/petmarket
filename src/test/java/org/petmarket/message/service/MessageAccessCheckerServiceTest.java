@@ -27,7 +27,6 @@ class MessageAccessCheckerServiceTest {
     @InjectMocks
     private MessageAccessCheckerService messageAccessCheckerService;
 
-
     @Test
     void testCheckCreateAccess_AccessDenied() {
         // Arrange
