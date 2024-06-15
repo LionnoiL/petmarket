@@ -28,7 +28,7 @@ class MessageAccessCheckerServiceTest {
     private MessageAccessCheckerService messageAccessCheckerService;
 
     @Test
-    void testCheckCreateAccess_AccessDenied() {
+    void testCheckCreateAccessWhenAccessDenied() {
         // Arrange
         User currentUser = new User();
         currentUser.setId(1L);
@@ -42,7 +42,7 @@ class MessageAccessCheckerServiceTest {
     }
 
     @Test
-    void testCheckCreateAccess_AccessGranted() {
+    void testCheckCreateAccessWhenAccessGranted() {
         // Arrange
         User currentUser = new User();
         currentUser.setId(1L);
@@ -55,7 +55,7 @@ class MessageAccessCheckerServiceTest {
     }
 
     @Test
-    void testCheckUpdateAccess_AccessDenied() {
+    void testCheckUpdateAccessWhenAccessDenied() {
         // Arrange
         User currentUser = new User();
         currentUser.setId(1L);
@@ -72,7 +72,7 @@ class MessageAccessCheckerServiceTest {
     }
 
     @Test
-    void testCheckUpdateAccess_AccessGranted() {
+    void testCheckUpdateAccessWhenAccessGranted() {
         // Arrange
         User currentUser = new User();
         currentUser.setId(1L);
@@ -89,7 +89,7 @@ class MessageAccessCheckerServiceTest {
     }
 
     @Test
-    void testCheckUpdateAccess_AdminUser() {
+    void testCheckUpdateAccessWhenAdminUser() {
         // Arrange
         when(userService.isCurrentUserAdmin()).thenReturn(true);
 
@@ -103,7 +103,7 @@ class MessageAccessCheckerServiceTest {
     }
 
     @Test
-    void testCheckReadAccess_AccessDenied() {
+    void testCheckReadAccessWhenAccessDenied() {
         // Arrange
         User currentUser = new User();
         currentUser.setId(1L);
@@ -120,7 +120,7 @@ class MessageAccessCheckerServiceTest {
     }
 
     @Test
-    void testCheckReadAccess_AccessGranted() {
+    void testCheckReadAccessWhenAccessGranted() {
         // Arrange
         User currentUser = new User();
         currentUser.setId(1L);
@@ -137,7 +137,7 @@ class MessageAccessCheckerServiceTest {
     }
 
     @Test
-    void testCheckReadAccess_AdminUser() {
+    void testCheckReadAccessWhenAdminUser() {
         // Arrange
         when(userService.isCurrentUserAdmin()).thenReturn(true);
 
@@ -150,7 +150,7 @@ class MessageAccessCheckerServiceTest {
     }
 
     @Test
-    void testCheckDeleteAccess_AccessDenied() {
+    void testCheckDeleteAccessWhenAccessDenied() {
         // Arrange
         User currentUser = new User();
         currentUser.setId(1L);
@@ -167,7 +167,7 @@ class MessageAccessCheckerServiceTest {
     }
 
     @Test
-    void testCheckDeleteAccess_AccessGranted() {
+    void testCheckDeleteAccessWhenAccessGranted() {
         // Arrange
         User currentUser = new User();
         currentUser.setId(1L);
@@ -184,7 +184,7 @@ class MessageAccessCheckerServiceTest {
     }
 
     @Test
-    void testCheckDeleteAccess_AdminUser() {
+    void testCheckDeleteAccessWhenAdminUser() {
         // Arrange
         when(userService.isCurrentUserAdmin()).thenReturn(true);
 
