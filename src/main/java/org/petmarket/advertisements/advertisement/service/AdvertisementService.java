@@ -12,6 +12,7 @@ import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.sort.dsl.FieldSortOptionsStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.petmarket.advertisements.advertisement.dto.AdvertisementDetailsResponseDto;
@@ -282,15 +283,15 @@ public class AdvertisementService {
     @Transactional
     public AdvertisementReviewResponseDto addReview(Long id, AdvertisementReviewRequestDto request,
                                                     BindingResult bindingResult, Authentication authentication) {
-        ErrorUtils.checkItemNotCreatedException(bindingResult);
+//        ErrorUtils.checkItemNotCreatedException(bindingResult);
 
         User author = getUserByEmail(authentication.getName());
         User user = getAdvertisement(id).getAuthor();
         Advertisement advertisement = getAdvertisement(id);
-
-        if (reviewService.existsByAuthorIdAndUserId(author.getId(), user.getId())) {
-            throw new ItemNotCreatedException(REVIEW_ALREADY_EXISTS);
-        }
+//
+//        if (reviewService.existsByAuthorIdAndUserId(author.getId(), user.getId())) {
+//            throw new ItemNotCreatedException(REVIEW_ALREADY_EXISTS);
+//        }
 
         Review review = Review.builder()
                 .author(author)
@@ -301,8 +302,9 @@ public class AdvertisementService {
                 .advertisement(advertisement)
                 .build();
         reviewRepository.save(review);
-        userCacheService.evictCaches(user);
-        reviewService.updateAdvertisementIndexes(List.of(advertisement));
+//        entityManager.flush();
+//        userCacheService.evictCaches(user);
+//        reviewService.updateAdvertisementIndexes(List.of(advertisement));
 
         return reviewMapper.mapEntityToAdvertisementDto(review);
     }
@@ -410,6 +412,112 @@ public class AdvertisementService {
 
     public List<Advertisement> getAdvertisementsByImageIds(List<Long> imageIds) {
         return advertisementRepository.findAdvertisementsByImageIds(imageIds);
+    }
+
+    @Transactional
+    public void updateTopRating(Advertisement advertisement) {
+        advertisement.setTopRating(calculateRating(advertisement));
+        entityManager.merge(advertisement);
+    }
+
+    @Transactional
+    public void updateAllTopRatings() {
+        int batchSize = 1000;
+        int page = 0;
+        Page<Advertisement> advertisements;
+
+        do {
+            advertisements = advertisementRepository
+                    .findAllByStatus(AdvertisementStatus.ACTIVE, PageRequest.of(page, batchSize));
+
+            for (Advertisement advertisement : advertisements) {
+                updateTopRating(advertisement);
+            }
+
+            entityManager.flush();
+            entityManager.clear();
+            page++;
+        } while (advertisements.hasNext());
+    }
+
+    public void updateRating(Review review) {
+        Advertisement advertisement = review.getAdvertisement();
+        advertisement.setRating(reviewRepository.findAverageRatingByAdvertisementId(advertisement.getId()));
+
+        entityManager.refresh(advertisement);
+        Search.session(entityManager).indexingPlan().addOrUpdate(advertisement);
+    }
+
+    @Transactional
+    public void updateAllRatings() {
+        int batchSize = 1000;
+        int page = 0;
+        Page<Review> reviews;
+
+        do {
+            reviews = reviewRepository
+                    .findAllByAdvertisementStatus(AdvertisementStatus.ACTIVE, PageRequest.of(page, batchSize));
+
+            for (Review review : reviews) {
+                updateRating(review);
+            }
+
+            entityManager.flush();
+            entityManager.clear();
+            page++;
+        } while (reviews.hasNext());
+
+        page = 0;
+        Page<User> users;
+
+        do {
+            users = userRepository.findAll(PageRequest.of(page, batchSize));
+
+            for (User user : users) {
+                user.setRating(reviewRepository.findAverageRatingByUserId(user.getId()));
+                entityManager.merge(user);
+            }
+
+            entityManager.flush();
+            entityManager.clear();
+            page++;
+        } while (users.hasNext());
+
+        SearchSession searchSession = Search.session(entityManager);
+        MassIndexer indexer = searchSession.massIndexer()
+                .idFetchSize(150)
+                .batchSizeToLoadObjects(25)
+                .threadsToLoadObjects(12);
+        try {
+            indexer.startAndWait();
+        } catch (InterruptedException e) {
+            log.warn("Failed to load data from database");
+            Thread.currentThread().interrupt();
+        }
+
+        log.info("All ratings have been updated");
+    }
+
+    private int calculateDescriptionLengthBonus(Advertisement advertisement) {
+        return (advertisement.getTranslations() != null && advertisement.getTranslations().stream()
+                .anyMatch(tr -> tr.getDescription().length() > 20)) ? 30 : 0;
+    }
+
+    private int calculateImageBonus(Advertisement advertisement) {
+        return (advertisement.getImages() != null && !advertisement.getImages().isEmpty()) ? 150 : 0;
+    }
+
+    private int calculateAttributesBonus(Advertisement advertisement) {
+        int bonus = (advertisement.getAttributes() != null ? advertisement.getAttributes().size() : 0) * 30;
+        return Math.min(bonus, 150);
+    }
+
+    private int calculateRating(Advertisement advertisement) {
+        return advertisement.getRating() * 10
+                + advertisement.getAuthor().getRating() * 10
+                + calculateDescriptionLengthBonus(advertisement)
+                + calculateImageBonus(advertisement)
+                + calculateAttributesBonus(advertisement);
     }
 
     private Long getCategoryIdFromSearch(String search) {
