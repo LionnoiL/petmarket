@@ -34,7 +34,6 @@ import org.petmarket.errorhandling.BadRequestException;
 import org.petmarket.errorhandling.ItemNotCreatedException;
 import org.petmarket.errorhandling.ItemNotFoundException;
 import org.petmarket.language.entity.Language;
-import org.petmarket.language.repository.LanguageRepository;
 import org.petmarket.location.entity.City;
 import org.petmarket.location.entity.Location;
 import org.petmarket.location.repository.CityRepository;
@@ -75,7 +74,6 @@ import static org.petmarket.utils.MessageUtils.*;
 @Service
 public class AdvertisementService {
 
-    private final LanguageRepository languageRepository;
     private final AdvertisementRepository advertisementRepository;
     private final ReviewRepository reviewRepository;
     private final UserRepository userRepository;
@@ -283,15 +281,15 @@ public class AdvertisementService {
     @Transactional
     public AdvertisementReviewResponseDto addReview(Long id, AdvertisementReviewRequestDto request,
                                                     BindingResult bindingResult, Authentication authentication) {
-//        ErrorUtils.checkItemNotCreatedException(bindingResult);
+        ErrorUtils.checkItemNotCreatedException(bindingResult);
 
         User author = getUserByEmail(authentication.getName());
         User user = getAdvertisement(id).getAuthor();
         Advertisement advertisement = getAdvertisement(id);
-//
-//        if (reviewService.existsByAuthorIdAndUserId(author.getId(), user.getId())) {
-//            throw new ItemNotCreatedException(REVIEW_ALREADY_EXISTS);
-//        }
+
+        if (reviewService.existsByAuthorIdAndUserId(author.getId(), user.getId())) {
+            throw new ItemNotCreatedException(REVIEW_ALREADY_EXISTS);
+        }
 
         Review review = Review.builder()
                 .author(author)
@@ -302,16 +300,11 @@ public class AdvertisementService {
                 .advertisement(advertisement)
                 .build();
         reviewRepository.save(review);
-//        entityManager.flush();
-//        userCacheService.evictCaches(user);
-//        reviewService.updateAdvertisementIndexes(List.of(advertisement));
+        entityManager.flush();
+        userCacheService.evictCaches(user);
+        reviewService.updateAdvertisementIndexes(List.of(advertisement));
 
         return reviewMapper.mapEntityToAdvertisementDto(review);
-    }
-
-    private Language getLanguage(String langCode) {
-        return languageRepository.findByLangCodeAndEnableIsTrue(langCode)
-                .orElseThrow(() -> new ItemNotFoundException(LANGUAGE_NOT_FOUND));
     }
 
     public Advertisement getAdvertisement(Long id) {
@@ -405,11 +398,6 @@ public class AdvertisementService {
         return new PageImpl<>(similarAdvertisements, pageable, searchQuery.fetchTotalHitCount());
     }
 
-    public Advertisement getAdvertisementByImageId(Long imageId) {
-        return advertisementRepository.findAdvertisementByImageId(imageId)
-                .orElseThrow(() -> new ItemNotFoundException(ADVERTISEMENT_NOT_FOUND));
-    }
-
     public List<Advertisement> getAdvertisementsByImageIds(List<Long> imageIds) {
         return advertisementRepository.findAdvertisementsByImageIds(imageIds);
     }
@@ -452,20 +440,20 @@ public class AdvertisementService {
     public void updateAllRatings() {
         int batchSize = 1000;
         int page = 0;
-        Page<Review> reviews;
+        Page<Advertisement> advertisements;
 
         do {
-            reviews = reviewRepository
-                    .findAllByAdvertisementStatus(AdvertisementStatus.ACTIVE, PageRequest.of(page, batchSize));
+            advertisements = advertisementRepository
+                    .findAllByStatus(AdvertisementStatus.ACTIVE, PageRequest.of(page, batchSize));
 
-            for (Review review : reviews) {
-                updateRating(review);
+            for (Advertisement advertisement : advertisements) {
+                advertisement.setRating(reviewRepository.findAverageRatingByAdvertisementId(advertisement.getId()));
             }
 
             entityManager.flush();
             entityManager.clear();
             page++;
-        } while (reviews.hasNext());
+        } while (advertisements.hasNext());
 
         page = 0;
         Page<User> users;
@@ -475,7 +463,6 @@ public class AdvertisementService {
 
             for (User user : users) {
                 user.setRating(reviewRepository.findAverageRatingByUserId(user.getId()));
-                entityManager.merge(user);
             }
 
             entityManager.flush();
@@ -498,26 +485,26 @@ public class AdvertisementService {
         log.info("All ratings have been updated");
     }
 
-    private int calculateDescriptionLengthBonus(Advertisement advertisement) {
-        return (advertisement.getTranslations() != null && advertisement.getTranslations().stream()
-                .anyMatch(tr -> tr.getDescription().length() > 20)) ? 30 : 0;
-    }
-
-    private int calculateImageBonus(Advertisement advertisement) {
-        return (advertisement.getImages() != null && !advertisement.getImages().isEmpty()) ? 150 : 0;
-    }
-
-    private int calculateAttributesBonus(Advertisement advertisement) {
-        int bonus = (advertisement.getAttributes() != null ? advertisement.getAttributes().size() : 0) * 30;
-        return Math.min(bonus, 150);
-    }
-
-    private int calculateRating(Advertisement advertisement) {
+    public static int calculateRating(Advertisement advertisement) {
         return advertisement.getRating() * 10
                 + advertisement.getAuthor().getRating() * 10
                 + calculateDescriptionLengthBonus(advertisement)
                 + calculateImageBonus(advertisement)
                 + calculateAttributesBonus(advertisement);
+    }
+
+    private static int calculateDescriptionLengthBonus(Advertisement advertisement) {
+        return (advertisement.getTranslations() != null && advertisement.getTranslations().stream()
+                .anyMatch(tr -> tr.getDescription().length() > 20)) ? 30 : 0;
+    }
+
+    private static int calculateImageBonus(Advertisement advertisement) {
+        return (advertisement.getImages() != null && !advertisement.getImages().isEmpty()) ? 150 : 0;
+    }
+
+    private static int calculateAttributesBonus(Advertisement advertisement) {
+        int bonus = (advertisement.getAttributes() != null ? advertisement.getAttributes().size() : 0) * 30;
+        return Math.min(bonus, 150);
     }
 
     private Long getCategoryIdFromSearch(String search) {
@@ -635,12 +622,6 @@ public class AdvertisementService {
     private User getUserByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new ItemNotFoundException(USER_NOT_FOUND));
-    }
-
-    private AdvertisementTranslate getTranslation(Advertisement advertisement, Language language) {
-        return advertisement.getTranslations().stream()
-                .filter(t -> t.getLanguage().equals(language))
-                .findFirst().orElseThrow(() -> new TranslateException(NO_TRANSLATION));
     }
 
     private void addTranslation(Advertisement advertisement, AdvertisementTranslate translation) {

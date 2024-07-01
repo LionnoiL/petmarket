@@ -1,21 +1,17 @@
 package org.petmarket.advertisements.advertisement.listener;
 
-import jakarta.persistence.PostPersist;
-import jakarta.persistence.PostUpdate;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+import jakarta.transaction.Transactional;
 import org.petmarket.advertisements.advertisement.entity.Advertisement;
-import org.petmarket.advertisements.advertisement.service.AdvertisementService;
-import org.springframework.context.annotation.Lazy;
 
+import static org.petmarket.advertisements.advertisement.service.AdvertisementService.calculateRating;
+
+@Transactional
 public class AdvertisementListener {
-//    private final AdvertisementService advertisementService;
-//
-//    public AdvertisementListener(@Lazy AdvertisementService advertisementService) {
-//        this.advertisementService = advertisementService;
-//    }
-//
-//    @PostPersist
-//    @PostUpdate
-//    public void updateTopRating(Advertisement advertisement) {
-//        advertisementService.updateTopRating(advertisement);
-//    }
+    @PrePersist
+    @PreUpdate
+    public void updateTopRating(Advertisement advertisement) {
+        advertisement.setTopRating(calculateRating(advertisement));
+    }
 }

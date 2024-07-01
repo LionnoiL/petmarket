@@ -1,9 +1,7 @@
 package org.petmarket.review.repository;
 
-import org.petmarket.advertisements.advertisement.entity.AdvertisementStatus;
+import org.petmarket.review.dto.AverageReview;
 import org.petmarket.review.entity.Review;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -68,5 +66,19 @@ public interface ReviewRepository extends ReviewRepositoryBasic {
             """, nativeQuery = true)
     Integer findAverageRatingByUserId(@Param("id") Long id);
 
-    Page<Review> findAllByAdvertisementStatus(AdvertisementStatus status, Pageable pageable);
+    @Query(value = """
+            SELECT COALESCE(COUNT(r), 0) AS count, COALESCE(SUM(r.value), 0) AS sum
+            FROM Review r
+            JOIN r.advertisement a
+            WHERE a.id = :id
+            """)
+    AverageReview findAverageReviewByAdvertisementId(Long id);
+
+    @Query(value = """
+            SELECT COALESCE(COUNT(r), 0) AS count, COALESCE(SUM(r.value), 0) AS sum
+            FROM Review r
+            JOIN r.user u
+            WHERE u.id = :id
+            """)
+    AverageReview findAverageReviewByUserId(Long id);
 }
