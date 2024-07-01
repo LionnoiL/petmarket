@@ -7,7 +7,6 @@ import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Configuration;
@@ -19,16 +18,9 @@ public class HibernateSearchIndexBuild implements ApplicationListener<Applicatio
     @Autowired
     private EntityManager entityManager;
 
-    @Value("${hibernate.search.indexing.startup.enabled}")
-    private boolean indexOnStartup;
-
     @Override
     @Transactional
     public void onApplicationEvent(ApplicationReadyEvent event) {
-        if (!indexOnStartup) {
-            return;
-        }
-
         SearchSession searchSession = Search.session(entityManager);
         MassIndexer indexer = searchSession.massIndexer()
                 .idFetchSize(150)
