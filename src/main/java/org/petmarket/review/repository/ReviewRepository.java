@@ -1,5 +1,6 @@
 package org.petmarket.review.repository;
 
+import org.petmarket.review.dto.AverageReview;
 import org.petmarket.review.entity.Review;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -52,4 +53,32 @@ public interface ReviewRepository extends ReviewRepositoryBasic {
             WHERE r.author_id = :authorId AND r.user_id = :userId
             """, nativeQuery = true)
     List<Review> findReviewByAuthorIdAndUserId(@Param("authorId") Long authorId, @Param("userId") Long userId);
+
+    @Query(value = """
+            SELECT COALESCE(AVG(review_value), 0) FROM reviews
+            WHERE advertisement_id = :id
+            """, nativeQuery = true)
+    Integer findAverageRatingByAdvertisementId(@Param("id") Long id);
+
+    @Query(value = """
+            SELECT COALESCE(AVG(review_value), 0) FROM reviews
+            WHERE user_id = :id
+            """, nativeQuery = true)
+    Integer findAverageRatingByUserId(@Param("id") Long id);
+
+    @Query(value = """
+            SELECT COALESCE(COUNT(r), 0) AS count, COALESCE(SUM(r.value), 0) AS sum
+            FROM Review r
+            JOIN r.advertisement a
+            WHERE a.id = :id
+            """)
+    AverageReview findAverageReviewByAdvertisementId(Long id);
+
+    @Query(value = """
+            SELECT COALESCE(COUNT(r), 0) AS count, COALESCE(SUM(r.value), 0) AS sum
+            FROM Review r
+            JOIN r.user u
+            WHERE u.id = :id
+            """)
+    AverageReview findAverageReviewByUserId(Long id);
 }

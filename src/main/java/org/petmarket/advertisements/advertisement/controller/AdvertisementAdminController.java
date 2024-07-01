@@ -97,4 +97,22 @@ public class AdvertisementAdminController {
                 .map(adv -> advertisementMapper.mapEntityToDto(adv, defaultSiteLanguage))
                 .toList();
     }
+
+    @Operation(summary = "Update Advertisements top rating")
+    @ApiResponseSuccessful
+    @ApiResponseUnauthorized
+    @ApiResponseForbidden
+    @PutMapping("/top-rating")
+    public void updateAllTopRatings() {
+        advertisementService.updateAllTopRatings();
+    }
+
+    @Operation(summary = "Update Advertisements rating")
+    @ApiResponseSuccessful
+    @ApiResponseUnauthorized
+    @ApiResponseForbidden
+    @PutMapping("/rating")
+    public void updateAllRatings() {
+        advertisementService.updateAllRatings();
+    }
 }

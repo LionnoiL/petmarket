@@ -1,0 +1,2 @@
+ALTER TABLE advertisements
+    ADD COLUMN top_rating INTEGER NOT NULL DEFAULT 0;
