@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.petmarket.advertisements.advertisement.entity.Advertisement;
 import org.petmarket.order.entity.Order;
-import org.petmarket.review.listener.ReviewListener;
 import org.petmarket.users.entity.User;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -18,7 +17,7 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@EntityListeners({AuditingEntityListener.class, ReviewListener.class})
+@EntityListeners(AuditingEntityListener.class)
 public class Review {
 
     @Id
