@@ -68,7 +68,7 @@ public interface AdvertisementRepository extends AdvertisementRepositoryBasic {
                     WHERE a.category IN :categories
                     AND a.status = :status
                     AND a.author.status <> 'DELETED'
-                    ORDER BY a.created DESC
+                    ORDER BY a.topRating DESC, a.created DESC
                     """)
     Page<Advertisement> findAllByCategoryInAndStatusOrderByCreatedDesc(
             @Param("categories") List<AdvertisementCategory> categories,
@@ -85,7 +85,7 @@ public interface AdvertisementRepository extends AdvertisementRepositoryBasic {
                     JOIN a.author
                     WHERE a.status = :status
                     AND a.author.status <> 'DELETED'
-                    ORDER BY a.created DESC
+                    ORDER BY a.topRating DESC, a.created DESC
                     """)
     Page<Advertisement> findAllByStatusOrderByCreatedDesc(@Param("status") AdvertisementStatus status,
                                                           Pageable pageable);
@@ -166,4 +166,6 @@ public interface AdvertisementRepository extends AdvertisementRepositoryBasic {
     List<Advertisement> findAllByOrderId(Long orderId);
 
     List<Advertisement> findAllByAuthorId(Long authorId);
+
+    Page<Advertisement> findAllByStatus(AdvertisementStatus status, Pageable pageable);
 }
