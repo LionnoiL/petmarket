@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.*;
+import org.petmarket.advertisements.advertisement.listener.AdvertisementListener;
 import org.petmarket.advertisements.attributes.entity.Attribute;
 import org.petmarket.advertisements.category.entity.AdvertisementCategory;
 import org.petmarket.advertisements.images.entity.AdvertisementImage;
@@ -32,7 +33,7 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@EntityListeners(AuditingEntityListener.class)
+@EntityListeners({AuditingEntityListener.class, AdvertisementListener.class})
 @Indexed
 public class Advertisement implements TranslateHolder {
 
@@ -91,6 +92,9 @@ public class Advertisement implements TranslateHolder {
     @Column(name = "rating")
     @GenericField(sortable = Sortable.YES)
     private int rating;
+
+    @Column(name = "top_rating")
+    private int topRating;
 
     @ManyToOne
     @JoinColumn(name = "breed_id")
